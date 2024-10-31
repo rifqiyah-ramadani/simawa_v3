@@ -22,7 +22,7 @@ class DetailUser extends Model
     ];
 
     /**
-     * Get the user that owns the detail.
+     * relasi one to one dengan user.
      */
     public function user()
     {

@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('detail_users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('program_reguler');
-            $table->string('semester');
-            $table->string('IPK');
-            $table->string('Umur');
-            $table->string('status_beasiswa');
-            $table->string('jurusan');
+            $table->string('program_reguler')->nullable();
+            $table->string('semester')->nullable();
+            $table->decimal('IPK', 3, 2)->nullable(); 
+            $table->integer('Umur')->nullable();      
+            $table->string('status_beasiswa')->nullable();
+            $table->string('jurusan')->nullable();
             $table->timestamps();
-        });
+        });        
     }
 
     /**

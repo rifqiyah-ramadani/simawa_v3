@@ -15,4 +15,11 @@ class DaftarBeasiswa extends Model
         'kode_beasiswa',
         'nama_beasiswa',
     ];
+
+    // Relasi ke model BuatPendaftaranBeasiswa
+    // satu beasiswa dapat memiliki banyak entri pendaftaran.
+    public function buatPendaftaran() 
+    {
+        return $this->hasMany(BuatPendaftaranBeasiswa::class);
+    }
 }

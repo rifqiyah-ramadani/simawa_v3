@@ -12,15 +12,22 @@ class ValidasiPendaftaranBeasiswa extends Model
     protected $table = 'validasi_pendaftaran_beasiswas';
 
     protected $fillable = [
-        'pendaftaran_id',
+        'buat_pendaftaran_id',
+        // 'pendaftaran_id',
         'role_id',
         'urutan',
+        // 'status',
     ];
 
-    public function pendaftaran()
+    public function buatPendaftaran()
     {
-        return $this->belongsTo(BuatPendaftaranBeasiswa::class, 'pendaftaran_id');
+        return $this->belongsTo(BuatPendaftaranBeasiswa::class, 'buat_pendaftaran_id');
     }
+
+    // public function pendaftaran()
+    // {
+    //     return $this->belongsTo(PendaftaranBeasiswa::class, 'pendaftaran_id');
+    // }
 
     public function role()
     {

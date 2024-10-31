@@ -87,7 +87,8 @@ class UserRoleController extends Controller
                 'usertype' => $request->usertype,
                 'password' => bcrypt($request->password), // Hash password sebelum disimpan
             ]);
-              // Assign role ke user yang baru dibuat
+            
+            // Assign role ke user yang baru dibuat
             $users->syncRoles($request->roles);
 
             return response()->json(['success' => "Berhasil menyimpan data"]);

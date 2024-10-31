@@ -17,11 +17,21 @@ class BerkasPendaftaran extends Model
         'template_path',
     ];
 
-    // Relasi belongs to many dengan buat pendaftaran
-    public function pendaftaran()
+    // Relasi many-to-many dengan BuatPendaftaranBeasiswa
+    public function buatPendaftaranBeasiswas()
     {
-        return $this->belongsToMany(BuatPendaftaranBeasiswa::class, 'berkas_pendaftaran_beasiswa', 'pendaftaran_id', 'berkas_id')
-                    ->withTimestamps();
+        return $this->belongsToMany(
+            BuatPendaftaranBeasiswa::class, 
+            'berkas_pendaftaran_beasiswa', 
+            'berkas_id', 
+            'pendaftaran_id'
+        )->withTimestamps();
+    }
+
+    // Relasi ke FileUpload (lebih spesifik)
+    public function fileUploads()
+    {
+        return $this->hasMany(FileUpload::class, 'berkas_pendaftaran_id');
     }
 
     /**

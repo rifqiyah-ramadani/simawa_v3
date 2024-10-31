@@ -114,7 +114,6 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           <button type="button" class="btn btn-primary tombol-simpan">Simpan Data</button>
-          <button type="button" class="btn btn-warning tombol-simpan-lainnya">Simpan & Tambah Lainnya</button>
         </div>
       </div>
     </div>
@@ -157,15 +156,16 @@
                 e.preventDefault();
                 $('#exampleModal').modal('show');
                 $('#exampleModalLabel').text('Tambah Daftar Beasiswa');
-                
+
+                // Reset form field
+                $('#kode_beasiswa').val('');
+                $('#nama_beasiswa').val('');
+                $('.is-invalid').removeClass('is-invalid'); // Clear validation errors
+                $('.text-danger').remove();
+                    
                 // Event listener untuk tombol Simpan
                 $('.tombol-simpan').off('click').on('click', function () {
                     simpanDanTutup(); // Simpan data dan tutup modal
-                });
-
-                // Event listener untuk tombol Simpan & Tambah Lainnya
-                $('.tombol-simpan-lainnya').off('click').on('click', function () {
-                    simpanDanTambahLainnya(); // Simpan data dan tetap di modal
                 });
             });
 
@@ -175,8 +175,10 @@
                 e.preventDefault();
                 var id = $(this).data('id');
 
-                // Sembunyikan tombol "Simpan & Tambah Lainnya"
-                $('.tombol-simpan-lainnya').hide();
+                $('#kode_beasiswa').val('');
+                $('#nama_beasiswa').val('');
+                $('.is-invalid').removeClass('is-invalid'); // Clear validation errors
+                $('.text-danger').remove();
 
                 $.ajax({
                     url: 'daftar_beasiswa/' + id + '/edit',
@@ -237,10 +239,6 @@
             // Fungsi simpan dan update data
             function simpanDanTutup(id = '') {
                 simpan(id, true); // Panggil simpan dengan closeModal = true
-            }
-
-            function simpanDanTambahLainnya(id = '') {
-                simpan(id, false); // Panggil simpan dengan closeModal = false
             }
 
             function simpan(id = '', closeModal = true) {

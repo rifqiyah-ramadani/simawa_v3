@@ -15,10 +15,10 @@ class BerkasPendaftaranController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:read kelola_beasiswa/berkas_pendaftaran')->only('index');
-        $this->middleware('can:create kelola_beasiswa/berkas_pendaftaran')->only(['create', 'store']);
-        $this->middleware('can:update kelola_beasiswa/berkas_pendaftaran')->only(['edit', 'update']);
-        $this->middleware('can:delete kelola_beasiswa/berkas_pendaftaran')->only('destroy');
+        $this->middleware('can:read master_beasiswa/berkas_pendaftaran')->only('index');
+        $this->middleware('can:create master_beasiswa/berkas_pendaftaran')->only(['create', 'store']);
+        $this->middleware('can:update master_beasiswa/berkas_pendaftaran')->only(['edit', 'update']);
+        $this->middleware('can:delete master_beasiswa/berkas_pendaftaran')->only('destroy');
     }
     /**
      * Display a listing of the resource.
@@ -124,12 +124,12 @@ class BerkasPendaftaranController extends Controller
      */
     public function update(Request $request, $id)
     {
-        \Log::info($request->all()); // Debugging
+        // Dapatkan data BerkasPendaftaran sebelum validasi
         $berkasPendaftaran = BerkasPendaftaran::findOrFail($id);
 
         // Validasi input
         $validate = Validator::make($request->all(), [
-            'nama_file' => 'required|unique:berkas_pendaftarans,nama_file,',
+            'nama_file' => 'required|unique:berkas_pendaftarans,nama_file,' . $id,
             'keterangan' => 'nullable',
             'template_path' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ], [
@@ -150,7 +150,7 @@ class BerkasPendaftaranController extends Controller
             $berkasPendaftaran->template_path = $filePath;
         }
 
-        // Update data
+        // Update data BerkasPendaftaran
         $berkasPendaftaran->update([
             'nama_file' => $request->nama_file,
             'keterangan' => $request->keterangan,
@@ -158,6 +158,7 @@ class BerkasPendaftaranController extends Controller
 
         return response()->json(['success' => "Berhasil memperbarui data"]);
     }
+
 
 
     /**

@@ -13,12 +13,19 @@ class FileUpload extends Model
 
     protected $fillable = [
         'pendaftaran_beasiswas_id',
+        'berkas_pendaftaran_id',
         'file_path',
     ];
 
-    // Relasi ke model Pendaftaran
+    // Relasi ke PendaftaranBeasiswa
     public function pendaftaranBeasiswa()
     {
-        return $this->belongsTo(PendaftaranBeasiswa::class);
+        return $this->belongsTo(PendaftaranBeasiswa::class, 'pendaftaran_beasiswas_id');
+    }
+
+    // Relasi ke BerkasPendaftaran
+    public function berkasPendaftaran() 
+    {
+        return $this->belongsTo(BerkasPendaftaran::class, 'berkas_pendaftaran_id');
     }
 }

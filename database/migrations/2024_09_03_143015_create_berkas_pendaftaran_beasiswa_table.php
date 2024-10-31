@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreign('pendaftaran_id', 'fk_pendaftaran_beasiswa')
                   ->references('id')
                   ->on('buat_pendaftaran_beasiswas')
-                  ->onDelete('cascade');
+                  ->onDelete('cascade'); 
 
             $table->foreign('berkas_id', 'fk_berkas')
                   ->references('id')

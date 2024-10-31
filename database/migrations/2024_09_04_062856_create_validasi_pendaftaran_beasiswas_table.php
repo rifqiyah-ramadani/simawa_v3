@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('validasi_pendaftaran_beasiswas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pendaftaran_id')->constrained('buat_pendaftaran_beasiswas')->onDelete('cascade');
+            $table->foreignId('buat_pendaftaran_id')->constrained('buat_pendaftaran_beasiswas')->onDelete('cascade');
             $table->foreignId('role_id')->constrained('roles')->onDelete('cascade'); // Role yang akan melakukan validasi
             $table->integer('urutan')->default(1); // Urutan validasi, 1 untuk yang pertama
             $table->timestamps();

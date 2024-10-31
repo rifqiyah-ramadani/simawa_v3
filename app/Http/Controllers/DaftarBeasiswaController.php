@@ -15,10 +15,10 @@ class DaftarBeasiswaController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:read kelola_beasiswa/daftar_beasiswa')->only('index');
-        $this->middleware('can:create kelola_beasiswa/daftar_beasiswa')->only(['create', 'store']);
-        $this->middleware('can:update kelola_beasiswa/daftar_beasiswa')->only(['edit', 'update']);
-        $this->middleware('can:delete kelola_beasiswa/daftar_beasiswa')->only('destroy');
+        $this->middleware('can:read master_beasiswa/daftar_beasiswa')->only('index');
+        $this->middleware('can:create master_beasiswa/daftar_beasiswa')->only(['create', 'store']);
+        $this->middleware('can:update master_beasiswa/daftar_beasiswa')->only(['edit', 'update']);
+        $this->middleware('can:delete master_beasiswa/daftar_beasiswa')->only('destroy');
     }
     /**
      * Display a listing of the resource.
@@ -35,7 +35,6 @@ class DaftarBeasiswaController extends Controller
                 })
                 ->make(true);
         }
-    
         return view('kelola_beasiswa.daftar_beasiswa');
     }
 
@@ -111,7 +110,6 @@ class DaftarBeasiswaController extends Controller
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         } else {
-            $daftarBeasiswa = DaftarBeasiswa::find($id);
             $daftarBeasiswa->update([
                 'kode_beasiswa' => $request->kode_beasiswa,
                 'nama_beasiswa' => $request->nama_beasiswa,

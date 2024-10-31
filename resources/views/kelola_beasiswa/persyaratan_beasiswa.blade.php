@@ -68,7 +68,10 @@
                                     <tr>
                                         <th style="width: 20px">No</th>
                                         <th>Nama Persyaratan</th>
-                                        <th>Keterangan Tambahan</th>
+                                        <th style="width: 100px">Keterangan Tambahan</th>
+                                        <th>Kritera</th>
+                                        <th>Operator</th>
+                                        <th>Value</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead> 
@@ -89,32 +92,54 @@
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Form Persyaratan Beasiswa</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-                {{-- start form --}}
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Form Persyaratan Beasiswa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{-- Start form --}}
                 <div class="row">
                     <div class="col mb-3">
                         <label for="nama_persyaratan" class="form-label fw-bold">Nama Persyaratan:
                             <span style="color: red;">*</span>
                         </label>
-                        <input type="nama_persyaratan" class="form-control" id="nama_persyaratan" placeholder="Enter Nama Persyaratan" name="nama_persyaratan" required>
+                        <input type="text" class="form-control" id="nama_persyaratan" placeholder="Enter Nama Persyaratan" name="nama_persyaratan" required>
                     </div>
                     <div class="col mb-3">
-                      <label for="keterangan" class="form-label fw-bold">Keterangan Tambahan:</label>
-                      <input type="keterangan" class="form-control" id="keterangan" placeholder="Enter Keterangan Tambahan" name="keterangan" required>
-                    </div> 
-                </div> {{-- end form --}}   
+                        <label for="keterangan" class="form-label fw-bold">Keterangan Tambahan:</label>
+                        <input type="text" class="form-control" id="keterangan" placeholder="Enter Keterangan Tambahan" name="keterangan">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="kriteria" class="form-label fw-bold">Kriteria:</label>
+                        <input type="text" class="form-control" id="kriteria" placeholder="Masukkan Kriteria (mis. program_reguler, IPK, Umur)" name="kriteria" required>
+                    </div>
+                    <div class="col mb-3">
+                        <label for="operator" class="form-label fw-bold">Operator:</label>
+                        <select class="form-select" id="operator" name="operator" required>
+                            <option value="">Pilih Operator</option>
+                            <option value=">=">>= (Lebih dari atau sama dengan)</option>
+                            <option value=">">> (Lebih dari)</option>
+                            <option value="<">< (Kurang dari)</option>
+                            <option value="<="><= (Kurang dari atau sama dengan)</option>
+                            <option value="=">= (Sama dengan)</option>
+                            <option value="!=">!= (Tidak sama dengan)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col mb-3">
+                    <label for="value" class="form-label fw-bold">Value:</label>
+                    <input type="text" class="form-control" id="value" placeholder="Masukkan Nilai (mis. '3.00', 'S1', '23')" name="value" required>
+                </div>
+                {{-- End form --}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary tombol-simpan">Simpan Data</button>
+            </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary tombol-simpan">Simpan Data</button>
-          <button type="button" class="btn btn-warning tombol-simpan-lainnya">Simpan & Tambah Lainnya</button>
-        </div>
-      </div>
     </div>
 </div>
 <!--end::App Main-->
@@ -139,6 +164,9 @@
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                     { data: 'nama_persyaratan', name: 'nama_persyaratan' },
                     { data: 'keterangan', name: 'keterangan' },
+                    { data: 'kriteria', name: 'kriteria' },
+                    { data: 'operator', name: 'operator' },
+                    { data: 'value', name: 'value' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false}
                 ]
             });
@@ -154,27 +182,36 @@
             $('body').on('click', '.tombol-tambah', function (e) {
                 e.preventDefault();
                 $('#exampleModal').modal('show');
-                $('#exampleModalLabel').text('Buat Persyaratan Beasiswa');
+                $('#exampleModalLabel').text('Tambah Persyaratan Beasiswa');
+
+                // Reset form field
+                $('#nama_persyaratan').val('');
+                $('#keterangan').val('');
+                $('#kriteria').val('');
+                $('#operator').val('');
+                $('#value').val('');
+                $('.is-invalid').removeClass('is-invalid'); // Clear validation errors
+                $('.text-danger').remove();
                 
                 // Event listener untuk tombol Simpan
                 $('.tombol-simpan').off('click').on('click', function () {
                     simpanDanTutup(); // Simpan data dan tutup modal
                 });
-
-                // Event listener untuk tombol Simpan & Tambah Lainnya
-                $('.tombol-simpan-lainnya').off('click').on('click', function () {
-                    simpanDanTambahLainnya(); // Simpan data dan tetap di modal
-                });
             });
-
 
             // Proses edit data
             $('body').on('click', '.tombol-edit', function (e) {
                 e.preventDefault();
                 var id = $(this).data('id');
 
-                // Sembunyikan tombol "Simpan & Tambah Lainnya"
-                $('.tombol-simpan-lainnya').hide();
+                // Reset form field
+                $('#nama_persyaratan').val('');
+                $('#keterangan').val('');
+                $('#kriteria').val('');
+                $('#operator').val('');
+                $('#value').val('');
+                $('.is-invalid').removeClass('is-invalid'); // Clear validation errors
+                $('.text-danger').remove();
 
                 $.ajax({
                     url: 'persyaratan_beasiswa/' + id + '/edit',
@@ -184,6 +221,9 @@
                         $('#exampleModalLabel').text('Edit Persyaratan Beasiswa');
                         $('#nama_persyaratan').val(response.result.nama_persyaratan);
                         $('#keterangan').val(response.result.keterangan);
+                        $('#kriteria').val(response.result.kriteria);
+                        $('#operator').val(response.result.operator);
+                        $('#value').val(response.result.value);
                         $('.tombol-simpan').off('click').on('click', function () {
                             simpanDanTutup(id); // Simpan data dan tutup modal
                         });
@@ -237,10 +277,6 @@
                 simpan(id, true); // Panggil simpan dengan closeModal = true
             }
 
-            function simpanDanTambahLainnya(id = '') {
-                simpan(id, false); // Panggil simpan dengan closeModal = false
-            }
-
             function simpan(id = '', closeModal = true) {
                 var var_url = id ? 'persyaratan_beasiswa/' + id : 'persyaratan_beasiswa';
                 var var_type = id ? 'PUT' : 'POST';
@@ -254,7 +290,10 @@
                     type: var_type,
                     data: {
                         nama_persyaratan: $('#nama_persyaratan').val(),
-                        keterangan: $('#keterangan').val()
+                        keterangan: $('#keterangan').val(),
+                        kriteria: $('#kriteria').val(),
+                        operator: $('#operator').val(),
+                        value: $('#value').val()
                     },
                     success: function(response) {
                         if (response.errors) {
@@ -279,6 +318,9 @@
                                 // Bersihkan form untuk input baru
                                 $('#nama_persyaratan').val('').removeClass('is-invalid');
                                 $('#keterangan').val('').removeClass('is-invalid');
+                                $('#kriteria').val('').removeClass('is-invalid');
+                                $('#operator').val('').removeClass('is-invalid');
+                                $('#value').val('').removeClass('is-invalid');
                                 $('.text-danger').remove();
                             }
                         }

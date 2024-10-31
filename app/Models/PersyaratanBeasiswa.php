@@ -14,6 +14,9 @@ class PersyaratanBeasiswa extends Model
     protected $fillable = [
         'nama_persyaratan',
         'keterangan',
+        'kriteria',
+        'operator',
+        'value',
     ];
 
     // Kalo data nyo dak mau masuk mungkin salah nyo disni

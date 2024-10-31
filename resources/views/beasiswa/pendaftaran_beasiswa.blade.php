@@ -15,7 +15,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 20px; 
             border: 1px solid #e9ecef;
             background-color: #ffffff; 
         }
@@ -34,16 +34,15 @@
         }
 
         .badge-status {
-            background-color: #28a745;
             color: white;
             padding: 5px 10px;
             border-radius: 15px;
             font-size: 0.875rem;
             margin-bottom: 10px;
             display: inline-block;
-            width: auto; /* Pastikan width mengikuti teks */
-            flex-shrink: 0; /* Cegah badge meluas dalam konteks flexbox */
             text-transform: capitalize;
+            width: auto;
+            flex-shrink: 0;
         }
 
         .tombol-daftar {
@@ -105,35 +104,22 @@
 
     <div class="app-content"> 
         <div class="container-fluid"> 
-            <div class="row">
-                @foreach($buatPendaftaran as $item)
-                <div class="col-md-12">
-                    <div class="card-scholarship">
-                        <!-- Bagian Kiri: Gambar Logo -->
-                        <img src="{{asset('images/logo.png')}}" alt="Logo Beasiswa">
-    
-                        <!-- Bagian Tengah: Detail Beasiswa -->
-                        <div class="card-body">
-                            <!-- Status di atas judul -->
-                            <span class="badge-status">{{ $item->status }}</span>
-                            <h5 class="card-title">Beasiswa {{ $item->beasiswa->nama_beasiswa }}</h5>
-                            <p class="card-subtitle">{{ $item->tahun }}</p>
-    
-                            <div class="info-icons">
-                                <span><i class="bi bi-calendar2-week"></i> {{ \Carbon\Carbon::parse($item->tanggal_mulai)->format('d M Y') }} - {{ \Carbon\Carbon::parse($item->tanggal_berakhir)->format('d M Y') }}</span>
-                            </div>
-                        </div>
-    
-                        <!-- Bagian Kanan: Tombol -->
-                        <div class="card-footer">
-                            <button class="btn btn-primary tombol-daftar" data-id="{{ $item->id }}">Lihat Detail</button>
-                        </div>
-                    </div>
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <select id="filter-status" class="form-select">
+                        <option value="semua">Semua</option>
+                        <option value="dibuka">Dibuka</option>
+                        <option value="ditutup">Ditutup</option>
+                    </select>
                 </div>
-                @endforeach
-            </div> 
+            </div>
+            
+            <div id="table-container">
+                @include('beasiswa.pendaftaran_beasiswa_partial', ['buatPendaftaran' => $buatPendaftaran])
+            </div> <!-- End #table-container -->
         </div> 
-    </div> 
+    </div>
+    
 </main> 
 @endsection
 
@@ -145,25 +131,58 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        $(document).ready(function () {
-            $(document).on('click', '.tombol-daftar', function () {
-                var pendaftaranId = $(this).data('id');
+    $(document).ready(function () {
+        // Fungsi untuk menangani perubahan filter status
+        $('#filter-status').change(function() {
+            var status = $(this).val(); // Ambil nilai status dari dropdown
+            var url = '/beasiswa/pendaftaran_beasiswa/filter';
 
-                $.ajax({
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: { status: status },
+                success: function(response) {
+                    $('#table-container').html(response); // Ganti isi kontainer
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText); // Cek error di console
+                    $('#table-container').html('<p>Tidak ada data ditemukan.</p>'); // Tampilkan pesan error di halaman
+                }
+            });
+        });
+
+        // Fungsi untuk tombol Lihat Detail
+        $(document).on('click', '.tombol-daftar', function () {
+            var pendaftaranId = $(this).data('id');
+            var status = $(this).data('status'); // Ambil status beasiswa
+
+            if (status === 'ditutup') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Beasiswa Sedang Ditutup',
+                    text: 'Silakan tunggu info selanjutnya.',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                $.ajax({ 
                     url: '/pendaftaran-beasiswa/persyaratan/' + pendaftaranId,
                     type: 'GET',
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             window.location.href = '/pendaftaran-beasiswa/daftar/' + pendaftaranId;
                         } else {
-                            iziToast.error({ title: 'Error', message: response.message });
+                            window.location.href = '/pendaftaran-beasiswa/' + pendaftaranId;
                         }
                     },
-                    error: function(xhr) {
-                        iziToast.error({ title: 'Error', message: 'Terjadi kesalahan, coba lagi.' });
+                    error: function (xhr) {
+                        iziToast.error({ 
+                            title: 'Error', 
+                            message: 'Terjadi kesalahan, coba lagi.' 
+                        });
                     }
                 });
-            });
+            }
         });
-    </script>
+    });
+</script>
 @endpush

@@ -25,11 +25,6 @@ class NavigationSeeder extends Seeder
             'icon' => '',
         ]);
         $konfigurasi->subMenus()->create([
-            'name' => 'Permission',
-            'url' => 'konfigurasi/permission',
-            'icon' => '',
-        ]);
-        $konfigurasi->subMenus()->create([
             'name' => 'Users',
             'url' => 'konfigurasi/users',
             'icon' => '',
@@ -45,36 +40,35 @@ class NavigationSeeder extends Seeder
             'icon' => '',
         ]);
 
-        
-        // kelola_kegiatan
+        // tambah menu
         $rekam = Navigation::create([
-            'name' => 'Rekam Kegiatan',
-            'url' => 'rekam_kegiatan',
-            'icon' => 'bi bi-box-seam-fill',
+            'name' => 'Master Beasiswa',
+            'url' => 'master_beasiswa',
+            'icon' => 'bi bi-clipboard-fill',
             'main_menu' => null,
         ]);
         $rekam->subMenus()->create([
-            'name' => 'Kategori Kegiatan',
-            'url' => 'rekam_kegiatan/kategori_kegiatan',
+            'name' => 'Daftar Beasiswa',
+            'url' => 'master_beasiswa/daftar_beasiswa',
             'icon' => '',
         ]);
         $rekam->subMenus()->create([
-            'name' => 'Jenis Kegiatan',
-            'url' => 'rekam_kegiatan/jenis_kegiatan',
+            'name' => 'Persyaratan Beasiswa',
+            'url' => 'master_beasiswa/persyaratan_beasiswa',
             'icon' => '',
         ]);
         $rekam->subMenus()->create([
-            'name' => 'Jenis Tahapan',
-            'url' => 'rekam_kegiatan/jenis_tahapan',
+            'name' => 'Berkas Pendaftaran',
+            'url' => 'master_beasiswa/berkas_pendaftaran',
             'icon' => '',
         ]);
         $rekam->subMenus()->create([
-            'name' => 'Buat Kegiatan',
-            'url' => 'rekam_kegiatan/buat_kegiatan',
+            'name' => 'Tahapan Beasiswa',
+            'url' => 'master_beasiswa/tahapan_beasiswa',
             'icon' => '',
         ]);
 
-        // tambah menu
+        
         $rekam = Navigation::create([
             'name' => 'Kelola Beasiswa',
             'url' => 'kelola_beasiswa',
@@ -82,33 +76,18 @@ class NavigationSeeder extends Seeder
             'main_menu' => null,
         ]);
         $rekam->subMenus()->create([
-            'name' => 'Data Beasiswa',
-            'url' => 'kelola_beasiswa/data_beasiswa',
-            'icon' => '',
-        ]);
-        $rekam->subMenus()->create([
-            'name' => 'Daftar Beasiswa',
-            'url' => 'kelola_beasiswa/daftar_beasiswa',
-            'icon' => '',
-        ]);
-        $rekam->subMenus()->create([
-            'name' => 'Persyaratan Beasiswa',
-            'url' => 'kelola_beasiswa/persyaratan_beasiswa',
-            'icon' => '',
-        ]);
-        $rekam->subMenus()->create([
-            'name' => 'Berkas Pendaftaran',
-            'url' => 'kelola_beasiswa/berkas_pendaftaran',
-            'icon' => '',
-        ]);
-        $rekam->subMenus()->create([
-            'name' => 'Buat Pendaftaran Beasiswa',
-            'url' => 'kelola_beasiswa/buat_pendaftaran_beasiswa',
+            'name' => 'Manajemen Pendaftaran',
+            'url' => 'kelola_beasiswa/manajemen_pendaftaran',
             'icon' => '',
         ]);
         $rekam->subMenus()->create([
             'name' => 'Usulan Beasiswa',
             'url' => 'kelola_beasiswa/usulan_beasiswa',
+            'icon' => '',
+        ]);
+        $rekam->subMenus()->create([
+            'name' => 'Data Beasiswa',
+            'url' => 'kelola_beasiswa/data_beasiswa',
             'icon' => '',
         ]);
         $rekam->subMenus()->create([

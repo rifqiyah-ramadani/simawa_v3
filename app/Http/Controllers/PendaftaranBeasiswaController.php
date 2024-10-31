@@ -7,9 +7,13 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Models\BuatPendaftaranBeasiswa;
+use App\Models\PendaftaranBeasiswa;
 use App\Models\DetailUser;
 use App\Models\BerkasPendaftaran;
+use App\Models\ValidasiPendaftaranBeasiswa;
+use App\Models\ValidasiPendaftaranMahasiswa;
 use App\Models\FileUpload;
+use App\Models\User;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -44,6 +48,32 @@ class PendaftaranBeasiswaController extends Controller
         return view('beasiswa.pendaftaran_beasiswa', compact('buatPendaftaran'));
     }
 
+    public function filter(Request $request)
+    {
+        $status = $request->get('status');
+        $currentDate = now();
+
+        // Ambil pendaftaran beasiswa dengan query yang tepat
+        $buatPendaftaran = BuatPendaftaranBeasiswa::with('beasiswa');
+
+        if ($status == 'dibuka') {
+            $buatPendaftaran->where('tanggal_mulai', '<=', $currentDate)
+                            ->where('tanggal_berakhir', '>=', $currentDate);
+        } elseif ($status == 'ditutup') {
+            $buatPendaftaran->where('tanggal_berakhir', '<', $currentDate);
+        }
+
+        $buatPendaftaran = $buatPendaftaran->get();
+
+        // Untuk debugging, cek apa yang dikembalikan oleh query
+        if ($buatPendaftaran->isEmpty()) {
+            return response()->json(['error' => 'Tidak ada data ditemukan'], 404);
+        }
+
+        // Kembalikan partial view
+        return view('beasiswa.pendaftaran_beasiswa_partial', compact('buatPendaftaran'))->render();
+    }
+
     // Method untuk mendapatkan persyaratan beasiswa
     public function getPersyaratan($pendaftaranId)
     {
@@ -70,155 +100,261 @@ class PendaftaranBeasiswaController extends Controller
         
         // Ambil detail user dari tabel detail_user
         $detailUser = DetailUser::where('user_id', $user->id)->first();
-
+    
+        // Cek apakah detail user sudah ada
+        if (!$detailUser) {
+            return redirect()->route('profile.edit')->withErrors('Harap lengkapi profil Anda sebelum melanjutkan ke pendaftaran beasiswa.');
+        }
+    
         // Ambil persyaratan dan berkas yang terkait dengan pendaftaran
-        $buatPendaftaran = BuatPendaftaranBeasiswa::with('persyaratan', 'beasiswa', 'berkas')->findOrFail($pendaftaranId);
-
-        // Logika pengecekan persyaratan
-        $persyaratan = [];
-        foreach ($buatPendaftaran->persyaratan as $syarat) {
-            if ($syarat->nama_persyaratan === 'Memiliki IPK minimal 3.00 (Skala 4)' && $detailUser->IPK < 3.00) {
-                $persyaratan[] = [
-                    'nama' => 'Anda tidak memenuhi persyaratan karena IPK Anda saat ini kurang dari 3.00',
-                    'status' => false, // Tidak terpenuhi
-                ];
-            } else if ($syarat->nama_persyaratan === 'Mahasiswa aktif program S1' && $detailUser->program_reguler !== 'Program S1') {
-                $persyaratan[] = [
-                    'nama' => 'Anda tidak memenuhi syarat karena Anda bukan mahasiswa aktif program S1',
-                    'status' => false, // Tidak terpenuhi
-                ];
-            } else if ($syarat->nama_persyaratan === 'Telah menyelasaikan minimal 40 SKS atau 3 semester' && $detailUser->semester < "Semester 3") {
-                $persyaratan[] = [
-                    'nama' => 'Saat ini Anda belum menyelesaikan minimal 40 SKS atau 3 semester',
-                    'status' => false, // Tidak terpenuhi
-                ];
-            } else if ($syarat->nama_persyaratan === 'Maksimal umur 23 tahun' && $detailUser->Umur > 23) {
-                $persyaratan[] = [
-                    'nama' => 'Anda tidak memenuhi syarat karena usia Anda melebihi batas maksimal 23 tahun',
-                    'status' => false, // Tidak terpenuhi
-                ];
-            } else if ($syarat->nama_persyaratan === 'Tidak sedang menerima beasiswa lain' && $detailUser->status_beasiswa === 'Sedang menerima beasiswa lain') {
-                $persyaratan[] = [
-                    'nama' => 'Anda tidak memenuhi syarat karena saat ini Anda sedang menerima beasiswa lain',
-                    'status' => false, // Tidak terpenuhi
-                ];    
-            } else {
-                $persyaratan[] = [
-                    'nama' => $syarat->nama_persyaratan,
-                    'status' => true, // Terpenuhi
-                ];
+        $buatPendaftaran = BuatPendaftaranBeasiswa::with('persyaratan', 'beasiswa', 'berkasPendaftarans')->findOrFail($pendaftaranId);
+        $tahunPendaftaran = \Carbon\Carbon::parse($buatPendaftaran->tahun);
+    
+        // Cek apakah mahasiswa sudah mendaftar pada beasiswa internal lain di tahun yang sama
+        $existingPendaftaran = PendaftaranBeasiswa::where('user_id', $user->id)
+            ->whereHas('buatPendaftaranBeasiswa', function ($query) use ($tahunPendaftaran) {
+                $query->where('jenis_beasiswa', 'internal')
+                      ->whereYear('tahun', $tahunPendaftaran);
+            })
+            ->exists();
+    
+        // Jika mahasiswa sudah terdaftar di beasiswa internal lain pada tahun yang sama
+        if ($existingPendaftaran) {
+            $alertMessage = "Anda sudah terdaftar pada beasiswa internal lain pada tahun $tahunPendaftaran. Anda tidak dapat mendaftar pada beasiswa ini.";
+            $showForm = false;
+        } else {
+            // Cek jenis beasiswa (internal atau eksternal)
+            if ($buatPendaftaran->jenis_beasiswa === 'internal') {
+                // Cek apakah user sudah mengisi form pendaftaran sebelumnya
+                $pendaftaranUser = $buatPendaftaran->pendaftaranBeasiswa()->where('user_id', $user->id)->first();
+    
+                // Ambil tahapan pendaftaran beasiswa dari tahapan yang sudah di-set
+                $tahapanAdministrasi = $buatPendaftaran->tahapan()->where('nama_tahapan', 'Pendaftaran Beasiswa')->first();
+    
+                // Cek jika tahapan seleksi administrasi tidak ada
+                if (!$tahapanAdministrasi) {
+                    return view('beasiswa.daftar')->withErrors('Tahapan pendaftaran beasiswa tidak ditemukan');
+                }
+    
+                // Cek tanggal tahapan pendaftaran beasiswa
+                $currentDate = now();
+                $tahapanDimulai = $tahapanAdministrasi->pivot->tanggal_mulai;
+                $tahapanBerakhir = $tahapanAdministrasi->pivot->tanggal_akhir;
+    
+                // Kondisi untuk menentukan tampilan
+                $showForm = false;
+                $alertMessage = null;
+    
+                if ($pendaftaranUser) {
+                    // User sudah mengisi form pendaftaran sebelumnya
+                    $alertMessage = "Anda sudah mengisi form pendaftaran, harap menunggu informasi lebih lanjut.";
+                } elseif ($currentDate->lt($tahapanDimulai)) {
+                    // Belum memasuki tahapan pendaftaran beasiswa
+                    $alertMessage = "Pendaftaran beasiswa belum dibuka. Anda dapat mengisi form pendaftaran setelah tanggal " . \Carbon\Carbon::parse($tahapanDimulai)->format('d M Y') . ".";
+                } elseif ($currentDate->gt($tahapanBerakhir)) {
+                    // Tahapan pendaftaran beasiswa sudah berakhir
+                    $alertMessage = "Tahapan pendaftaran beasiswa sudah berakhir. Anda tidak bisa mengisi form pendaftaran lagi.";
+                } else {
+                    // Tahapan pendaftaran beasiswa sedang berlangsung, tampilkan form
+                    $showForm = true;
+                }
+            } else if ($buatPendaftaran->jenis_beasiswa === 'eksternal') {
+                // Logika untuk beasiswa eksternal
+                return view('beasiswa.beasiswa_eksternal', compact('buatPendaftaran'));
             }
         }
     
+        // Ambil semua persyaratan dari database
+        $persyaratan = $buatPendaftaran->persyaratan;
+    
+        // Proses validasi persyaratan
+        $hasilValidasi = $this->validasiPersyaratan($persyaratan, $detailUser);
+    
         // Cek apakah semua persyaratan terpenuhi
-        $semuaTerpenuhi = collect($persyaratan)->every(fn($p) => $p['status'] === true);
-          // Ambil berkas yang terkait
-        $berkas = $buatPendaftaran->berkas;
-         // Tambahkan template_path dari pendaftaran (jika ada)
+        $semuaTerpenuhi = collect($hasilValidasi)->every(fn($p) => $p['status'] === true);
+    
+        // Ambil berkas yang terkait
+        $berkasPendaftaran = $buatPendaftaran->berkasPendaftarans;
         $templatePath = $buatPendaftaran->template_path ? asset('storage/' . $buatPendaftaran->template_path) : null;
-
+    
         // Kembalikan view dengan data pendaftaran, persyaratan, dan template_path
-        return view('beasiswa.daftar', compact('buatPendaftaran', 'persyaratan', 'semuaTerpenuhi', 'berkas', 'templatePath'));
+        return view('beasiswa.daftar', compact(
+            'buatPendaftaran', 'hasilValidasi', 'semuaTerpenuhi', 
+            'berkasPendaftaran', 'templatePath', 'alertMessage', 'showForm', 'persyaratan'
+        ));
+    }    
+
+    /**
+     * Fungsi untuk memvalidasi persyaratan secara dinamis.
+     */
+    private function validasiPersyaratan($persyaratan, $detailUser)
+    {
+        $result = [];
+
+        foreach ($persyaratan as $syarat) {
+            $kriteria = $syarat->kriteria;
+            $operator = $syarat->operator;
+            $value = $syarat->value;
+
+            // Ambil nilai user sesuai kriteria
+            $userValue = $detailUser->{$kriteria};
+
+            // Bandingkan nilai dengan operator
+            $isValid = $this->compareValues($userValue, $operator, $value);
+
+            $result[] = [
+                'nama' => $syarat->nama_persyaratan,
+                'status' => $isValid,  // true jika valid
+                'message' => $isValid 
+                    ? "Persyaratan terpenuhi" 
+                    : "Persyaratan tidak terpenuhi: $syarat->nama_persyaratan",
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Fungsi untuk membandingkan nilai berdasarkan operator.
+     */
+    private function compareValues($userValue, $operator, $value)
+    {
+        switch ($operator) {
+            case '>=':
+                return $userValue >= $value;
+            case '<=':
+                return $userValue <= $value;
+            case '>':
+                return $userValue > $value;
+            case '<':
+                return $userValue < $value;
+            case '=':
+                return $userValue == $value;
+            case '!=':
+                return $userValue != $value;
+            default:
+                return false;
+        }
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create($pendaftaranId)
+    public function store(Request $request, $buatPendaftaranId)
     {
-        // Ambil pendaftaran terkait
-        $buatPendaftaran = BuatPendaftaranBeasiswa::findOrFail($pendaftaranId);
-
-        // Tampilkan view dengan data pendaftaran
-        return view('beasiswa.daftar', compact('buatPendaftaran'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request, $pendaftaranId)
-    {
-        // Validasi input pengguna
+        // Validasi input mahasiswa
         $validate = Validator::make($request->all(), [
             'nama_lengkap' => 'required|string|max:255',
             'nim' => 'required|string|max:255',
             'fakultas' => 'required|string|max:255',
             'jurusan' => 'required|string|max:255',
+            'IPK' => 'required|numeric|between:0,4.00',
+            'semester' => 'required|string|max:255',
             'alamat_lengkap' => 'required|string',
             'telepon' => 'required|string|max:20',
-            'berkas.*' => 'required|file|mimes:pdf,jpeg,png|max:2048', // Validasi berkas harus file dengan ekstensi tertentu
-        ], [
-            'nama_lengkap.required' => '*Nama lengkap wajib diisi',
-            'nim.required' => '*NIM wajib diisi',
-            'fakultas.required' => '*Fakultas wajib dipilih',
-            'jurusan.required' => '*Jurusan wajib dipilih',
-            'alamat_lengkap.required' => '*Alamat lengkap wajib diisi',
-            'telepon.required' => '*Nomor telepon wajib diisi',
-            'berkas.*.required' => 'Berkas wajib diunggah.',
-            'berkas.*.mimes' => 'Berkas harus berupa file dengan format pdf, jpeg, atau png.',
-            'berkas.*.max' => 'Ukuran berkas maksimal adalah 2MB.',
+            'berkas.*' => 'required|file|mimes:pdf,jpeg,png|max:2048',
         ]);
 
-        // Jika validasi gagal
         if ($validate->fails()) {
             return back()->withErrors($validate)->withInput();
         }
 
-        // Ambil pendaftaran terkait
-        $buatPendaftaran = BuatPendaftaranBeasiswa::with('berkas')->findOrFail($pendaftaranId);
+        Log::info('Validasi berhasil');
 
-        // Simpan data pendaftaran ke database (sesuaikan dengan struktur database Anda)
-        $pendaftaran = $buatPendaftaran->pendaftaranBeasiswa()->create([
-            'nama_lengkap' => $request->nama_lengkap,
-            'nim' => $request->nim,
-            'fakultas' => $request->fakultas,
-            'jurusan' => $request->jurusan,
-            'alamat_lengkap' => $request->alamat_lengkap,
-            'telepon' => $request->telepon,
-        ]);
+         // Ambil data beasiswa dan tahun
+        $buatPendaftaran = BuatPendaftaranBeasiswa::findOrFail($buatPendaftaranId);
+        $tahunPendaftaran = \Carbon\Carbon::parse($buatPendaftaran->tanggal_mulai)->year;
 
-        // Simpan berkas yang diunggah
-        if ($request->hasFile('berkas')) {
-            foreach ($request->file('berkas') as $file) {
-                $path = $file->store('file_uploads', 'public');
+        $user = auth()->user();
+        $existingPendaftaran = PendaftaranBeasiswa::where('user_id', $user->id)
+            ->where('buat_pendaftaran_beasiswa_id', $buatPendaftaranId)
+            ->exists();
 
-                // Simpan path berkas ke tabel `file_uploads`
-                FileUpload::create([
-                    'pendaftaran_beasiswas_id' => $buatPendaftaran->id, // Menggunakan foreign key dari tabel pendaftaran beasiswa
-                    'file_path' => $path,
-                ]);
-            }
+        // Cek jika mahasiswa sudah mendaftar di beasiswa ini
+        if ($existingPendaftaran) {
+            return response()->json([
+                'success' => false,
+                'alertMessage' => "Anda sudah mengisi form pendaftaran, harap menunggu informasi lebih lanjut."
+            ]);
         }
 
-         // Jika berhasil menyimpan data
-         return response()->json(['success' => "Berhasil menyimpan data"]);
+        // Cek jika sudah mendaftar di beasiswa internal lain pada tahun yang sama
+        $existingPendaftaranTahunSama = PendaftaranBeasiswa::where('user_id', $user->id)
+            ->whereHas('buatPendaftaranBeasiswa', function ($query) use ($tahunPendaftaran) {
+                $query->where('jenis_beasiswa', 'internal')
+                    ->whereYear('tanggal_mulai', $tahunPendaftaran);
+            })
+            ->exists();
+
+        if ($existingPendaftaranTahunSama) {
+            return response()->json([
+                'success' => false,
+                'alertMessage' => "Anda sudah terdaftar pada beasiswa internal lain pada tahun $tahunPendaftaran. Anda tidak dapat mendaftar pada beasiswa ini."
+            ]);
+        }
+
+        // Simpan pendaftaran mahasiswa
+        try {
+            $pendaftaran = PendaftaranBeasiswa::create([
+                'nama_lengkap' => $request->nama_lengkap,
+                'nim' => $request->nim,
+                'fakultas' => $request->fakultas,
+                'jurusan' => $request->jurusan,
+                'alamat_lengkap' => $request->alamat_lengkap,
+                'telepon' => $request->telepon,
+                'IPK' => $request->IPK,
+                'semester' => $request->semester,
+                'user_id' => auth()->user()->id,
+                'buat_pendaftaran_beasiswa_id' => $buatPendaftaranId,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Gagal menyimpan pendaftaran', ['message' => $e->getMessage()]);
+            return back()->with('error', 'Gagal menyimpan data.');
+        }
+
+        // Ambil data beasiswa dan berkas yang sedang dibuat
+        $buatPendaftaran = BuatPendaftaranBeasiswa::with('berkasPendaftarans')->findOrFail($buatPendaftaranId);
+        $berkasPendaftaran = $buatPendaftaran->berkasPendaftarans;
+        // Simpan berkas yang diunggah
+        try {
+            foreach ($request->file('berkas') as $berkasId => $file) {
+                // Temukan berkas sesuai koleksi pada database $berkasPendaftarans
+                $berkasPendaftaran = $berkasPendaftaran->firstWhere('id', $berkasId);
+            
+                if ($berkasPendaftaran) {
+                    $path = $file->store('file_uploads', 'public');
+            
+                    FileUpload::create([
+                        'pendaftaran_beasiswas_id' => $pendaftaran->id,
+                        'berkas_pendaftaran_id' => $berkasPendaftaran->id,
+                        'file_path' => $path,
+                    ]);
+                }
+            }
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menyimpan berkas.');
+        }
+
+        /// Ambil template validasi berdasarkan buat_pendaftaran_id
+        $templateValidasi = ValidasiPendaftaranBeasiswa::where('buat_pendaftaran_id', $buatPendaftaranId)->get();
+
+        // Buat validasi untuk mahasiswa berdasarkan template
+        foreach ($templateValidasi as $validasi) {
+            ValidasiPendaftaranMahasiswa::create([
+                'pendaftaran_id' => $pendaftaran->id,
+                'role_id' => $validasi->role_id,
+                'urutan' => $validasi->urutan,
+                'status' => 'menunggu',  // Status awal validasi
+            ]);
+        }
+
+        // Jika berhasil menyimpan data
+         return response()->json([
+            'success' => "Berhasil menyimpan data",
+            'alertMessage' => "Anda sudah mengisi form pendaftaran, harap menunggu informasi lebih lanjut."
+        ]);
     }
-
-    // public function riwayat(Request $request)
-    // {
-    //     if ($request->ajax()) {
-    //         // Ambil data pendaftaran yang sudah diusulkan oleh user
-    //         $riwayatPendaftaran = auth()->user()->pendaftaranBeasiswa()->with('buatPendaftaranBeasiswa.beasiswa')->get();
-
-    //         return DataTables::of($riwayatPendaftaran)
-    //             ->addIndexColumn()
-    //             ->addColumn('nama_beasiswa', function ($riwayat) {
-    //                 return $riwayat->buatPendaftaranBeasiswa->beasiswa->nama_beasiswa;
-    //             })
-    //             ->addColumn('status', function ($riwayat) {
-    //                 return $riwayat->status ?? 'Pending'; // Sesuaikan dengan field status pendaftaran
-    //             })
-    //             ->addColumn('tanggal_pengajuan', function ($riwayat) {
-    //                 return $riwayat->created_at->format('d-m-Y');
-    //             })
-    //             ->addColumn('aksi', function ($riwayat) {
-    //                 return '<a href="'.route('pendaftaran_beasiswa.show', $riwayat->id).'" class="btn btn-info btn-sm">Lihat Detail</a>';
-    //             })
-    //             ->rawColumns(['aksi'])
-    //             ->make(true);
-    //     }
-    // }
-
 
     /**
      * Display the specified resource.

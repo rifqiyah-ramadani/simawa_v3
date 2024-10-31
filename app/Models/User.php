@@ -47,4 +47,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Relasi many-to-many dengan Role via Spatie's permission package
+    // public function roles()
+    // {
+    //     return $this->belongsToMany(Role::class, 'model_has_roles', 'model_id', 'role_id')
+    //                 ->where('model_type', User::class); // Spesifik untuk User
+    // }
+
+    public function detailUser()
+    {
+        return $this->hasOne(DetailUser::class);
+    }
 }

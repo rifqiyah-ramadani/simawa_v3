@@ -6,21 +6,20 @@ use Illuminate\Routing\Controller as Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use App\Models\Permission;
+use App\Models\TahapanBeasiswa;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-class PermissionController extends Controller
+class TahapanBeasiswaController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:read konfigurasi/permission')->only('index');
-        $this->middleware('can:create konfigurasi/permission')->only(['create', 'store']);
-        $this->middleware('can:update konfigurasi/permission')->only(['edit', 'update']);
-        $this->middleware('can:delete konfigurasi/permission')->only('destroy');
+        $this->middleware('can:read master_beasiswa/tahapan_beasiswa')->only('index');
+        $this->middleware('can:create master_beasiswa/tahapan_beasiswa')->only(['create', 'store']);
+        $this->middleware('can:update master_beasiswa/tahapan_beasiswa')->only(['edit', 'update']);
+        $this->middleware('can:delete master_beasiswa/tahapan_beasiswa')->only('destroy');
     }
-    
     /**
      * Display a listing of the resource.
      */
@@ -28,16 +27,16 @@ class PermissionController extends Controller
     {
         if ($request->ajax()) {
             // ambil semua data roles di database
-            $permissions = Permission::all();
-            return DataTables::of($permissions)
+            $tahapanBeasiswa = TahapanBeasiswa::all();
+            return DataTables::of($tahapanBeasiswa)
                 ->addIndexColumn()
-                ->addColumn('aksi', function($permissions){
-                    return view('konfigurasi.tombol')->with('data',$permissions);
+                ->addColumn('aksi', function($tahapanBeasiswa){
+                    return view('konfigurasi.tombol')->with('data',$tahapanBeasiswa);
                 })
                 ->make(true);
         }
     
-        return view('konfigurasi.permission');
+        return view('kelola_beasiswa.tahapan_beasiswa');
     }
 
     /**
@@ -55,22 +54,19 @@ class PermissionController extends Controller
     {
         // Validasi dengan cek unik
         $validate = Validator::make($request->all(), [
-            'name' => 'required|unique:permissions,name',
-            'guard_name' => 'required',
+            'nama_tahapan' => 'required|unique:tahapan_beasiswas,nama_tahapan',
         ], [
-            'name.required' => '*Permission wajib diisi',
-            'name.unique' => '*Permission sudah ada, silakan masukkan yang lain',
-            'guard_name.required' => '*Guard name wajib diisi',
+            'nama_tahapan.required' => '*Nama tahapan wajib diisi',
+            'nama_tahapan.unique' => '*Nama tahapan sudah ada, silakan masukkan yang lain',
         ]);
     
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         } else {
-            $permissions = [
-                'name' => $request->name,
-                'guard_name' => $request->guard_name,
+            $tahapanBeasiswa = [
+                'nama_tahapan' => $request->nama_tahapan,
             ];
-            Permission::create($permissions);
+            TahapanBeasiswa::create($tahapanBeasiswa);
             return response()->json(['success' => "Berhasil menyimpan data"]);
         }
     }
@@ -88,8 +84,8 @@ class PermissionController extends Controller
      */
     public function edit($id)
     {
-        $permissions = Permission::where('id', $id)->first();
-        return response()->json(['result' => $permissions]);
+        $tahapanBeasiswa = TahapanBeasiswa::where('id', $id)->first();
+        return response()->json(['result' => $tahapanBeasiswa]);
     }
 
     /**
@@ -97,23 +93,19 @@ class PermissionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Validasi dengan cek unik, kecuali untuk data yang sedang diupdate
         $validate = Validator::make($request->all(), [
-            'name' => 'required|unique:permissions,name,' . $id,
-            'guard_name' => 'required',
+            'nama_tahapan' => 'required|unique:tahapan_beasiswas,nama_tahapan,' . $id,
         ], [
-            'name.required' => '*Permission wajib diisi',
-            'name.unique' => '*Permission sudah ada, silakan masukkan yang lain',
-            'guard_name.required' => '*Guard name wajib diisi',
+            'nama_tahapan.required' => '*Nama tahapan wajib diisi',
+            'nama_tahapan.unique' => '*Nama tahapan sudah ada, silakan masukkan yang lain',
         ]);
-
+    
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         } else {
-            $permissions = Permission::find($id);
-            $permissions->update([
-                'name' => $request->name,
-                'guard_name' => $request->guard_name,
+            $tahapanBeasiswa = TahapanBeasiswa::find($id);
+            $tahapanBeasiswa->update([
+                'nama_tahapan' => $request->nama_tahapan,
             ]);
             return response()->json(['success' => "Berhasil memperbarui data"]);
         }
@@ -124,6 +116,6 @@ class PermissionController extends Controller
      */
     public function destroy($id)
     {
-        Permission::where('id', $id)->delete();
+        TahapanBeasiswa::where('id', $id)->delete();
     }
 }

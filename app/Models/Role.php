@@ -13,6 +13,6 @@ class Role extends RoleSpatie
     // Relasi one-to-many dengan ValidasiPendaftaranBeasiswa
     public function validasiPendaftaran()
     {
-        return $this->hasMany(ValidasiPendaftaranBeasiswa::class, 'role_id');
+        return $this->hasMany(ValidasiPendaftaranMahasiswa::class, 'role_id');
     }
 }

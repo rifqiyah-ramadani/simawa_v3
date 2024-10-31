@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use App\Models\PersyaratanBeasiswa;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Routing\Controller as Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use App\Models\PersyaratanBeasiswa;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 
 class PersyaratanBeasiswaController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:read kelola_beasiswa/persyaratan_beasiswa')->only('index');
-        $this->middleware('can:create kelola_beasiswa/persyaratan_beasiswa')->only(['create', 'store']);
-        $this->middleware('can:update kelola_beasiswa/persyaratan_beasiswa')->only(['edit', 'update']);
-        $this->middleware('can:delete kelola_beasiswa/persyaratan_beasiswa')->only('destroy');
+        $this->middleware('can:read master_beasiswa/persyaratan_beasiswa')->only('index');
+        $this->middleware('can:create master_beasiswa/persyaratan_beasiswa')->only(['create', 'store']);
+        $this->middleware('can:update master_beasiswa/persyaratan_beasiswa')->only(['edit', 'update']);
+        $this->middleware('can:delete master_beasiswa/persyaratan_beasiswa')->only('destroy');
     }
     /**
      * Display a listing of the resource.
@@ -56,10 +56,16 @@ class PersyaratanBeasiswaController extends Controller
         $validate = Validator::make($request->all(), [
             'nama_persyaratan' => 'required|unique:persyaratan_beasiswas,nama_persyaratan',
             'keterangan' => 'nullable',
+            'kriteria' => 'required',
+            'operator' => 'required',
+            'value' => 'required',
         ], [
             'nama_persyaratan.required' => '*Nama persyaratan wajib diisi',
             'nama_persyaratan.unique' => '*Nama persyaratan sudah ada, silakan masukkan yang lain',
             'keterangan.nullable' => '*Keterangan tidak wajib diisi',
+            'kriteria.nullable' => '*Kriteria tidak wajib diisi',
+            'operator.nullable' => '*Operator tidak wajib dipilih',
+            'value.nullable' => '*Value tidak wajib diisi',
         ]);
     
         if ($validate->fails()) {
@@ -68,6 +74,9 @@ class PersyaratanBeasiswaController extends Controller
             $persyaratanBeasiswa = [
                 'nama_persyaratan' => $request->nama_persyaratan,
                 'keterangan' => $request->keterangan,
+                'kriteria' => $request->kriteria,
+                'operator' => $request->operator,
+                'value' => $request->value,
             ];
             PersyaratanBeasiswa::create($persyaratanBeasiswa);
             return response()->json(['success' => "Berhasil menyimpan data"]);
@@ -100,10 +109,16 @@ class PersyaratanBeasiswaController extends Controller
         $validate = Validator::make($request->all(), [
             'nama_persyaratan' => 'required|unique:persyaratan_beasiswas,nama_persyaratan,' . $id,
             'keterangan' => 'nullable',
+            'kriteria' => 'required',
+            'operator' => 'required',
+            'value' => 'required',
         ], [
             'nama_persyaratan.required' => '*Nama persyaratan wajib diisi',
             'nama_persyaratan.unique' => '*Nama persyaratan sudah ada, silakan masukkan yang lain',
             'keterangan.nullable' => '*Keterangan tidak wajib diisi',
+            'kriteria.nullable' => '*Kriteria tidak wajib diisi',
+            'operator.nullable' => '*Operator tidak wajib dipilih',
+            'value.nullable' => '*Value tidak wajib diisi',
         ]);
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
@@ -112,6 +127,9 @@ class PersyaratanBeasiswaController extends Controller
             $persyaratanBeasiswa->update([
                 'nama_persyaratan' => $request->nama_persyaratan,
                 'keterangan' => $request->keterangan,
+                'kriteria' => $request->kriteria,
+                'operator' => $request->operator,
+                'value' => $request->value,
             ]);
             return response()->json(['success' => "Berhasil memperbarui data"]);
         }
