@@ -4,11 +4,12 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\Navigation;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class UserRolePermissionSeeder extends Seeder
@@ -19,7 +20,7 @@ class UserRolePermissionSeeder extends Seeder
     public function run(): void
     {
         $default_user_value = [
-            'password' => Hash::make('password'), 
+            'password' => Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
 
@@ -50,161 +51,220 @@ class UserRolePermissionSeeder extends Seeder
                 'usertype' => 'mahasiswa',
             ], $default_user_value));
 
-            $reviewer = User::create(array_merge([
-                'username' => '0102030405',
-                'name' => 'Rizqa Raaiqa',
-                'usertype' => 'dosen',
-            ], $default_user_value));
-    
-            // Periksa apakah role sudah ada sebelum membuatnya
-            // Buat role atau ambil jika sudah ada
+            // Buat roles atau ambil jika sudah ada
             $role_super_admin = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
             $role_operator_kemahasiswaan = Role::firstOrCreate(['name' => 'Operator Kemahasiswaan', 'guard_name' => 'web']);
             $role_operator_fakultas = Role::firstOrCreate(['name' => 'Operator Fakultas', 'guard_name' => 'web']);
             $role_mahasiswa = Role::firstOrCreate(['name' => 'Mahasiswa', 'guard_name' => 'web']);
-            $role_reviewer = Role::firstOrCreate(['name' => 'Reviewer', 'guard_name' => 'web']);
 
-            // Permissions untuk Super Admin
-            $super_admin_permissions = [
-                'read konfigurasi',
-                'read konfigurasi/role',
-                'create konfigurasi/role',
-                'update konfigurasi/role',
-                'delete konfigurasi/role',
-                'create konfigurasi/users',
-                'read konfigurasi/users',
-                'update konfigurasi/users',
-                'delete konfigurasi/users',
-                'create konfigurasi/menu',
-                'read konfigurasi/menu',
-                'update konfigurasi/menu',
-                'delete konfigurasi/menu',
-                'create konfigurasi/akses_role',
-                'read konfigurasi/akses_role',
-                'update konfigurasi/akses_role',
-                'delete konfigurasi/akses_role',
-
-                'read master_beasiswa',
-                'create master_beasiswa/daftar_beasiswa',
-                'read master_beasiswa/daftar_beasiswa',
-                'update master_beasiswa/daftar_beasiswa',
-                'delete master_beasiswa/daftar_beasiswa',
-                'create master_beasiswa/persyaratan_beasiswa',
-                'read master_beasiswa/persyaratan_beasiswa',
-                'update master_beasiswa/persyaratan_beasiswa',
-                'delete master_beasiswa/persyaratan_beasiswa',
-                'create master_beasiswa/berkas_pendaftaran',
-                'read master_beasiswa/berkas_pendaftaran',
-                'update master_beasiswa/berkas_pendaftaran',
-                'delete master_beasiswa/berkas_pendaftaran',
-                'create master_beasiswa/tahapan_beasiswa',
-                'read master_beasiswa/tahapan_beasiswa',
-                'update master_beasiswa/tahapan_beasiswa',
-                'delete master_beasiswa/tahapan_beasiswa',
-
-                'read kelola_beasiswa',
-                'create kelola_beasiswa/manajemen_pendaftaran',
-                'read kelola_beasiswa/manajemen_pendaftaran',
-                'update kelola_beasiswa/manajemen_pendaftaran',
-                'delete kelola_beasiswa/manajemen_pendaftaran',
-                'create kelola_beasiswa/usulan_beasiswa',
-                'read kelola_beasiswa/usulan_beasiswa',
-                'update kelola_beasiswa/usulan_beasiswa',
-                'delete kelola_beasiswa/usulan_beasiswa',
-                'create kelola_beasiswa/data_beasiswa',
-                'read kelola_beasiswa/data_beasiswa',
-                'update kelola_beasiswa/data_beasiswa',
-                'delete kelola_beasiswa/data_beasiswa',
+            // Struktur menu dan sub-menu beserta permissions untuk setiap role
+            $menus = [
+                'Konfigurasi' => [
+                    'url' => 'konfigurasi',
+                    'icon' => 'bi bi-gear-fill',
+                    'permissions' => [
+                        
+                        'role' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                        ],
+                        'permission' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                        ],
+                        'users' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                        ],
+                        'menu' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                        ],
+                        'akses_role' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                        ],
+                    ]
+                ],
+                'Master Beasiswa' => [
+                    'url' => 'master_beasiswa',
+                    'icon' => 'bi bi-clipboard-fill',
+                    'permissions' => [
+                        'daftar_beasiswa' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
+                        ],
+                        'persyaratan_beasiswa' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
+                        ],
+                        'berkas_pendaftaran' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
+                        ],
+                        'tahapan_beasiswa' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
+                        ],
+                    ]
+                ],
+                'Kelola Beasiswa' => [
+                    'url' => 'kelola_beasiswa',
+                    'icon' => 'bi bi-clipboard-fill',
+                    'permissions' => [
+                        'manajemen_pendaftaran' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
+                        ],
+                        'usulan_beasiswa' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
+                            'Operator Fakultas' =>  ['read', 'create', 'update', 'delete'],
+                        ],
+                        'data_beasiswa' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
+                            'Operator Fakultas' =>  ['read', 'create', 'update', 'delete'],
+                        ],
+                    ]
+                ],
+                'Beasiswa' => [
+                    'url' => 'beasiswa',
+                    'icon' => 'bi bi-clipboard-fill',
+                    'permissions' => [
+                        'pendaftaran_beasiswa' => [
+                            'Mahasiswa' => ['read', 'create', 'update', 'delete'],
+                        ],
+                        'riwayat_usulan' => [
+                            'Mahasiswa' => ['read'],
+                        ],
+                    ]
+                ],
             ];
 
-            // Permissions untuk Operator Kemahasiswaan
-            $operator_permissions = [
-                'read master_beasiswa',
-                'create master_beasiswa/daftar_beasiswa',
-                'read master_beasiswa/daftar_beasiswa',
-                'update master_beasiswa/daftar_beasiswa',
-                'delete master_beasiswa/daftar_beasiswa',
-                'create master_beasiswa/persyaratan_beasiswa',
-                'read master_beasiswa/persyaratan_beasiswa',
-                'update master_beasiswa/persyaratan_beasiswa',
-                'delete master_beasiswa/persyaratan_beasiswa',
-                'create master_beasiswa/berkas_pendaftaran',
-                'read master_beasiswa/berkas_pendaftaran',
-                'update master_beasiswa/berkas_pendaftaran',
-                'delete master_beasiswa/berkas_pendaftaran',
-                'create master_beasiswa/tahapan_beasiswa',
-                'read master_beasiswa/tahapan_beasiswa',
-                'update master_beasiswa/tahapan_beasiswa',
-                'delete master_beasiswa/tahapan_beasiswa',
-                
-                'read kelola_beasiswa',
-                'create kelola_beasiswa/manajemen_pendaftaran',
-                'read kelola_beasiswa/manajemen_pendaftaran',
-                'update kelola_beasiswa/manajemen_pendaftaran',
-                'delete kelola_beasiswa/manajemen_pendaftaran',
-                'create kelola_beasiswa/usulan_beasiswa',
-                'read kelola_beasiswa/usulan_beasiswa',
-                'update kelola_beasiswa/usulan_beasiswa',
-                'delete kelola_beasiswa/usulan_beasiswa',
-                'create kelola_beasiswa/data_beasiswa',
-                'read kelola_beasiswa/data_beasiswa',
-                'update kelola_beasiswa/data_beasiswa',
-                'delete kelola_beasiswa/data_beasiswa',
-            ];
+            // Iterasi untuk membuat menu, sub-menu, dan permissions
+            foreach ($menus as $menuName => $menuData) {
+                // Buat atau ambil menu utama
+                $mainMenu = Navigation::firstOrCreate([
+                    'name' => $menuName,
+                    'url' => $menuData['url'],
+                    'icon' => $menuData['icon'],
+                    'main_menu' => null
+                ]);
 
-            // Permissions untuk Operator Fakultas
-            $operator_fakultas_permissions = [
-                'create kelola_beasiswa/data_beasiswa',
-                'read kelola_beasiswa/data_beasiswa',
-                'update kelola_beasiswa/data_beasiswa',
-                'delete kelola_beasiswa/data_beasiswa',
+                // Tambahkan permission untuk menu utama (misalnya 'read konfigurasi')
+                foreach ($menuData['permissions'] as $subMenu => $rolesPermissions) {
+                    foreach ($rolesPermissions as $roleName => $actions) {
+                        // Buat permission untuk akses utama menu (hanya 'read' saja)
+                        $mainPermissionName = "read {$menuData['url']}";
+                        $mainPermission = Permission::firstOrCreate([
+                            'name' => $mainPermissionName,
+                            'guard_name' => 'web',
+                            'navigation_id' => $mainMenu->id
+                        ]);
 
-                'read kelola_beasiswa',
-                'create kelola_beasiswa/usulan_beasiswa',
-                'read kelola_beasiswa/usulan_beasiswa',
-                'update kelola_beasiswa/usulan_beasiswa',
-                'delete kelola_beasiswa/usulan_beasiswa',
-            ];
+                        // Berikan permission 'read konfigurasi' kepada role yang sesuai
+                        $role = Role::where('name', $roleName)->first();
+                        if ($role) {
+                            $role->givePermissionTo($mainPermission);
+                        }
+                    }
+                }
 
-            // Permissions untuk Mahasiswa
-            $mahasiswa_permissions = [
-                'create beasiswa/pendaftaran_beasiswa',
-                'read beasiswa/pendaftaran_beasiswa',
-                'read beasiswa'
-            ];
+                foreach ($menuData['permissions'] as $subMenu => $rolesPermissions) {
+                    // Buat atau ambil sub-menu
+                    $subMenuNavigation = Navigation::firstOrCreate([
+                        'name' => ucfirst($subMenu),
+                        'url' => "{$menuData['url']}/{$subMenu}",
+                        'icon' => '',
+                        'main_menu' => $mainMenu->id
+                    ]);
 
-            // Buat permissions di database jika belum ada
-            $all_permissions = array_merge(
-                $super_admin_permissions,
-                $operator_permissions,
-                $operator_fakultas_permissions,
-                $mahasiswa_permissions
-            );
+                    foreach ($rolesPermissions as $roleName => $actions) {
+                        foreach ($actions as $action) {
+                            // Buat permission untuk setiap aksi pada sub-menu
+                            $permissionName = "{$action} {$menuData['url']}/{$subMenu}";
+                            $permission = Permission::firstOrCreate([
+                                'name' => $permissionName,
+                                'guard_name' => 'web',
+                                'navigation_id' => $subMenuNavigation->id
+                            ]);
 
-            foreach ($all_permissions as $permission) {
-                Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+                            // Berikan permission ini kepada role yang sesuai
+                            $role = Role::where('name', $roleName)->first();
+                            if ($role) {
+                                $role->givePermissionTo($permission);
+                            }
+                        }
+                    }
+                }
             }
 
-            // Berikan permissions ke masing-masing role
-            $role_super_admin->syncPermissions($super_admin_permissions);
-            $role_operator_kemahasiswaan->syncPermissions($operator_permissions);
-            $role_operator_fakultas->syncPermissions($operator_fakultas_permissions);
-            $role_mahasiswa->syncPermissions($mahasiswa_permissions);
+            // foreach ($menus as $menuName => $menuData) {
+            //     // Buat atau ambil menu utama
+            //     $mainMenu = Navigation::firstOrCreate([
+            //         'name' => $menuName,
+            //         'url' => $menuData['url'],
+            //         'icon' => $menuData['icon'],
+            //         'main_menu' => null
+            //     ]);
+            
+            //     // Tambahkan permission untuk menu utama
+            //     foreach ($menuData['permissions'] as $subMenu => $rolesPermissions) {
+            //         foreach ($rolesPermissions as $roleName => $actions) {
+            //             // Buat permission untuk semua aksi pada menu utama (bukan hanya 'read')
+            //             foreach ($actions as $action) {
+            //                 $mainPermissionName = "{$action} {$menuData['url']}";
+            //                 $mainPermission = Permission::firstOrCreate([
+            //                     'name' => $mainPermissionName,
+            //                     'guard_name' => 'web',
+            //                     'navigation_id' => $mainMenu->id
+            //                 ]);
+            
+            //                 // Berikan permission kepada role yang sesuai
+            //                 $role = Role::where('name', $roleName)->first();
+            //                 if ($role) {
+            //                     $role->givePermissionTo($mainPermission);
+            //                 }
+            //             }
+            //         }
+            //     }
+            
+            //     foreach ($menuData['permissions'] as $subMenu => $rolesPermissions) {
+            //         // Buat atau ambil sub-menu
+            //         $subMenuNavigation = Navigation::firstOrCreate([
+            //             'name' => ucfirst($subMenu),
+            //             'url' => "{$menuData['url']}/{$subMenu}",
+            //             'icon' => '',
+            //             'main_menu' => $mainMenu->id
+            //         ]);
+            
+            //         foreach ($rolesPermissions as $roleName => $actions) {
+            //             foreach ($actions as $action) {
+            //                 // Buat permission untuk setiap aksi pada sub-menu
+            //                 $permissionName = "{$action} {$menuData['url']}/{$subMenu}";
+            //                 $permission = Permission::firstOrCreate([
+            //                     'name' => $permissionName,
+            //                     'guard_name' => 'web',
+            //                     'navigation_id' => $subMenuNavigation->id
+            //                 ]);
+            
+            //                 // Berikan permission ini kepada role yang sesuai
+            //                 $role = Role::where('name', $roleName)->first();
+            //                 if ($role) {
+            //                     $role->givePermissionTo($permission);
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }            
+
+            // Assign roles ke users
+            $super_admin->assignRole($role_super_admin);
+            $operator_kemahasiswaan->assignRole($role_operator_kemahasiswaan);
+            $operator_fakultas->assignRole($role_operator_fakultas);
+            $mahasiswa->assignRole($role_mahasiswa);
 
             DB::commit();
-
-            // Assign roles to users
-            $super_admin->assignRole('Super Admin');
-            $operator_kemahasiswaan->assignRole('Operator Kemahasiswaan');
-            $operator_fakultas->assignRole('Operator Fakultas');
-            $mahasiswa->assignRole('Mahasiswa');
-            $reviewer->assignRole('Reviewer');
-
-            // DB::commit();
         } catch (\Throwable $th) {
             DB::rollback();
             Log::error('Seeder failed: ' . $th->getMessage());
-            throw $th; // Optional: Re-throw to get the exact error when running the seeder
+            throw $th;
         }
     }
 }

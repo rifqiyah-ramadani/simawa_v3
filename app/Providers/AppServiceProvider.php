@@ -6,6 +6,8 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
 use App\Policies\RolePolicy;
+use Spatie\Permission\Models\Permission as SpatiePermission;
+use App\Models\Permission;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +16,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+         // Bind Spatie's Permission model to the custom Permission model
+        $this->app->bind(SpatiePermission::class, Permission::class);
     }
 
     /**

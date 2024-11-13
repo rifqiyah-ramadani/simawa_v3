@@ -9,15 +9,52 @@
     <!-- Or for RTL support -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
     <style>
-        /* Menambah padding dan border */
+        /* Style untuk tampilan tabel */
+        #myTable {
+            font-size: 1rem;
+            color: #333;
+            margin-top: 100px;
+        }
+        #myTable th {
+            background-color: #FA812F;
+            color: white;
+            text-align: center;
+        }
         #myTable td {
-            padding: 5px;
+            padding: 3px;
+            text-align: center;
             border: 1px solid #f2f2f2;
         }
 
-        /* Adjust the z-index of the select2 dropdown */
-        .select2-container {
-            z-index: 2051 !important; /* Ensure it's above the modal's z-index */
+        /* Style untuk tombol */
+        .tombol-tambah {
+            background-color: #FEF3E2;
+            border-color: #FA4032;
+            color: #FA4032;
+        }
+        .tombol-tambah:hover {
+            background-color: #FAD2B1; 
+            border-color: #E53B1F;    
+            color: #E53B1F;
+        }
+        .tombol-simpan {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+
+        /* Styling modal */
+        .modal-header {
+            background-color: #FA812F;
+            color: white;
+        }
+        .modal-body label {
+            color: #495057;
+        }
+        /* Card Header Background */
+        .card-header {
+            background-color: white; 
+            padding: 1rem;
         }
     </style>
 @endpush
@@ -63,7 +100,7 @@
                     <div class="card mb-4"> 
                         <!--begin::card header-->
                         <div class="card-header">
-                            <a href="#" class="btn btn-primary text-light tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
+                            <a href="#" class="btn text-dark tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
                         </div> 
                         <!--end::card header-->
 
@@ -149,7 +186,7 @@
         {{-- modal footer --}}
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary tombol-simpan">Simpan Data</button>
+          <button type="button" class="btn btn-primary tombol-simpan"><i class="bi bi-save me-1"></i>Simpan Data</button>
         </div>
       </div>
     </div>

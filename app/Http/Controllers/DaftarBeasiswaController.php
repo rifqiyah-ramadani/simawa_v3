@@ -90,7 +90,7 @@ class DaftarBeasiswaController extends Controller
         $daftarBeasiswa = DaftarBeasiswa::where('id', $id)->first();
         return response()->json(['result' => $daftarBeasiswa]);
     }
-
+ 
     /**
      * Update the specified resource in storage.
      */
@@ -110,6 +110,7 @@ class DaftarBeasiswaController extends Controller
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         } else {
+            $daftarBeasiswa = DaftarBeasiswa::find($id);
             $daftarBeasiswa->update([
                 'kode_beasiswa' => $request->kode_beasiswa,
                 'nama_beasiswa' => $request->nama_beasiswa,

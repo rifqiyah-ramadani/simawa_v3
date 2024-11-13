@@ -69,7 +69,7 @@ class NavigationController extends Controller
             'name.unique' => '*Nama menu sudah ada, silakan masukkan yang lain',
             'url.required' => '*URL wajib diisi',
             'main_menu.exists' => '*Main menu yang dipilih tidak valid',
-        ]);
+        ]); 
 
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);

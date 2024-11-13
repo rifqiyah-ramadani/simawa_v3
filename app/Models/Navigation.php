@@ -9,12 +9,17 @@ class Navigation extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
+    protected $fillable = ['name', 'url', 'icon', 'main_menu', 'sort'];
 
-    // relasi agar menu utama bereleasi dengan sub-menu
-    // 1 menu utama bisa mempunyai banyak sub-menu
+    // Anda bisa menambahkan relasi balik ke Permission jika diperlukan
+    public function permissions()
+    {
+        return $this->hasMany(Permission::class, 'navigation_id', 'id');
+    }
+
+    // Relasi ke sub-menus (self-referential relationship)
     public function subMenus()
     {
-        return $this->hasMany(Navigation::class, 'main_menu');
+        return $this->hasMany(Navigation::class, 'main_menu', 'id')->orderBy('sort', 'asc');
     }
 }

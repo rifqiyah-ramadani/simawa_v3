@@ -179,31 +179,147 @@ class BuatPendaftaranController extends Controller
             return response()->json(['success' => "Berhasil menyimpan data"]);
         }
     }
-    
 
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+         // Temukan data berdasarkan ID
+         $buatPendaftaran = BuatPendaftaranBeasiswa::with(['beasiswa', 'persyaratan', 'berkasPendaftarans', 'roles', 'tahapan'])->findOrFail($id);
+ 
+         return response()->json(['result' => $buatPendaftaran]);
+    }
     
     /**
-     * Display the specified resource.
+     * Update the specified resource in storage.
      */
-    // public function show($id)
-    // {
-    //     // Ambil data pendaftaran beasiswa berdasarkan ID
-    //     $buatPendaftaran = BuatPendaftaranBeasiswa::with('persyaratan', 'berkas', 'roles')
-    //                         ->findOrFail($id);
+    public function update(Request $request, $id)
+    {
 
-    //     // Mengambil detail validasi dari role
-    //     $roles = ValidasiPendaftaranBeasiswa::where('pendaftaran_id', $id)
-    //                 ->with('role')  // relasi 'role' di model ValidasiPendaftaranBeasiswa
-    //                 ->get();
+        dd(request()->all());
+        // Validasi input
+        $validate = Validator::make($request->all(), [
+            'daftar_beasiswas_id' => 'required|exists:daftar_beasiswas,id',
+            'tahun' => 'required|integer',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_berakhir' => 'required|date|after:tanggal_mulai',
+            'status' => 'required|in:dibuka,ditutup',
+            'persyaratan.*' => 'required|exists:persyaratan_beasiswas,id',
+            'berkas.*' => 'required|exists:berkas_pendaftarans,id',
+            'roles.*' => $request->jenis_beasiswa === 'internal' ? 'required|exists:roles,id' : '',
+            'urutan.*' => $request->jenis_beasiswa === 'internal' ? 'required|integer|min:1' : '',
+            'jenis_beasiswa' => 'required|in:internal,eksternal',
+            'flyer' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'link_pendaftaran' => 'nullable|url',
+            'tahapans.*' => 'required|exists:tahapan_beasiswas,id',
+            'tahapan_tanggal_mulai.*' => 'required|date',
+            'tahapan_tanggal_akhir.*' => 'required|date|after:tahapan_tanggal_mulai.*',
+        ]);
 
-    //     // Kembalikan data ke AJAX sebagai response
-    //     return response()->json([
-    //         'result' => $buatPendaftaran,
-    //         'roles' => $roles,
-    //         'persyaratan' => $buatPendaftaran->persyaratan->pluck('id')->toArray(),
-    //         'berkas' => $buatPendaftaran->berkas->pluck('id')->toArray(),
-    //     ]);
-    // }
+        // Jika validasi gagal
+        if ($validate->fails()) {
+            return response()->json(['errors' => $validate->errors()]);
+        }
+
+        // $persyaratanBeasiswa = PersyaratanBeasiswa::find($id);
+        // Temukan data yang akan diperbarui
+        $buatPendaftaran = BuatPendaftaranBeasiswa::find($id);
+        $buatPendaftaran->update([
+            'daftar_beasiswas_id' => $request->daftar_beasiswas_id,
+            'tahun' => $request->tahun,
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'tanggal_berakhir' => $request->tanggal_berakhir,
+            'status' => $request->status,
+            'jenis_beasiswa' => $request->jenis_beasiswa,
+            'link_pendaftaran' => $request->link_pendaftaran,
+        ]);
+
+        // Jika ada flyer baru untuk beasiswa eksternal, upload dan update
+        if ($request->hasFile('flyer')) {
+            $flyerPath = $request->file('flyer')->store('flyers', 'public');
+            $buatPendaftaran->flyer = $flyerPath;
+            $buatPendaftaran->save();
+        }
+
+        // Update persyaratan
+        $buatPendaftaran->persyaratan()->sync($request->persyaratan);
+
+        // Update berkas pendaftaran
+        $buatPendaftaran->berkasPendaftarans()->sync($request->berkas);
+
+        // Update roles jika beasiswa internal
+        if ($request->jenis_beasiswa === 'internal' && $request->has('roles')) {
+            // Hapus validasi lama
+            $buatPendaftaran->validasiPendaftaran()->delete();
+            // Tambahkan validasi baru
+            foreach ($request->roles as $index => $role_id) {
+                ValidasiPendaftaranBeasiswa::create([
+                    'buat_pendaftaran_id' => $buatPendaftaran->id,
+                    'role_id' => $role_id,
+                    'urutan' => $request->urutan[$index],
+                ]);
+            }
+        }
+
+        // Update tahapan
+        if ($request->has('tahapans')) {
+            $tahapanData = [];
+            foreach ($request->tahapans as $tahapan_id) {
+                $tahapanData[$tahapan_id] = [
+                    'tanggal_mulai' => $request->tahapan_tanggal_mulai[$tahapan_id] ?? null,
+                    'tanggal_akhir' => $request->tahapan_tanggal_akhir[$tahapan_id] ?? null,
+                ];
+            }
+            $buatPendaftaran->tahapan()->sync($tahapanData);
+            // Log::info("Tahapan Data:", $tahapanData);
+        }
+
+
+        return response()->json(['success' => "Data berhasil diperbarui"]);
+    }
+
+    public function show($id)
+    {
+        $buatPendaftaran = BuatPendaftaranBeasiswa::with(['beasiswa', 'persyaratan', 'berkasPendaftarans', 'roles', 'tahapan'])
+                        ->findOrFail($id);
+
+        // Konversi path flyer menjadi URL penuh jika flyer tersedia
+        if ($buatPendaftaran->flyer) {
+            $buatPendaftaran->flyer = asset('storage/' . $buatPendaftaran->flyer); 
+        }
+
+        return response()->json(['result' => $buatPendaftaran]);
+    }
+
+    public function destroy($id)
+    {
+        // Cari data BuatPendaftaranBeasiswa berdasarkan ID
+        $buatPendaftaran = BuatPendaftaranBeasiswa::findOrFail($id);
+
+        // Hapus relasi berkas_pendaftarans di tabel pivot
+        $buatPendaftaran->berkasPendaftarans()->detach();
+
+        // Hapus relasi persyaratan di tabel pivot
+        $buatPendaftaran->persyaratan()->detach();
+
+        // Hapus relasi roles (role validasi) di tabel pivot
+        $buatPendaftaran->roles()->detach();
+
+        // Hapus relasi tahapan di tabel pivot
+        $buatPendaftaran->tahapan()->detach();
+
+        // Hapus file flyer dari storage jika ada
+        if ($buatPendaftaran->flyer) {
+            Storage::delete($buatPendaftaran->flyer);
+        }
+
+        // Hapus data pendaftaran dari database
+        $buatPendaftaran->delete();
+
+        // Berikan respons sukses
+        return response()->json(['message' => 'Data pendaftaran dan semua relasi berhasil dihapus.'], 200);
+    }
 
 
     /**

@@ -16,7 +16,7 @@
 <main class="app-main"> 
     <div class="app-content-header"> 
         <div class="container-fluid"> 
-            <div class="row">
+            <div class="row"> 
                 <div class="col-sm-6">
                     <h3 class="mb-0">Beasiswa - Pendaftaran Beasiswa</h3>
                 </div>
@@ -82,7 +82,7 @@
                                 <!-- Berkas yang Diperlukan -->
                                 <h5 class="fw-bold">Berkas yang Perlu Dipersiapkan:</h5>
                                 <ul>
-                                    @foreach($buatPendaftaran->berkas as $berkas)
+                                    @foreach($buatPendaftaran->berkasPendaftarans as $berkas)
                                         <li>{{ $berkas->nama_file }}</li>
                                     @endforeach
                                 </ul>

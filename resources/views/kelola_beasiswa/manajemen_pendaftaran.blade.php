@@ -24,13 +24,56 @@
             border-radius: 4px;
         }
         /* Menambah padding dan border */
-        #myTable td {
-            padding: 5px;
-            border: 1px solid #f2f2f2;
+        #myTable { 
+            font-size: 1rem;
+            color: #333;
+            margin-top: 100px;
         }
 
         .select2-container {
             z-index: 2051 !important; /* Ensure it's above the modal's z-index */
+        }
+
+        #myTable th {
+            background-color: #FA812F;
+            color: white;
+            text-align: center;
+        } 
+        #myTable td {
+            padding: 3px;
+            text-align: center;
+            border: 1px solid #f2f2f2;
+        }
+
+        /* Style untuk tombol */
+        .tombol-tambah {
+            background-color: #FEF3E2;
+            border-color: #FA4032;
+            color: #FA4032;
+        }
+        .tombol-tambah:hover {
+            background-color: #FAD2B1; 
+            border-color: #E53B1F;    
+            color: #E53B1F;
+        }
+        .tombol-simpan {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+
+        /* Styling modal */
+        .modal-header {
+            background-color: #FA812F;
+            color: white;
+        }
+        .modal-body label {
+            color: #495057;
+        }
+        /* Card Header Background */
+        .card-header {
+            background-color: white; 
+            padding: 1rem;
         }
     </style>
 @endpush
@@ -76,7 +119,7 @@
                     <div class="card mb-4"> 
                         <!--begin::card header-->
                         <div class="card-header">
-                            <a href="#" class="btn btn-primary text-light tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
+                            <a href="#" class="btn text-dark tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
                         </div> 
                         <!--end::card header-->
 
@@ -86,7 +129,7 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 20px">No</th>
-                                        <th>Jenis Beasiswa</th>
+                                        <th style="width: 30px">Jenis Beasiswa</th>
                                         <th>Nama Beasiswa</th>
                                         <th>Tahun</th>
                                         <th>Tanggal Mulai Pendaftaran</th>
@@ -106,7 +149,7 @@
         </div> 
         <!--end::Container-->
     </div> 
-    <!--end::App Content--> 
+    <!--end::App Content-->  
 </main> 
 
 <!-- Modal Jenis Beasiswa -->
@@ -279,10 +322,12 @@
                     <!-- Field Internal yang sudah ada -->
                     <!-- Tambahan Field Eksternal: Gambar Flyer, Link Pendaftaran -->
                     <div class="col mb-3">
+                        {{-- <img id="flyer-preview" src="" alt="Preview Flyer" style="max-width: 100%; display: none;"> --}}
                         <label for="flyer" class="form-label fw-bold">Gambar Flyer:
                             <span style="color: red;">*</span>
                         </label>
                         <input type="file" class="form-control" id="flyer" name="flyer">
+                        <a id="flyer-link" href="" target="_blank" style="display: none;">Lihat Flyer yang Diupload</a>
                     </div>
                     <div class="col mb-3">
                         <label for="link_pendaftaran" class="form-label fw-bold">Link Pendaftaran:
@@ -300,7 +345,6 @@
       </div>
     </div>
 </div>
-
 <!-- Modal -->
 
 <!--end::App Main-->
@@ -315,7 +359,6 @@
     <!-- Select2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    {{-- script datatables --}}
     <script>
         $(document).ready(function() {
             // Inisialisasi DataTable
@@ -445,6 +488,251 @@
                 }
             });
 
+            // Fungsi untuk membuka modal edit dan mengisi data berdasarkan ID yang dipilih
+            $('body').on('click', '.tombol-edit', function (e) {
+                e.preventDefault();
+                const id = $(this).data('id'); // Ambil ID dari tombol edit
+
+                // Aktifkan kembali form dan tampilkan modal
+                enableForm();
+                $('#exampleModalLabel').text('Edit Pendaftaran Beasiswa');
+                $('#exampleModal').modal('show');
+                $('.tombol-simpan').show();
+
+                // Kosongkan pesan error sebelumnya
+                $('.text-danger').remove();
+                $('.is-invalid').removeClass('is-invalid');
+
+                // Ambil data dari server untuk mengisi form edit
+                $.ajax({
+                    url: `manajemen_pendaftaran/${id}/edit`, // Endpoint edit sesuai dengan ID
+                    type: 'GET',
+                    success: function(response) {
+                        console.log("Response dari Server:", response);
+                        console.log("Jenis Beasiswa (edit):", response.result.jenis_beasiswa);
+                        // Isi form dengan data yang diterima dari server
+                        $('#daftar_beasiswas_id').val(response.result.daftar_beasiswas_id);
+                        $('#tahun').val(response.result.tahun);
+                        $('#tanggal_mulai').val(response.result.tanggal_mulai);
+                        $('#tanggal_berakhir').val(response.result.tanggal_berakhir);
+                        $('#status').val(response.result.status);
+                       
+                        // Pilih persyaratan dan berkas yang sudah ada
+                        $('#persyaratan').val(response.result.persyaratan.map(item => item.id)).trigger('change');
+                        $('#berkas').val(response.result.berkas_pendaftarans.map(item => item.id)).trigger('change');
+                        $('#jenisBeasiswaModal').modal('hide');
+
+                        // Check jenis beasiswa
+                        if (response.result.jenis_beasiswa === 'eksternal') {
+                            $('#form-eksternal').show();
+                            $('#flyer').val('');
+                            $('#link_pendaftaran').val(response.result.link_pendaftaran);
+                            $('#role-validasi-container').hide();
+                        } else {
+                            $('#form-eksternal').hide();
+                            $('#role-validasi-container').show();
+                        }
+
+                        // Kosongkan role validasi dan tambahkan sesuai data yang ada
+                        $('#role-validasi-container').empty();
+                        if (response.result.roles) {
+                            response.result.roles.forEach((role, index) => {
+                                const newRow = `
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <select class="form-control" name="roles[]" required>
+                                                <option value="" disabled>Pilih Role</option>
+                                                @foreach($roles as $role)
+                                                    <option value="{{ $role->id }}" ${role.id == {{ $role->id }} ? 'selected' : ''}>{{ $role->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" class="form-control" name="urutan[]" placeholder="Urutan Validasi" required value="${role.pivot.urutan}">
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-success add-role">+</button>
+                                            <button type="button" class="btn btn-danger remove-role">-</button>
+                                        </div>
+                                    </div>`;
+                                $('#role-validasi-container').append(newRow);
+                            });
+                        }
+                        $('input[name="tahapans[]"]').each(function () {
+                            const tahapanId = $(this).val();
+                            
+                            // Cek apakah `response.result.tahapan` tersedia dan memiliki data
+                            const tahapanData = response.result.tahapan.find(tahapan => tahapan.id == tahapanId);
+                            
+                            if (tahapanData) {
+                                $(this).prop('checked', true);
+                                $('#tahapan_tanggal_mulai_' + tahapanId).val(tahapanData.pivot.tanggal_mulai).prop('disabled', false);
+                                $('#tahapan_tanggal_akhir_' + tahapanId).val(tahapanData.pivot.tanggal_akhir).prop('disabled', false);
+                            } else {
+                                console.warn("Tahapan ID " + tahapanId + " tidak ditemukan dalam data tahapans.");
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error("Error fetching data: ", xhr);
+                    }
+                });
+
+                // Simpan perubahan data saat tombol simpan diklik
+                $('.tombol-simpan').off('click').on('click', function () {
+                    simpan(id); // Fungsi simpan untuk update (dengan ID)
+                });
+            });
+
+            // Tombol untuk melihat detail
+            $('body').on('click', '.tombol-detail', function(e) {
+                e.preventDefault();
+
+                const id = $(this).data('id'); // Ambil ID dari tombol detail
+
+                // Nonaktifkan form untuk mode baca saja
+                disableForm();
+
+                // Ubah judul modal menjadi "Detail Pendaftaran Beasiswa"
+                $('#exampleModalLabel').text('Detail Pendaftaran Beasiswa');
+                
+                // Kosongkan pesan error sebelumnya
+                $('.text-danger').remove();
+                $('.is-invalid').removeClass('is-invalid');
+
+                // Ambil data dari server untuk mengisi form detail
+                $.ajax({
+                     url: `/kelola_beasiswa/manajemen_pendaftaran/${id}/`,// Endpoint detail sesuai dengan ID
+                    type: 'GET',
+                    success: function(response) {
+                        const data = response.result;
+                        
+                        // Isi form dengan data yang diterima dari server
+                        $('#daftar_beasiswas_id').val(data.daftar_beasiswas_id);
+                        $('#tahun').val(data.tahun);
+                        $('#tanggal_mulai').val(data.tanggal_mulai);
+                        $('#tanggal_berakhir').val(data.tanggal_berakhir);
+                        $('#status').val(data.status);
+                        $('#persyaratan').val(data.persyaratan.map(item => item.id)).trigger('change');
+                        $('#berkas').val(data.berkas_pendaftarans.map(item => item.id)).trigger('change');
+
+                       // Periksa nilai data.flyer di console untuk memastikan data ada
+                        console.log('Flyer URL:', data.flyer);
+
+                        if (data.jenis_beasiswa === 'eksternal') {
+                            $('#form-eksternal').show();
+                            $('#flyer').val(''); // Kosongkan input file flyer
+                            $('#link_pendaftaran').val(data.link_pendaftaran);
+                            $('#role-validasi-container').hide();
+
+                            // Tampilkan link flyer jika data flyer tersedia
+                            if (data.flyer) {
+                                $('#flyer-link').attr('href', data.flyer).show(); // Set link ke flyer dan tampilkan
+                            } else {
+                                $('#flyer-link').hide(); // Sembunyikan jika tidak ada flyer
+                            }
+                        } else {
+                            $('#form-eksternal').hide();
+                            $('#role-validasi-container').show();
+                            $('#flyer-link').hide(); // Sembunyikan link flyer jika bukan beasiswa eksternal
+                        }
+
+                        // Kosongkan role validasi dan tambahkan sesuai data yang ada
+                        $('#role-validasi-container').empty();
+                        if (data.roles) {
+                            data.roles.forEach((role) => {
+                                const newRow = `
+                                    <div class="row mb-2">
+                                        <div class="col">
+                                            <select class="form-control" name="roles[]" disabled>
+                                                <option value="" disabled>Pilih Role</option>
+                                                @foreach($roles as $role)
+                                                    <option value="{{ $role->id }}" ${role.id == {{ $role->id }} ? 'selected' : ''}>{{ $role->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <input type="number" class="form-control" name="urutan[]" placeholder="Urutan Validasi" required value="${role.pivot.urutan}" disabled>
+                                        </div>
+                                    </div>`;
+                                $('#role-validasi-container').append(newRow);
+                            });
+                        }
+
+                        // Isi data tahapan dan tanggal mulai/akhir
+                        $('input[name="tahapans[]"]').each(function () {
+                            const tahapanId = $(this).val();
+                            const tahapanData = data.tahapan.find(tahapan => tahapan.id == tahapanId);
+
+                            if (tahapanData) {
+                                $(this).prop('checked', true);
+                                $('#tahapan_tanggal_mulai_' + tahapanId).val(tahapanData.pivot.tanggal_mulai).prop('disabled', true);
+                                $('#tahapan_tanggal_akhir_' + tahapanId).val(tahapanData.pivot.tanggal_akhir).prop('disabled', true);
+                            } else {
+                                $(this).prop('checked', false);
+                                $('#tahapan_tanggal_mulai_' + tahapanId).val('').prop('disabled', true);
+                                $('#tahapan_tanggal_akhir_' + tahapanId).val('').prop('disabled', true);
+                            }
+                        });
+
+                        // Tampilkan modal
+                        $('#exampleModal').modal('show');
+
+                        // Sembunyikan tombol simpan di mode detail
+                        $('.tombol-simpan').hide();
+                    },
+                    error: function(xhr) {
+                        console.error("Gagal mengambil detail data: ", xhr);
+                        iziToast.error({
+                            title: 'Error',
+                            message: 'Gagal memuat data detail. Silakan coba lagi.',
+                            position: 'topRight'
+                        });
+                    }
+                });
+            });
+
+                        // Proses delete data
+            $('body').on('click', '.tombol-delete', function (e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+
+                // Tampilkan SweetAlert2
+                Swal.fire({
+                    title: 'Yakin mau hapus data ini?',
+                    text: "Data yang sudah dihapus tidak bisa dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Lakukan permintaan AJAX untuk menghapus data
+                        $.ajax({
+                            url: 'manajemen_pendaftaran/' + id,
+                            type: 'DELETE',
+                            success: function(response) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Data berhasil dihapus.',
+                                    'success'
+                                );
+                                $('#myTable').DataTable().ajax.reload();
+                            },
+                            error: function(xhr) {
+                                Swal.fire(
+                                    'Error!',
+                                    'Terjadi kesalahan saat menghapus data.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+
             // Fungsi untuk menambahkan baris default untuk role validasi
             function addDefaultRoleRow() {
                 const container = $('#role-validasi-container');
@@ -533,12 +821,16 @@
                 formData.append('jenis_beasiswa', $('input[name="jenis_beasiswa"]:checked').val()); // Jenis beasiswa (internal/eksternal)
 
                 // Tambahkan flyer jika jenis beasiswa eksternal dan ada file
-                if ($('input[name="jenis_beasiswa"]:checked').val() === 'eksternal') {
-                    if ($('#flyer')[0].files.length > 0) {
-                        formData.append('flyer', $('#flyer')[0].files[0]); // Menambahkan file flyer ke FormData
-                    }
-                    formData.append('link_pendaftaran', $('#link_pendaftaran').val()); // Menambahkan link pendaftaran
+                if ($('input[name="jenis_beasiswa"]:checked').val() === 'eksternal' && $('#flyer')[0].files.length > 0) {
+                    formData.append('flyer', $('#flyer')[0].files[0]); // Menambahkan file flyer ke FormData
                 }
+                formData.append('link_pendaftaran', $('#link_pendaftaran').val()); // Menambahkan link pendaftaran jika ada
+                // if ($('input[name="jenis_beasiswa"]:checked').val() === 'eksternal') {
+                //     if ($('#flyer')[0].files.length > 0) {
+                //         formData.append('flyer', $('#flyer')[0].files[0]); // Menambahkan file flyer ke FormData
+                //     }
+                //     formData.append('link_pendaftaran', $('#link_pendaftaran').val()); // Menambahkan link pendaftaran
+                // }
 
                 // Menambahkan array persyaratan
                 $.each($('#persyaratan').val(), function (i, persyaratan_id) {

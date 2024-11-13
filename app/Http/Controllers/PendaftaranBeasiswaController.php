@@ -29,9 +29,9 @@ class PendaftaranBeasiswaController extends Controller
         $currentDate = now();
         
         $buatPendaftaran = BuatPendaftaranBeasiswa::with('beasiswa')
-            ->where('status', 'dibuka') // Filter pendaftaran dengan status "dibuka"
-            ->where('tanggal_mulai', '<=', $currentDate)
-            ->where('tanggal_berakhir', '>=', $currentDate)
+            // ->where('status') // Filter pendaftaran dengan status "dibuka"
+            // ->where('tanggal_mulai', '<=', $currentDate)
+            // ->where('tanggal_berakhir', '>=', $currentDate)
             ->get();
 
         // Cek apakah ada permintaan ajax (untuk datatables)
@@ -136,10 +136,10 @@ class PendaftaranBeasiswaController extends Controller
                     return view('beasiswa.daftar')->withErrors('Tahapan pendaftaran beasiswa tidak ditemukan');
                 }
     
-                // Cek tanggal tahapan pendaftaran beasiswa
+                // Parse tanggal mulai dan berakhir sebagai objek Carbon
                 $currentDate = now();
-                $tahapanDimulai = $tahapanAdministrasi->pivot->tanggal_mulai;
-                $tahapanBerakhir = $tahapanAdministrasi->pivot->tanggal_akhir;
+                $tahapanDimulai = \Carbon\Carbon::parse($tahapanAdministrasi->pivot->tanggal_mulai);
+                $tahapanBerakhir = \Carbon\Carbon::parse($tahapanAdministrasi->pivot->tanggal_akhir)->endOfDay();
     
                 // Kondisi untuk menentukan tampilan
                 $showForm = false;
@@ -150,7 +150,7 @@ class PendaftaranBeasiswaController extends Controller
                     $alertMessage = "Anda sudah mengisi form pendaftaran, harap menunggu informasi lebih lanjut.";
                 } elseif ($currentDate->lt($tahapanDimulai)) {
                     // Belum memasuki tahapan pendaftaran beasiswa
-                    $alertMessage = "Pendaftaran beasiswa belum dibuka. Anda dapat mengisi form pendaftaran setelah tanggal " . \Carbon\Carbon::parse($tahapanDimulai)->format('d M Y') . ".";
+                    $alertMessage = "Pendaftaran beasiswa belum dibuka. Anda dapat mengisi form pendaftaran setelah tanggal " . $tahapanDimulai->format('d M Y') . ".";
                 } elseif ($currentDate->gt($tahapanBerakhir)) {
                     // Tahapan pendaftaran beasiswa sudah berakhir
                     $alertMessage = "Tahapan pendaftaran beasiswa sudah berakhir. Anda tidak bisa mengisi form pendaftaran lagi.";
@@ -182,8 +182,8 @@ class PendaftaranBeasiswaController extends Controller
             'buatPendaftaran', 'hasilValidasi', 'semuaTerpenuhi', 
             'berkasPendaftaran', 'templatePath', 'alertMessage', 'showForm', 'persyaratan'
         ));
-    }    
-
+    }
+    
     /**
      * Fungsi untuk memvalidasi persyaratan secara dinamis.
      */
@@ -352,9 +352,11 @@ class PendaftaranBeasiswaController extends Controller
         // Jika berhasil menyimpan data
          return response()->json([
             'success' => "Berhasil menyimpan data",
-            'alertMessage' => "Anda sudah mengisi form pendaftaran, harap menunggu informasi lebih lanjut."
+            'alertMessage' => "Anda sudah mengisi form pendaftaran, harap menunggu informasi lebih lanjut pada menu riwayat usulan"
         ]);
     }
+
+
 
     /**
      * Display the specified resource.

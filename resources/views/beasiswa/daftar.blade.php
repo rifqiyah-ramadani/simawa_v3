@@ -159,7 +159,7 @@
                                             <option value="Kehutanan">Kehutanan</option>
                                             <option value="Peternakan">Peternakan</option>
                                             <option value="Perikanan">Perikanan</option>
-                                            <option value="Pendidikan Olahraga">Pendidikan Olahraga</option>
+                                            <option value="Peandidikan Olahraga">Pendidikan Olahraga</option>
                                             <option value="Sejarah">Sejarah</option>
                                             <option value="Ilmu Ekonomi">Ilmu Ekonomi</option>
                                             <option value="Akuntansi">Akuntansi</option>

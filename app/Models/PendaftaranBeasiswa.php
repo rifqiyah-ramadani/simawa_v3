@@ -48,4 +48,10 @@ class PendaftaranBeasiswa extends Model
      {
          return $this->belongsTo(User::class);
      }
+
+    // Relasi satu ke satu ke model `Interview`
+    public function interview()
+    {
+        return $this->hasOne(Interview::class, 'pendaftaran_id');
+    }
 }

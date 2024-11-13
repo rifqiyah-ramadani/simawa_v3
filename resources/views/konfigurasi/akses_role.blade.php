@@ -7,13 +7,52 @@
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 
     <style>
-        /* Mengubah gaya baris tabel */
-
-
-        /* Menambah padding dan border */
+        /* Style untuk tampilan tabel */
+        #myTable {
+            font-size: 1rem;
+            color: #333;
+            margin-top: 100px;
+        }
+        #myTable th {
+            background-color: #FA812F;
+            color: white;
+            text-align: center;
+        }
         #myTable td {
-            padding: 5px;
+            padding: 3px;
+            text-align: center;
             border: 1px solid #f2f2f2;
+        }
+
+        /* Style untuk tombol */
+        .tombol-tambah {
+            background-color: #FEF3E2;
+            border-color: #FA4032;
+            color: #FA4032;
+        }
+        .tombol-tambah:hover {
+            background-color: #FAD2B1; 
+            border-color: #E53B1F;    
+            color: #E53B1F;
+        }
+        .tombol-simpan {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+
+        /* Styling modal */
+        .modal-header {
+            background-color: #FA812F;
+            color: white;
+        }
+        .modal-body label {
+            color: #495057;
+        }
+        /* Card Header Background */
+        .card-header {
+            background-color: white; 
+            padding: 1rem;
         }
     </style>
 @endpush
@@ -57,12 +96,6 @@
                 <form> 
                     <!--begin::card-->
                     <div class="card mb-4"> 
-                        <!--begin::card header-->
-                        <div class="card-header">
-                            <a href="#" class="btn btn-primary text-light tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
-                        </div> 
-                        <!--end::card header-->
-
                         <!--begin::card body-->
                         <div class="card-body"> 
                             <table class="table table-bordered mb-3" id="myTable">

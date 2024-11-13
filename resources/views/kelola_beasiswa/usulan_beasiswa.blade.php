@@ -5,12 +5,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" />
     
     <style>
-        /* Mengubah gaya baris tabel */
-
-
         /* Menambah padding dan border */
+        #myTable { 
+            font-size: 1rem;
+            color: #333;
+            margin-top: 100px;
+        }
+        #myTable th {
+            background-color: #FA812F;
+            color: white;
+            text-align: center;
+        }
         #myTable td {
-            padding: 5px;
+            padding: 3px;
+            text-align: center;
             border: 1px solid #f2f2f2;
         }
     </style>
@@ -64,7 +72,7 @@
                                         <th>Nama Beasiswa</th>
                                         <th>Nama Lengkap</th>
                                         <th>NIM</th>
-                                        <th>Fakultas</th>
+                                        <th style="width: 100px">Fakultas</th>
                                         <th>Jurusan</th>
                                         <th>Status</th>
                                         <th>Aksi</th>
