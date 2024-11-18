@@ -41,6 +41,11 @@
         <link rel="stylesheet" href="{{asset('mediplus-lite/css/normalize.css')}}">
         <link rel="stylesheet" href="{{asset('mediplus-lite/style.css')}}">
         <link rel="stylesheet" href="{{asset('mediplus-lite/css/responsive.css')}}">
+		<!-- Bootstrap CSS -->
+		{{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+		<!-- Bootstrap Bundle with Popper (JavaScript) -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script> --}}
+
 		
         <style>
             .nav.menu > li > a {
@@ -99,39 +104,37 @@
 			<div class="header-inner">
 				<div class="container">
 					<div class="inner">
-						<div class="row">
+						<div class="row justify-content-center">
 							<div class="col-lg-3 col-md-3 col-12">
 								<!-- Start Logo -->
-								<div class="logo">
+								<div class="logo d-flex align-items-center">
+									<img src="{{asset('images/logo.png')}}" alt="SIMAWA Logo" style="width: 40px; margin-right: 10px;">
 									<h3>SIMAWA UNJA</h3>
 								</div>
 								<!-- End Logo -->
-								<!-- Mobile Nav -->
-								<div class="mobile-nav"></div>
-								<!-- End Mobile Nav -->
 							</div>
 							<div class="col-lg-7 col-md-9 col-12">
 								<!-- Main Menu -->
-								<div class="main-menu">
+								<div class="main-menu text-center">
 									<nav class="navigation">
 										<ul class="nav menu">
                                             <li class="active"><a href="#">Home </a></li>
                                             <li><a href="#">About </a></li>
-											<li><a href="#">Berita </a></li>
-											<li><a href="#">Pengumuman </a></li>
+											<li><a href="#">Informasi </a></li>
 											<li><a href="#">Statistik <i class="icofont-rounded-down"></i></a>
 												<ul class="dropdown">
 													<li><a href="blog-single.html">Statistik Prestasi</a></li>
                                                     <li><a href="blog-single.html">Statistik Beasiswa</a></li>
 												</ul>
 											</li>
+											<li><a href="#">Galeri </a></li>
 										</ul>
 									</nav>
 								</div>
 								<!--/ End Main Menu -->
 							</div>
 							<div class="col-lg-2 col-12">
-                                <div class="get-quote">
+                                <div class="get-quote text-end">
                                     @if (Route::has('login'))
                                         @auth
                                             <a href="{{ url('/dashboard') }}" class="btn">
@@ -158,7 +161,7 @@
 		<section class="slider">
 			<div class="hero-slider">
 				<!-- Start Single Slider -->
-				<div class="single-slider" style="background-image: url('{{ asset('mediplus-lite/img/unja.png') }}');">
+				<div class="single-slider" style="background-image: url('{{ asset('mediplus-lite/img/about2.jpeg') }}');">
 					<div class="container">
 						<div class="row">
 							<div class="col-lg-12">
@@ -180,7 +183,7 @@
 		<!--/ End Slider Area -->
 		
 		<!-- Start Schedule Area -->
-		<section class="schedule">
+		{{-- <section class="schedule">
 			<div class="container">
 				<div class="schedule-inner">
 					<div class="row">
@@ -239,11 +242,177 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</section> --}}
 		<!--/End Start schedule Area -->
 
+		<!-- Start Why choose -->
+		<section class="why-choose section" >
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-6 col-12">
+						<!-- Start Choose Left -->
+						<div class="choose-left">
+							<h2>ABOUT SIMAWA</h2>
+							<p>Sistem Informasi Kemahasiswaan (SIMAWA) UNJA merupakan sistem informasi mahasiswa UNJA yang terkoordinir di bawah lembaga 
+										pengembangan kemahasiswaan dan alumni Universitas Jambi yang berfungsi untuk 
+										pengelolaan seluruh kegiatan kemahasiswaan Universitas Jambi.</p>
+									
+							<div class="row">
+								<div class="col-lg-6">
+									<ul class="list">
+										<li><i class="fa fa-circle"></i>Kompetisi </li>
+										<li><i class="fa fa-circle"></i>Pendanaan</li>
+										<li><i class="fa fa-circle"></i>Prestasi Mahasiswa</li>
+									</ul>
+								</div>
+								<div class="col-lg-6">
+									<ul class="list">
+										<li><i class="fa fa-circle"></i>Beasiswa </li>
+										<li><i class="fa fa-circle"></i>Unit Kegiatan Mahasiswa</li>
+										<li><i class="fa fa-circle"></i>Organisasi Kemahasiswaan</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+								<!-- End Choose Left -->
+					</div>
+					<div class="col-lg-6 col-12">
+						<!-- Start Choose Right -->
+						<div class="choose-right">
+							<div class="image">
+								<img src="{{ asset('mediplus-lite/img/about7.jpeg') }}" alt="Deskripsi Gambar" style="width: 100%; border-radius: 8px;">
+							</div>
+						</div>
+						<!-- End Choose Right -->
+					</div>
+				</div>
+			</div>
+		</section>
+
+				<!-- Start Blog Area -->
+		<section class="blog section" id="blog">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="section-title">
+							<h2>INFORMASI</h2>
+							<!-- Nav Tabs -->
+							<ul class="nav nav-tabs" id="myTab" role="tablist">
+								<li class="nav-item" role="presentation">
+									<button class="nav-link active" id="berita-tab" data-toggle="tab" data-target="#berita" type="button" role="tab" aria-controls="berita" aria-selected="true">Berita</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button class="nav-link" id="pengumuman-tab" data-toggle="tab" data-target="#pengumuman" type="button" role="tab" aria-controls="pengumuman" aria-selected="false">Pengumuman</button>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<!-- Tab Content -->
+				<div class="tab-content" id="myTabContent">
+					<!-- Berita Tab -->
+					<div class="tab-pane fade show active" id="berita" role="tabpanel" aria-labelledby="berita-tab">
+						<div class="row">
+							<div class="col-lg-4 col-md-6 col-12">
+								<!-- Single Blog -->
+								<div class="single-news">
+									<div class="news-head">
+										<img src="mediplus-lite/img/about7.jpeg" alt="#">
+									</div>
+									<div class="news-body">
+										<div class="news-content">
+											<div class="date">22 Aug, 2020</div>
+											<h2><a href="blog-single.html">We have announced our new product.</a></h2>
+											<p class="text">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Tambahkan konten berita lainnya jika diperlukan -->
+						</div>
+					</div>
+		
+					<!-- Pengumuman Tab -->
+					<div class="tab-pane fade" id="pengumuman" role="tabpanel" aria-labelledby="pengumuman-tab">
+						<div class="row">
+							<div class="col-lg-4 col-md-6 col-12">
+								<!-- Single Pengumuman -->
+								<div class="single-news">
+									<div class="news-head">
+										<img src="mediplus-lite/img/about7.jpeg" alt="#">
+									</div>
+									<div class="news-body">
+										<div class="news-content">
+											<div class="date">01 Sep, 2020</div>
+											<h2><a href="announcement-single.html">Important announcement for all users.</a></h2>
+											<p class="text">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!-- Tambahkan konten pengumuman lainnya jika diperlukan -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- End Blog Area -->
+
+		<!-- Start portfolio -->
+		<section class="portfolio section" >
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="section-title">
+							<h2>GALERI KEGIATAN KEMAHASISWAAN UNIVERSITAS JAMBI</h2>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-lg-12 col-12">
+						<div class="owl-carousel portfolio-slider">
+							<div class="single-pf">
+								<img src={{ asset('mediplus-lite/img/about.jpeg') }} alt="#" >
+								{{-- <a href="portfolio-details.html" class="btn">View Details</a> --}}
+							</div>
+							<div class="single-pf">
+								<img src={{ asset('mediplus-lite/img/about3.jpg') }} alt="#" >
+								{{-- <a href="portfolio-details.html" class="btn">View Details</a> --}}
+							</div>
+							<div class="single-pf">
+								<img src={{ asset('mediplus-lite/img/about4.jpg') }} alt="#" >
+							</div>
+							<div class="single-pf">
+								<img src={{ asset('mediplus-lite/img/about5.jpeg') }} alt="#" >
+								{{-- <a href="portfolio-details.html" class="btn">View Details</a> --}}
+							</div>
+							<div class="single-pf">
+								<img src={{ asset('mediplus-lite/img/about8.jpeg') }} alt="#">
+								{{-- <a href="portfolio-details.html" class="btn">View Details</a> --}}
+							</div>
+							<div class="single-pf">
+								<img src={{ asset('mediplus-lite/img/about9.jpeg') }} alt="#">
+								{{-- <a href="portfolio-details.html" class="btn">View Details</a> --}}
+							</div>
+							<div class="single-pf">
+								<img src={{ asset('mediplus-lite/img/about10.jpeg') }} alt="#">
+								{{-- <a href="portfolio-details.html" class="btn">View Details</a> --}}
+							</div>
+							<div class="single-pf">
+								<img src={{ asset('mediplus-lite/img/about11.jpeg') }} alt="#">
+								{{-- <a href="portfolio-details.html" class="btn">View Details</a> --}}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--/ End portfolio -->
+		<!--/ End Why choose -->
 		<!-- Start Feautes -->
-		<section class="Feautes section">
+		{{-- <section class="Feautes section">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12">
@@ -293,11 +462,11 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</section> --}}
 		<!--/ End Feautes -->
 		
 		<!-- Start Fun-facts -->
-		<div id="fun-facts" class="fun-facts section overlay">
+		{{-- <div id="fun-facts" class="fun-facts section overlay">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-3 col-md-6 col-12">
@@ -346,72 +515,11 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> --}}
 		<!--/ End Fun-facts -->
-		
-		<!-- Start Why choose -->
-		<section class="why-choose section" >
-			<div class="container">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="section-title">
-							<h2>We Offer Different Services To Improve Your Health</h2>
-							<img src="img/section-img.png" alt="#">
-							<p>Lorem ipsum dolor sit amet consectetur adipiscing elit praesent aliquet. pretiumts</p>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-6 col-12">
-						<!-- Start Choose Left -->
-						<div class="choose-left">
-							<h3>Who We Are</h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pharetra antege vel est lobortis, a commodo magna rhoncus. In quis nisi non emet quam pharetra commodo. </p>
-							<p>Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. </p>
-							<div class="row">
-								<div class="col-lg-6">
-									<ul class="list">
-										<li><i class="fa fa-caret-right"></i>Maecenas vitae luctus nibh. </li>
-										<li><i class="fa fa-caret-right"></i>Duis massa massa.</li>
-										<li><i class="fa fa-caret-right"></i>Aliquam feugiat interdum.</li>
-									</ul>
-								</div>
-								<div class="col-lg-6">
-									<ul class="list">
-										<li><i class="fa fa-caret-right"></i>Maecenas vitae luctus nibh. </li>
-										<li><i class="fa fa-caret-right"></i>Duis massa massa.</li>
-										<li><i class="fa fa-caret-right"></i>Aliquam feugiat interdum.</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-						<!-- End Choose Left -->
-					</div>
-					<div class="col-lg-6 col-12">
-						<!-- Start Choose Rights -->
-						<div class="choose-right">
-							<div class="video-image">
-								<!-- Video Animation -->
-								<div class="promo-video">
-									<div class="waves-block">
-										<div class="waves wave-1"></div>
-										<div class="waves wave-2"></div>
-										<div class="waves wave-3"></div>
-									</div>
-								</div>
-								<!--/ End Video Animation -->
-								<a href="https://www.youtube.com/watch?v=RFVXy6CRVR4" class="video video-popup mfp-iframe"><i class="fa fa-play"></i></a>
-							</div>
-						</div>
-						<!-- End Choose Rights -->
-					</div>
-				</div>
-			</div>
-		</section>
-		<!--/ End Why choose -->
-		
+				
 		<!-- Start Call to action -->
-		<section class="call-action overlay" data-stellar-background-ratio="0.5">
+		{{-- <section class="call-action overlay" data-stellar-background-ratio="0.5">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12 col-md-12 col-12">
@@ -426,67 +534,11 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</section> --}}
 		<!--/ End Call to action -->
-		
-		<!-- Start portfolio -->
-		<section class="portfolio section" >
-			<div class="container">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="section-title">
-							<h2>We Maintain Cleanliness Rules Inside Our Hospital</h2>
-							<img src="img/section-img.png" alt="#">
-							<p>Lorem ipsum dolor sit amet consectetur adipiscing elit praesent aliquet. pretiumts</p>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-lg-12 col-12">
-						<div class="owl-carousel portfolio-slider">
-							<div class="single-pf">
-								<img src="img/pf1.jpg" alt="#">
-								<a href="portfolio-details.html" class="btn">View Details</a>
-							</div>
-							<div class="single-pf">
-								<img src="img/pf2.jpg" alt="#">
-								<a href="portfolio-details.html" class="btn">View Details</a>
-							</div>
-							<div class="single-pf">
-								<img src="img/pf3.jpg" alt="#">
-								<a href="portfolio-details.html" class="btn">View Details</a>
-							</div>
-							<div class="single-pf">
-								<img src="img/pf4.jpg" alt="#">
-								<a href="portfolio-details.html" class="btn">View Details</a>
-							</div>
-							<div class="single-pf">
-								<img src="img/pf1.jpg" alt="#">
-								<a href="portfolio-details.html" class="btn">View Details</a>
-							</div>
-							<div class="single-pf">
-								<img src="img/pf2.jpg" alt="#">
-								<a href="portfolio-details.html" class="btn">View Details</a>
-							</div>
-							<div class="single-pf">
-								<img src="img/pf3.jpg" alt="#">
-								<a href="portfolio-details.html" class="btn">View Details</a>
-							</div>
-							<div class="single-pf">
-								<img src="img/pf4.jpg" alt="#">
-								<a href="portfolio-details.html" class="btn">View Details</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-		<!--/ End portfolio -->
-		
+
 		<!-- Start service -->
-		<section class="services section">
+		{{-- <section class="services section">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12">
@@ -554,11 +606,11 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</section> --}}
 		<!--/ End service -->
 		
 		<!-- Pricing Table -->
-		<section class="pricing-table section">
+		{{-- <section class="pricing-table section">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12">
@@ -656,79 +708,11 @@
 					<!-- End Single Table-->
 				</div>	
 			</div>	
-		</section>	
+		</section>	 --}}
 		<!--/ End Pricing Table -->
-		
-		
-		
-		<!-- Start Blog Area -->
-		<section class="blog section" id="blog">
-			<div class="container">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="section-title">
-							<h2>Keep up with Our Most Recent Medical News.</h2>
-							<img src="img/section-img.png" alt="#">
-							<p>Lorem ipsum dolor sit amet consectetur adipiscing elit praesent aliquet. pretiumts</p>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-4 col-md-6 col-12">
-						<!-- Single Blog -->
-						<div class="single-news">
-							<div class="news-head">
-								<img src="img/blog1.jpg" alt="#">
-							</div>
-							<div class="news-body">
-								<div class="news-content">
-									<div class="date">22 Aug, 2020</div>
-									<h2><a href="blog-single.html">We have annnocuced our new product.</a></h2>
-									<p class="text">Lorem ipsum dolor a sit ameti, consectetur adipisicing elit, sed do eiusmod tempor incididunt sed do incididunt sed.</p>
-								</div>
-							</div>
-						</div>
-						<!-- End Single Blog -->
-					</div>
-					<div class="col-lg-4 col-md-6 col-12">
-						<!-- Single Blog -->
-						<div class="single-news">
-							<div class="news-head">
-								<img src="img/blog2.jpg" alt="#">
-							</div>
-							<div class="news-body">
-								<div class="news-content">
-									<div class="date">15 Jul, 2020</div>
-									<h2><a href="blog-single.html">Top five way for solving teeth problems.</a></h2>
-									<p class="text">Lorem ipsum dolor a sit ameti, consectetur adipisicing elit, sed do eiusmod tempor incididunt sed do incididunt sed.</p>
-								</div>
-							</div>
-						</div>
-						<!-- End Single Blog -->
-					</div>
-					<div class="col-lg-4 col-md-6 col-12">
-						<!-- Single Blog -->
-						<div class="single-news">
-							<div class="news-head">
-								<img src="img/blog3.jpg" alt="#">
-							</div>
-							<div class="news-body">
-								<div class="news-content">
-									<div class="date">05 Jan, 2020</div>
-									<h2><a href="blog-single.html">We provide highly business soliutions.</a></h2>
-									<p class="text">Lorem ipsum dolor a sit ameti, consectetur adipisicing elit, sed do eiusmod tempor incididunt sed do incididunt sed.</p>
-								</div>
-							</div>
-						</div>
-						<!-- End Single Blog -->
-					</div>
-				</div>
-			</div>
-		</section>
-		<!-- End Blog Area -->
-		
+					
 		<!-- Start clients -->
-		<div class="clients overlay">
+		{{-- <div class="clients overlay">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12 col-md-12 col-12">
@@ -764,11 +748,11 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> --}}
 		<!--/Ens clients -->
 		
 		<!-- Start Appointment -->
-		<section class="appointment">
+		{{-- <section class="appointment">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12">
@@ -855,11 +839,11 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</section> --}}
 		<!-- End Appointment -->
 		
 		<!-- Start Newsletter Area -->
-		<section class="newsletter section">
+		{{-- <section class="newsletter section">
 			<div class="container">
 				<div class="row ">
 					<div class="col-lg-6  col-12">
@@ -883,7 +867,7 @@
 					</div>
 				</div>
 			</div>
-		</section>
+		</section> --}}
 		<!-- /End Newsletter Area -->
 		
 		<!-- Footer Area -->
@@ -892,41 +876,35 @@
 			<div class="footer-top">
 				<div class="container">
 					<div class="row">
-						<div class="col-lg-3 col-md-6 col-12">
+						<div class="col-lg-6 col-md-6 col-12">
 							<div class="single-footer">
-								<h2>About Us</h2>
-								<p>Lorem ipsum dolor sit am consectetur adipisicing elit do eiusmod tempor incididunt ut labore dolore magna.</p>
+								<h2>Tentang Kami</h2>
+								<p>Sistem Informasi Kemahasiswaan (SIMAWA) UNJA merupakan sistem informasi mahasiswa UNJA yang terkoordinir di bawah lembaga 
+									pengembangan kemahasiswaan dan alumni Universitas Jambi yang berfungsi untuk 
+									pengelolaan seluruh kegiatan kemahasiswaan Universitas Jambi.</p>
 								<!-- Social -->
 								<ul class="social">
 									<li><a href="#"><i class="icofont-facebook"></i></a></li>
-									<li><a href="#"><i class="icofont-google-plus"></i></a></li>
-									<li><a href="#"><i class="icofont-twitter"></i></a></li>
-									<li><a href="#"><i class="icofont-vimeo"></i></a></li>
-									<li><a href="#"><i class="icofont-pinterest"></i></a></li>
+									<li><a href="#"><i class="icofont-instagram"></i></a></li>
+									<li><a href="#"><i class="icofont-youtube"></i></a></li>
+									<li><a href="#"><i class="icofont-email"></i></a></li>
+									{{-- <li><a href="#"><i class="icofont-pinterest"></i></a></li> --}}
 								</ul>
 								<!-- End Social -->
 							</div>
 						</div>
 						<div class="col-lg-3 col-md-6 col-12">
 							<div class="single-footer f-link">
-								<h2>Quick Links</h2>
+								<h2>Link Utama</h2>
 								<div class="row">
-									<div class="col-lg-6 col-md-6 col-12">
+									<div class="col-lg-12 col-md-6 col-12">
 										<ul>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Home</a></li>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>About Us</a></li>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Services</a></li>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Our Cases</a></li>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Other Links</a></li>	
-										</ul>
-									</div>
-									<div class="col-lg-6 col-md-6 col-12">
-										<ul>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Consuling</a></li>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Finance</a></li>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Testimonials</a></li>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>FAQ</a></li>
-											<li><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i>Contact Us</a></li>	
+											<li><a href="https://www.unja.ac.id/"><i class="fa fa-caret-right" aria-hidden="true"></i>WEB UNJA</a></li>
+											<li><a href="https://gerbang.unja.ac.id/"><i class="fa fa-caret-right" aria-hidden="true"></i>PORTAL GERBANG UNJA</a></li>
+											<li><a href="https://siakad.unja.ac.id/"><i class="fa fa-caret-right" aria-hidden="true"></i>SISTEM INFORMASI AKADEMIK</a></li>
+											<li><a href="https://skpi.unja.ac.id/"><i class="fa fa-caret-right" aria-hidden="true"></i>SKPI</a></li>
+											<li><a href="https://www.library.unja.ac.id/"><i class="fa fa-caret-right" aria-hidden="true"></i>PERPUSTAKAAN</a></li>	
+											<li><a href="https://repository.unja.ac.id/"><i class="fa fa-caret-right" aria-hidden="true"></i>REPOSITORY</a></li>	
 										</ul>
 									</div>
 								</div>
@@ -934,24 +912,13 @@
 						</div>
 						<div class="col-lg-3 col-md-6 col-12">
 							<div class="single-footer">
-								<h2>Open Hours</h2>
-								<p>Lorem ipsum dolor sit ame consectetur adipisicing elit do eiusmod tempor incididunt.</p>
+								<h2>Kontak Kami</h2>
+								<p>Jl. Raya Jambi - Muara Bulian Km. 15, Mendalo Indah, Jambi Luar Kota, Jambi 36361</p>
 								<ul class="time-sidual">
-									<li class="day">Monday - Fridayp <span>8.00-20.00</span></li>
-									<li class="day">Saturday <span>9.00-18.30</span></li>
-									<li class="day">Monday - Thusday <span>9.00-15.00</span></li>
+									<li class="day">Senin - Jum'at <span>07.00 - 17.00 WIB</span></li>
+									{{-- <li class="day">Saturday <span>9.00-18.30</span></li>
+									<li class="day">Monday - Thusday <span>9.00-15.00</span></li> --}}
 								</ul>
-							</div>
-						</div>
-						<div class="col-lg-3 col-md-6 col-12">
-							<div class="single-footer">
-								<h2>Newsletter</h2>
-								<p>subscribe to our newsletter to get allour news in your inbox.. Lorem ipsum dolor sit amet, consectetur adipisicing elit,</p>
-								<form action="mail/mail.php" method="get" target="_blank" class="newsletter-inner">
-									<input name="email" placeholder="Email Address" class="common-input" onfocus="this.placeholder = ''"
-										onblur="this.placeholder = 'Your email address'" required="" type="email">
-									<button class="button"><i class="icofont icofont-paper-plane"></i></button>
-								</form>
 							</div>
 						</div>
 					</div>
@@ -964,7 +931,7 @@
 					<div class="row">
 						<div class="col-lg-12 col-md-12 col-12">
 							<div class="copyright-content">
-								<p>© Copyright 2018  |  All Rights Reserved by <a href="https://www.wpthemesgrid.com" target="_blank">wpthemesgrid.com</a> </p>
+								<p>© Copyright 2024  |  All Rights Reserved by UNIVERSITAS JAMBI </p>
 							</div>
 						</div>
 					</div>

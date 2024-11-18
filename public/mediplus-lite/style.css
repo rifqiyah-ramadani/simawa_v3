@@ -125,7 +125,7 @@ body{
 	bottom: 15px;
 	right: 15px;
 	padding: 10px 20px;
-	background: #1a76d1;
+	background: #ff9800;
 	color: #fff;
 	font-size: 25px;
 	width: 45px;
@@ -137,7 +137,7 @@ body{
 	box-shadow: 0px 0px 10px #00000026;
 }
 #scrollUp:hover{
-	background:#2C2D3F;
+	background:#d35400;
 }
 /* Color Plate */
 .color-plate {
@@ -308,7 +308,7 @@ body{
 }
 .get-quote .btn:before{
 	color:#fff;
-	background-color: #1a76d1;
+	background-color: #d35400;
 }
 .header .logo {
 	float: left;
@@ -321,6 +321,10 @@ body{
 	margin: 0;
 	height: 0px;
 	min-height: 0px;
+}
+.header .nav {
+	justify-content: center;
+	display: flex;
 }
 .header .nav li{
 	margin-right: 15px;
@@ -594,22 +598,34 @@ body{
 =============================*/
 .slider .single-slider {
 	height: 600px;
-	background-size: cover;
+	background-size: 100%;
 	background-position: center;
 	background-repeat:no-repeat;
-	/* filter: blur(2px); */
+	position: relative;
+}
+.single-slider::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(32, 30, 30, 0.5); /* Gelap overlay, bisa disesuaikan */
+    z-index: 1; /* Overlay berada di atas background image */
 }
 .slider .single-slider .text{
-	margin-top:120px;
+	margin-top: 120px;
+	z-index: 2;
+	position: relative;
 }
 .slider.index2 .single-slider .text{
-	margin-top:150px;
+	margin-top:550px;
 }
 .slider .single-slider h1 {
 	color: #fff;
 	font-size: 38px;
 	font-weight: 700;
-	margin: 0;
+	margin-top: 200px;
 	padding: 0;
 	line-height: 42px;
 	text-align: center;
@@ -635,10 +651,10 @@ body{
 }
 .slider .single-slider .btn:before{
 	margin:0;
-	background:#1A76D1;
+	background:#d35400;
 }
 .slider .single-slider .btn.primary{
-	background:#1A76D1;
+	background:#d35400;
 	color:#fff;
 }
 .slider .single-slider .btn.primary:before{
@@ -971,23 +987,26 @@ body{
 /*===================
 	Why choose CSS
 =====================*/
-.why-choose .choose-left h3{
-	font-size:24px;
-	font-weight:600;
-	color:#2C2D3F;
-	position:relative;
-	padding-bottom:20px;
-	margin-bottom:24px;
+.why-choose .choose-left h2 {
+    /* font-size: 24px; */
+    font-weight: 600;
+    color: #2C2D3F;
+    position: relative;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
 }
-.why-choose .choose-left h3:before{
-	position:absolute;
+
+.why-choose .choose-left h2:before {
+    position:absolute;
 	content:"";
 	left:0;
 	bottom:0;
-	height:2px;
-	width:50px;
-	background:#1a76d1;
+	height:3px;
+	width:100px;
+	background:#ff9800;
+    /* border-top: 1px dashed #ff9800;  */
 }
+
 .why-choose .choose-left p{
 	margin-bottom:35px;
 }
@@ -999,17 +1018,12 @@ body{
 .why-choose .choose-left .list li:last-child{
 	margin-bottom:0px;
 }
-.why-choose .choose-left .list li i{
-	height:15px;
-	width:15px;
-	line-height:15px;
-	text-align:center;
-	background:#1a76d1;
-	color:#fff;
-	font-size:14px;
-	border-radius:100%;
-	padding-left:2px;
-	margin-right:16px;
+.why-choose .choose-left .list li i {
+    color: #ff9800; /* Memberikan warna langsung ke ikon */
+    font-size: 14px;
+    margin-right: 8px; /* Menyesuaikan jarak antar teks dan ikon */
+    background: none; /* Menghapus latar belakang */
+    padding: 0; /* Menghapus padding agar ukuran sesuai ikon */
 }
 /* Start Faq CSS */
 .why-choose{
@@ -1141,14 +1155,52 @@ body{
 	Start Portfolio CSS
 ============================*/
 .portfolio{
-	background:#FDFDFD;
+	background:#FFF;
+}
+
+.portfolio .section-title h2 {
+	font-weight: 600;
+    color: #2C2D3F;
+    position: relative;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+}
+.portfolio .section-title h2:before {
+	position: absolute;
+	content: "";
+	left: 50%;
+	bottom: 0;
+	height: 3px;
+	width: 100px;
+	background: #ff9800;
+	transform: translateX(-50%);
+    /* border-top: 1px dashed #ff9800;  */
+}
+.portfolio .portfolio-slider {
+	/* background-color: #ffe0b3; */
+	background-position:center;
+	padding:100px 0px;
+	position:relative;
 }
 .portfolio .single-pf{
 	position:relative;
+	position: relative;
+    overflow: hidden; /* overflow hidden untuk efek gambar */
+    border-radius: 10px; /* border-radius untuk sudut */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Berikan bayangan */
+    transition: transform 0.3s ease-in-out;
+}
+.portfolio .single-pf:hover {
+    transform: scale(1.05); /* Zoom lebih terasa saat hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Bayangan lebih tajam saat hover */
 }
 .portfolio .single-pf img{
 	height:100%;
 	width:100%;
+	transition: transform 0.4s ease-in-out;
+}
+.portfolio .single-pf:hover img {
+    transform: scale(1.05); /* Efek zoom pada gambar saat hover */
 }
 .portfolio .single-pf:before{
 	position:absolute;
@@ -1157,11 +1209,9 @@ body{
 	top:0;
 	height:100%;
 	width:100%;
-	background:#1a76d1;
+	Background: rgba(0, 0, 0, 0.5); /* Warna overlay */
 	opacity:0;
 	visibility:hidden;
-	-webkit-transition:all 0.4s ease;
-	-moz-transition:all 0.4s ease;
 	transition:all 0.4s ease;
 	z-index:1;
 }
@@ -1169,148 +1219,11 @@ body{
 	opacity:0.7;
 	visibility:visible;
 }
-.portfolio .single-pf .btn {
-	color: #1a76d1;
-	z-index: 3;
-	background: #fff;
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	border-radius: 0px;
-	opacity: 0;
-	visibility: hidden;
-	-webkit-transition: all 0.4s ease;
-	-moz-transition: all 0.4s ease;
-	transition: all 0.4s ease;
-	height: 48px;
-	width: 150px;
-	text-align: center;
-	line-height: 48px;
-	padding: 0;
-	font-weight: 500;
-	font-size: 14px;
-	margin-left: -75px;
-	margin-top: -24px;
-	border-radius:4px;
-}
-.portfolio .single-pf:hover .btn{
-	opacity:1;
-	visibility:visible;
-}
 .portfolio .single-pf .btn:hover{
 	color:#fff;
 }
 .portfolio .owl-nav{
 	display:none;
-}
-/* Slider Nav */
-.pf-details .image-slider .owl-nav{
-	margin: 0;
-    position: absolute;
-    top: 50%;
-    width: 100%;
-	margin-top:-25px;
-}
-.pf-details .image-slider .owl-carousel .owl-nav div {
-	height: 50px;
-	width: 50px;
-	line-height: 45px;
-	background: #fff;
-	color: #1A76D1;
-	position: absolute;
-	margin: 0;
-	border-radius: 100%;
-	font-size: 20px;
-	text-align: center;
-	-webkit-transition: all 0.4s ease;
-	-moz-transition: all 0.4s ease;
-	transition: all 0.4s ease;
-	box-shadow: 0px 0px 10px #0000001a;
-}
-.pf-details .image-slider .owl-carousel .owl-nav div:hover{
-	color:#fff;
-	background:#1A76D1;
-}
-.pf-details .image-slider .owl-carousel .owl-controls .owl-nav .owl-prev{
-	left:20px;
-}
-.pf-details .image-slider .owl-carousel .owl-controls .owl-nav .owl-next{
-	right:20px;
-}
-.pf-details .image-slider{
-	border-radius:8px 8px 0 0;
-}
-.pf-details .image-slider img{
-	height:100%;
-	width:100%;
-}
-.pf-details .date{
-	background: #1a76d1;
-	display: block;
-	padding: 20px;
-	text-align: center;
-	border-radius: 0;
-	border: none;
-	margin: 0;
-	margin-top: -1px;
-}
-.pf-details .date ul li{
-	font-size:16px;
-	color:#fff;
-	display:inline-block;
-	margin-right:60px;
-}
-.pf-details .date ul li:last-child{
-	margin:0;
-}
-.pf-details .date ul li span{
-	font-weight:500;
-	display:inline-block;
-	margin-right:5px;
-}
-.pf-details .body-text{}
-.pf-details .body-text h3 {
-	font-size: 30px;
-	font-weight: 600;
-	color: #333;
-	margin-top: 40px;
-}
-.pf-details .body-text p{
-	margin-top:20px;
-}
-.pf-details .body-text .share{
-	margin-top:40px;
-}
-.pf-details .body-text .share h4 {
-	font-size: 15px;
-	font-weight: 500;
-	display: inline-block;
-}
-.pf-details .body-text .share ul{
-	display:inline-block;
-	margin-left:12px;
-}
-.pf-details .body-text .share ul li{
-	display:inline-block;
-	margin-right:10px;
-}
-.pf-details .body-text .share ul li:last-child{
-	margin-right:0;
-}
-.pf-details .body-text .share ul li a{
-	height:35px;
-	width:35px;
-	line-height:35px;
-	text-align:center;
-	border:1px solid #C8C8C8;
-	color:#757575;
-	display:block;
-	border-radius:50%;
-}
-.pf-details .body-text .share ul li a:hover{
-	color:#fff;
-	border-color:transparent;
-	background:#1A76D1;
 }
 /*==========================
 	End Portfolio CSS
@@ -2002,11 +1915,31 @@ body{
 	Start Blog CSS
 =========================*/
 .blog{
-	background:#fff;
+	background:#FDFDFD;
+	/* margin-top: 5px; */
 }
-.blog .blog-title{
+/* .blog .blog-title{
 	text-align:center;
+} */
+.blog .section-title h2 {
+	font-weight: 600;
+    color: #2C2D3F;
+    position: relative;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
 }
+.blog .section-title h2:before {
+	position: absolute;
+	content: "";
+	left: 50%;
+	bottom: 0;
+	height: 3px;
+	width: 100px;
+	background: #ff9800;
+	transform: translateX(-50%);
+    /* border-top: 1px dashed #ff9800;  */
+}
+
 .blog .single-news {
 	background: #fff;
 	position: relative;
@@ -2043,7 +1976,7 @@ body{
 	bottom:0;
 	height:2px;
 	width:0%;
-	background:#1A76D1;
+	background:#ff9800;
 	opacity:0;
 	visibility:hidden;
 	-webkit-transition:all 0.4s ease;
@@ -2066,7 +1999,7 @@ body{
 	font-weight: 500;
 }
 .blog .single-news .news-body h2 a:hover{
-	color:#1A76D1;
+	color: #ff9800;
 }
 .blog .single-news .news-content p {
 	font-weight: 400;
@@ -2079,7 +2012,7 @@ body{
 	display: inline-block;
 	font-size: 14px;
 	margin-bottom: 5px;
-	background: #1A76D1;
+	background: #ff9800;
 	color: #fff;
 	padding: 4px 15px;
 	border-radius: 3px;
@@ -2089,6 +2022,36 @@ body{
 .blog.grid .single-news{
 	margin-top:30px;
 }
+.nav-tabs {
+    border: none;
+    justify-content: center;
+    display: flex;
+    padding: 10px 0;
+	margin: 0 auto; /* Memastikan elemen berada di tengah */
+    width: fit-content; /* Menyesuaikan lebar kontainer */
+}
+.nav-tabs .nav-link {
+    border-radius: 25px;
+    padding: 12px 25px;
+    color: #fff;
+    background-color: #d35400;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+    text-align: center;
+}
+.nav-tabs .nav-link.active {
+	background: linear-gradient(135deg, #FF9800, #FFC107);
+    color: #fff;
+    border: none; /* Menghapus border hitam */
+	outline: none; /* Menghapus outline */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+}
+.nav-tabs .nav-link:hover {
+    background-color: #ffe0b3;
+	border: none;
+	outline: none;
+}
+
 /* Blog Sidebar */
 .main-sidebar {
 	background: #fff;
@@ -3977,7 +3940,7 @@ body{
 .footer .footer-top{
 	padding:100px 0px;
 	position:relative;
-	background:#1A76D1;
+	background:#ff9800;
 }
 .footer .footer-top:before{
 	position:absolute;
@@ -4016,7 +3979,7 @@ body{
 	font-size: 16px;
 }
 .footer .single-footer .social li a:hover{
-	color:#1A76D1;
+	color:#ff9800;
 	background:#fff;
 	border-color:transparent;
 }
@@ -4161,7 +4124,7 @@ body{
 	color:#2C2D3F;
 }
 .footer .copyright{
-	background:#1A76D1;
+	background:#ff9800;
 	padding:25px 0px 25px 0px;
 	text-align:center;
 }
