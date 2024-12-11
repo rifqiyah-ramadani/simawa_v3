@@ -171,14 +171,14 @@
             <!-- Membuat tombol "Kembali ke daftar usulan"-->
             <button class="btn btn-outline-primary" onclick="history.back()">
                 <i class="fa fa-arrow-left"></i> Kembali ke daftar usulan
-            </button>
+            </button> 
         </div>
 
         <!-- Membuat progress bar untuk menampilkan tahapan -->
         <ul class="progressbar d-flex justify-content-between">
             @php $displayIndex = 1; @endphp <!-- Variabel indeks tampilan -->
             @foreach ($tahapans as $index => $tahapan)
-                @if ($tahapan['nama_tahapan'] === 'Pendaftaran Beasiswa')
+                @if ($tahapan['nama_tahapan'] === 'Pendaftaran beasiswa')
                     <!-- Lewati tahapan "Pendaftaran Beasiswa" -->
                     @continue
                 @endif
@@ -195,19 +195,19 @@
         <div class="tab-content mt-4">
             @php $displayIndex = 1; @endphp <!-- Reset indeks tampilan untuk konten tab -->
             @foreach ($tahapans as $index => $tahapan)
-                @if ($tahapan['nama_tahapan'] !== 'Pendaftaran Beasiswa')
+                @if ($tahapan['nama_tahapan'] !== 'Pendaftaran beasiswa')
                     <!-- Tampilkan konten tab untuk setiap tahapan kecuali "Pendaftaran Beasiswa" -->
                     <div class="tab-pane fade {{ $displayIndex === 1 ? 'show active' : '' }}" id="tab{{ $displayIndex }}" role="tabpanel"
                         data-tanggal-mulai="{{ $tahapan['tanggal_mulai'] }}" 
                         data-tanggal-akhir="{{ $tahapan['tanggal_akhir'] }}">
                         <!-- Tampilkan konten Seleksi Administrasi -->
-                        @if ($tahapan['nama_tahapan'] === 'Seleksi Administrasi')    
+                        @if ($tahapan['nama_tahapan'] === 'Seleksi administrasi')    
                             <!-- Konten Seleksi Administrasi -->
                             <div class="card mb-4 shadow-sm rounded">
                                 <!-- Header card menampilkan nama beasiswa dan status -->
                                 <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #f6783a;">
                                     <h4 class="fw-bold mb-0">{{ $namaBeasiswa }}</h4>
-                                    {{-- <span class="badge-status">Status: {{ $pendaftaran->status }}</span> --}}
+                                    <span class="badge-status">Status: {{ $pendaftaran->status }}</span>
                                 </div>
     
                                 <!-- card body menampilkan data mahasiswa -->
@@ -274,12 +274,14 @@
                                         @php
                                             $statusClass = match($statusUsulanAwal) {
                                                 'lulus seleksi administrasi' => 'text-success',
+                                                'diterima' => 'text-success',
                                                 'diproses' => 'text-warning',
                                                 'ditolak' => 'text-danger',
                                                 default => 'text-secondary',
                                             };
                                             $statusIcon = match($statusUsulanAwal) {
                                                 'lulus seleksi administrasi' => 'fa-check-circle',
+                                                'diterima' => 'fa-check-circle',
                                                 'diproses' => 'fa-hourglass-half',
                                                 'ditolak' => 'fa-times-circle',
                                                 default => 'fa-question-circle',
@@ -290,29 +292,30 @@
                                         <h4 class="mt-2 fw-bold {{ $statusClass }}">{{ ucfirst($statusUsulanAwal) }}</h4>
                                     </div>
                         
-                                    @if($statusUsulanAwal === 'ditolak')
+                                        @if($statusUsulanAwal === 'ditolak')
+                                            <p class="mb-0">
+                                            Status terbaru usulan beasiswa Anda adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
+                                                <br>
+                                                Kami mohon maaf, Anda tidak dapat melanjutkan ke tahapan seleksi berikutnya.
+                                                <br>
+                                                Terima kasih telah berpartisipasi.
+                                            </p>
+                                        @endif
+                                        @if($statusUsulanAwal === 'lulus seleksi administrasi')
+                                            <p class="mb-0">
+                                                Selamat! Anda dinyatakan <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }} </span> untuk beasiswa {{ $namaBeasiswa }}.
+                                                <br>
+                                                Silakan pantau informasi secara berkala untuk mendapatkan pembaruan mengenai tahapan seleksi berikutnya.
+                                            </p>
+                                        @endif
+                                        @if($statusUsulanAwal === 'diterima')
                                         <p class="mb-0">
-                                           Status terbaru usulan beasiswa Anda adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
-                                            <br>
-                                            Kami mohon maaf, Anda tidak dapat melanjutkan ke tahapan seleksi berikutnya.
-                                            <br>
-                                            Terima kasih telah berpartisipasi.
+                                            Selamat! Anda dinyatakan <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }} </span> pada beasiswa {{ $namaBeasiswa }}.
                                         </p>
                                     @endif
-                                    @if($statusUsulanAwal === 'lulus seleksi administrasi')
-                                        <p class="mb-0">
-                                            Selamat! Anda dinyatakan <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }} </span> untuk beasiswa {{ $namaBeasiswa }}.
-                                            <br>
-                                            Silakan pantau informasi secara berkala untuk mendapatkan pembaruan mengenai tahapan seleksi berikutnya.
-                                        </p>
-                                    @endif
-                                </div>
-                        
-                                <div class="card-footer text-center">
-                                    <button class="btn btn-primary" onclick="goToPreviousTab()">Kembali ke Tab Sebelumnya</button>
                                 </div>
                             </div>
-                            @elseif ($tahapan['nama_tahapan'] === 'Seleksi Wawancara')
+                        @elseif ($tahapan['nama_tahapan'] === 'Seleksi wawancara')
                             <!-- Konten Seleksi Wawancara -->
                             <div class="mt-4">
                                 <div class="card shadow-sm rounded mb-4">
@@ -418,7 +421,7 @@
                                     </div>
                                 </div>
                             </div>                          
-                        @elseif ($tahapan['nama_tahapan'] === 'Pengumuman Akhir')
+                        @elseif ($tahapan['nama_tahapan'] === 'Pengumuman akhir')
                             <!-- Konten Pengumuman Seleksi Wawancara -->
                             <div class="card shadow-sm rounded mb-4">
                                 <div class="card-header text-white" style="background-color: #4a90e2;">
@@ -429,14 +432,16 @@
                                     <h3 class="mb-3">Status Usulan Anda</h3>
                                     <div class="p-3 mb-3 rounded" style="background-color: #f7f9fc;">
                                         @php
-                                            $statusClass = match($statusUsulanAkhir) {
-                                                'lulus seleksi wawancara' => 'text-success',
+                                            $statusClass = match($statusUsulanAwal) {
+                                                'lulus seleksi administrasi' => 'text-success',
+                                                'diterima' => 'text-success',
                                                 'diproses' => 'text-warning',
                                                 'ditolak' => 'text-danger',
                                                 default => 'text-secondary',
                                             };
-                                            $statusIcon = match($statusUsulanAkhir) {
-                                                'lulus seleksi wawancara' => 'fa-check-circle',
+                                            $statusIcon = match($statusUsulanAwal) {
+                                                'lulus seleksi administrasi' => 'fa-check-circle',
+                                                'diterima' => 'fa-check-circle',
                                                 'diproses' => 'fa-hourglass-half',
                                                 'ditolak' => 'fa-times-circle',
                                                 default => 'fa-question-circle',
@@ -444,31 +449,30 @@
                                         @endphp
                         
                                         <i class="fa {{ $statusIcon }} fa-3x {{ $statusClass }}"></i>
-                                        <h4 class="mt-2 fw-bold {{ $statusClass }}">{{ ucfirst($statusUsulanAkhir) }}</h4>
+                                        <h4 class="mt-2 fw-bold {{ $statusClass }}">{{ ucfirst($statusUsulanAwal) }}</h4>
                                     </div>
                         
-                                    @if($statusUsulanAwal === 'ditolak')
+                                        @if($statusUsulanAwal === 'ditolak')
+                                            <p class="mb-0">
+                                            Status terbaru usulan beasiswa Anda adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
+                                                <br>
+                                                Kami mohon maaf, Anda tidak dapat melanjutkan ke tahapan seleksi berikutnya.
+                                                <br>
+                                                Terima kasih telah berpartisipasi.
+                                            </p>
+                                        @endif
+                                        @if($statusUsulanAwal === 'lulus seleksi administrasi')
+                                            <p class="mb-0">
+                                                Selamat! Anda dinyatakan <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }} </span> untuk beasiswa {{ $namaBeasiswa }}.
+                                                <br>
+                                                Silakan pantau informasi secara berkala untuk mendapatkan pembaruan mengenai tahapan seleksi berikutnya.
+                                            </p>
+                                        @endif
+                                        @if($statusUsulanAwal === 'diterima')
                                         <p class="mb-0">
-                                           Status terbaru usulan beasiswa Anda adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
-                                            <br>
-                                            Kami mohon maaf, Anda tidak dapat melanjutkan ke tahapan seleksi berikutnya.
-                                            <br>
-                                            Terima kasih telah berpartisipasi.
+                                            Selamat! Anda dinyatakan <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }} </span> pada beasiswa {{ $namaBeasiswa }}.
                                         </p>
                                     @endif
-                                    @if($statusUsulanAwal === 'lulus seleksi administrasi')
-                                        <p class="mb-0">
-                                            Selamat! Anda dinyatakan <span class="fw-bold">{{ ucfirst($statusUsulanAkhir) }} </span> untuk beasiswa {{ $namaBeasiswa }}.
-                                            <br>
-                                            Silakan pantau informasi secara berkala untuk mendapatkan pembaruan mengenai tahapan seleksi berikutnya.
-                                        </p>
-                                    @endif
-                                </div>
-                        
-                                <div class="card-footer text-center">
-                                    <button class="btn btn-primary" onclick="goToPreviousTab()">
-                                        <i class="fa fa-arrow-left"></i> Kembali ke Tab Sebelumnya
-                                    </button>
                                 </div>
                             </div>
                         @endif

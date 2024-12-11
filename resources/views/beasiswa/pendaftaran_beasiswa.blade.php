@@ -131,7 +131,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-    $(document).ready(function () {
+    $(document).ready(function () { 
         // Fungsi untuk menangani perubahan filter status
         $('#filter-status').change(function() {
             var status = $(this).val(); // Ambil nilai status dari dropdown
@@ -153,35 +153,27 @@
 
         // Fungsi untuk tombol Lihat Detail
         $(document).on('click', '.tombol-daftar', function () {
-            var pendaftaranId = $(this).data('id');
-            var status = $(this).data('status'); // Ambil status beasiswa
+        var pendaftaranId = $(this).data('id');
+        var status = $(this).data('status'); // Ambil status beasiswa
 
-            if (status === 'ditutup') {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Beasiswa Sedang Ditutup',
-                    text: 'Silakan tunggu info selanjutnya.',
-                    confirmButtonText: 'OK'
-                });
-            } else {
-                $.ajax({ 
-                    url: '/pendaftaran-beasiswa/persyaratan/' + pendaftaranId,
-                    type: 'GET',
-                    success: function (response) {
-                        if (response.success) {
-                            window.location.href = '/pendaftaran-beasiswa/daftar/' + pendaftaranId;
-                        } else {
-                            window.location.href = '/pendaftaran-beasiswa/' + pendaftaranId;
-                        }
-                    },
-                    error: function (xhr) {
-                        iziToast.error({ 
-                            title: 'Error', 
-                            message: 'Terjadi kesalahan, coba lagi.' 
-                        });
-                    }
+        $.ajax({ 
+            url: '/pendaftaran-beasiswa/persyaratan/' + pendaftaranId,
+            type: 'GET',
+            success: function (response) {
+                if (response.success) {
+                    window.location.href = '/pendaftaran-beasiswa/daftar/' + pendaftaranId;
+                } else {
+                    window.location.href = '/pendaftaran-beasiswa/' + pendaftaranId;
+                }
+            },
+            error: function (xhr) {
+                iziToast.error({ 
+                    title: 'Error', 
+                    message: 'Terjadi kesalahan, coba lagi.' 
                 });
             }
+        });
+            // }
         });
     });
 </script>

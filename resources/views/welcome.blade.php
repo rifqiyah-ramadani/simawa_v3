@@ -52,6 +52,13 @@
                 display: flex;
                 align-items: center;
             }
+
+			.news-head img {
+				width: 100%; /* Lebar gambar mengikuti lebar kolom */
+				height: 200px; /* Atur tinggi gambar */
+				object-fit: cover; /* Memastikan gambar terpotong rapi */
+				border-radius: 8px; /* Opsional: berikan sudut melengkung */
+			}
         </style>
     </head>
     <body>
@@ -118,18 +125,17 @@
 								<div class="main-menu text-center">
 									<nav class="navigation">
 										<ul class="nav menu">
-                                            <li class="active"><a href="#">Home </a></li>
-                                            <li><a href="#">About </a></li>
-											<li><a href="#">Informasi </a></li>
+											<li><a href="#home">Home</a></li>
+											<li><a href="#about">About</a></li>
+											<li><a href="#informasi">Informasi</a></li>
 											<li><a href="#">Statistik <i class="icofont-rounded-down"></i></a>
 												<ul class="dropdown">
 													<li><a href="blog-single.html">Statistik Prestasi</a></li>
                                                     <li><a href="blog-single.html">Statistik Beasiswa</a></li>
 												</ul>
 											</li>
-											<li><a href="#">Galeri </a></li>
+											<li><a href="#galeri">Galeri</a></li>
 										</ul>
-									</nav>
 								</div>
 								<!--/ End Main Menu -->
 							</div>
@@ -158,7 +164,7 @@
 		<!-- End Header Area -->
 		
 		<!-- Slider Area -->
-		<section class="slider">
+		<section class="slider" id="home">
 			<div class="hero-slider">
 				<!-- Start Single Slider -->
 				<div class="single-slider" style="background-image: url('{{ asset('mediplus-lite/img/about2.jpeg') }}');">
@@ -246,7 +252,7 @@
 		<!--/End Start schedule Area -->
 
 		<!-- Start Why choose -->
-		<section class="why-choose section" >
+		<section class="why-choose section" id="about">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-6 col-12">
@@ -289,8 +295,8 @@
 			</div>
 		</section>
 
-				<!-- Start Blog Area -->
-		<section class="blog section" id="blog">
+		<!-- Start Blog Area -->
+		<section class="blog section" id="informasi">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12">
@@ -312,54 +318,42 @@
 				<div class="tab-content" id="myTabContent">
 					<!-- Berita Tab -->
 					<div class="tab-pane fade show active" id="berita" role="tabpanel" aria-labelledby="berita-tab">
-						<div class="row">
-							<div class="col-lg-4 col-md-6 col-12">
-								<!-- Single Blog -->
-								<div class="single-news">
-									<div class="news-head">
-										<img src="mediplus-lite/img/about7.jpeg" alt="#">
-									</div>
-									<div class="news-body">
-										<div class="news-content">
-											<div class="date">22 Aug, 2020</div>
-											<h2><a href="blog-single.html">We have announced our new product.</a></h2>
-											<p class="text">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt.</p>
-										</div>
-									</div>
-								</div>
-							</div>
-							<!-- Tambahkan konten berita lainnya jika diperlukan -->
-						</div>
+						@include('partials.berita-partial', ['berita' => $berita])
 					</div>
 		
 					<!-- Pengumuman Tab -->
 					<div class="tab-pane fade" id="pengumuman" role="tabpanel" aria-labelledby="pengumuman-tab">
 						<div class="row">
-							<div class="col-lg-4 col-md-6 col-12">
-								<!-- Single Pengumuman -->
-								<div class="single-news">
-									<div class="news-head">
-										<img src="mediplus-lite/img/about7.jpeg" alt="#">
+							<div class="col-lg-6 col-12">
+								<!-- Informasi tentang pengumuman -->
+								<div class="pengumuman-left">
+									<div class="icon-wrap mb-3">
+										<i class="fa fa-bullhorn"></i>
 									</div>
-									<div class="news-body">
-										<div class="news-content">
-											<div class="date">01 Sep, 2020</div>
-											<h2><a href="announcement-single.html">Important announcement for all users.</a></h2>
-											<p class="text">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</p>
-										</div>
-									</div>
+									<h2 class="title">PENGUMUMAN</h2>
+									<p>
+										Temukan semua informasi terbaru mengenai kegiatan mahasiswa, jadwal penting, dan pengumuman lainnya di sini. Pastikan untuk selalu mengikuti kabar terkini!
+									</p>
+									<a href="#" class="btn-pengumuman mt-3">Lihat Semua</a>
+									{{-- <a href="#" class="btn btn-outline-warning mt-3">Lihat Semua</a> --}}
 								</div>
 							</div>
-							<!-- Tambahkan konten pengumuman lainnya jika diperlukan -->
+							<div class="col-lg-6 col-12">
+								<div class="pengumuman-list" id="pengumuman-list">
+									<!-- Data pengumuman akan dimuat di sini -->
+									@include('partials.pengumuman-partial', ['pengumuman' => $pengumuman])
+								</div>
+							</div>						
 						</div>
 					</div>
+					
 				</div>
 			</div>
 		</section>
 		<!-- End Blog Area -->
 
 		<!-- Start portfolio -->
-		<section class="portfolio section" >
+		<section class="portfolio section" id="galeri">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12">
@@ -884,11 +878,10 @@
 									pengelolaan seluruh kegiatan kemahasiswaan Universitas Jambi.</p>
 								<!-- Social -->
 								<ul class="social">
-									<li><a href="#"><i class="icofont-facebook"></i></a></li>
-									<li><a href="#"><i class="icofont-instagram"></i></a></li>
-									<li><a href="#"><i class="icofont-youtube"></i></a></li>
-									<li><a href="#"><i class="icofont-email"></i></a></li>
-									{{-- <li><a href="#"><i class="icofont-pinterest"></i></a></li> --}}
+									<li><a href="https://www.id-id.facebook.com/univ.jambi/"><i class="icofont-facebook"></i></a></li>
+									<li><a href="https://www.instagram.com/univ.jambi/"><i class="icofont-instagram"></i></a></li>
+									<li><a href="https://x.com/univ_jambi"><i class="icofont-twitter"></i></a></li>
+									<li><a href="https://www.youtube.com/@unjasmarttv"><i class="icofont-youtube"></i></a></li>
 								</ul>
 								<!-- End Social -->
 							</div>
@@ -914,10 +907,10 @@
 							<div class="single-footer">
 								<h2>Kontak Kami</h2>
 								<p>Jl. Raya Jambi - Muara Bulian Km. 15, Mendalo Indah, Jambi Luar Kota, Jambi 36361</p>
+
 								<ul class="time-sidual">
+									<li>Email <span>example@unja.ac.id</span></li>
 									<li class="day">Senin - Jum'at <span>07.00 - 17.00 WIB</span></li>
-									{{-- <li class="day">Saturday <span>9.00-18.30</span></li>
-									<li class="day">Monday - Thusday <span>9.00-15.00</span></li> --}}
 								</ul>
 							</div>
 						</div>
@@ -990,94 +983,92 @@
 			});
 		</script>
 
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+			const sections = document.querySelectorAll('section');
+			const navLinks = document.querySelectorAll('.nav li a');
+
+			// Fungsi untuk menandai menu aktif
+			const setActiveMenu = () => {
+				let current = '';
+
+				sections.forEach(section => {
+					const sectionTop = section.offsetTop;
+					const sectionHeight = section.offsetHeight;
+
+					if (window.pageYOffset >= sectionTop - sectionHeight / 3) {
+						current = section.getAttribute('id');
+					}
+				});
+
+				navLinks.forEach(link => {
+					link.parentElement.classList.remove('active');
+					if (link.getAttribute('href') === `#${current}`) {
+						link.parentElement.classList.add('active');
+
+						// Tambahkan active pada parent dropdown
+						const dropdown = link.closest('.dropdown');
+						if (dropdown) {
+							dropdown.classList.add('active');
+						}
+					}
+				});
+			};
+
+			// Panggil fungsi saat scrolling
+			window.addEventListener('scroll', setActiveMenu);
+		});
+		</script>
+
+		<!-- Query untuk pagination berita -->
+		<script>
+			// Tangani klik pada pagination khusus berita
+			$(document).on('click', '.pagination-berita a', function (e) {
+				e.preventDefault(); // Hentikan perilaku default link
+
+				let page = $(this).attr('href').split('page=')[1]; // Ambil nomor halaman
+				fetchBerita(page);
+			});
+
+			function fetchBerita(page) {
+				$.ajax({
+					url: "/?type=berita&page=" + page, // Tambahkan parameter type
+					type: "GET",
+					beforeSend: function () {
+						$('#berita').html('<div class="text-center">Memuat data berita...</div>'); // Placeholder loading
+					},
+					success: function (data) {
+						$('#berita').html(data); // Perbarui konten berita
+					},
+					error: function () {
+						alert('Gagal memuat data berita.');
+					}
+				});
+			}
+		</script>
+
+		<script>
+			$(document).on('click', '#prev-pengumuman, #next-pengumuman', function (e) {
+				e.preventDefault();
+
+				let url = $(this).data('url'); // URL dari tombol
+				let type = 'pengumuman'; // Tetapkan jenis data
+
+				$.ajax({
+					url: url,
+					type: 'GET',
+					data: { type: type }, // Kirim parameter type
+					beforeSend: function () {
+						$('#pengumuman-list').html('<div class="text-center">Memuat...</div>'); // Placeholder loading
+					},
+					success: function (response) {
+						$('#pengumuman-list').html(response); // Update bagian pengumuman-list
+					},
+					error: function () {
+						alert('Gagal memuat data pengumuman.');
+					}
+				});
+			});
+		</script>
     </body>
 </html>
-{{-- <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laravel SPA</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-
-    <!-- Styles -->
-    <style>
-        /* Your existing Tailwind CSS styles or any other styles here */
-        html, body {
-            scroll-behavior: smooth;
-        }
-        .section {
-            padding: 2rem 0;
-            min-height: 100vh;
-        }
-    </style>
-</head>
-<body class="font-sans antialiased dark:bg-black dark:text-white/50">
-    <div class="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
-        <div class="relative min-h-screen flex flex-col items-center justify-center selection:bg-[#FF2D20] selection:text-white">
-            <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl">
-                <!-- Navigation with scroll links -->
-                <header class="grid grid-cols-2 items-center gap-2 py-10 lg:grid-cols-3">
-                    <div class="flex lg:justify-center lg:col-start-2">
-                        <a href="#home" class="px-3 py-2 text-black dark:text-white">Home</a>
-                        <a href="#berita" class="px-3 py-2 text-black dark:text-white">Berita</a>
-                        <a href="#pengumuman" class="px-3 py-2 text-black dark:text-white">Pengumuman</a>
-                        <a href="#statistik" class="px-3 py-2 text-black dark:text-white">Statistik</a>
-                    </div>
-
-                    @if (Route::has('login'))
-                        <nav class="-mx-3 flex flex-1 justify-end">
-                            @auth
-                                <a href="{{ url('/dashboard') }}" class="rounded-md px-3 py-2 text-black dark:text-white">
-                                    Dashboard
-                                </a>
-                            @else
-                                <a href="{{ route('login') }}" class="rounded-md px-3 py-2 text-black dark:text-white">
-                                    Log in
-                                </a>
-                                @if (Route::has('register'))
-                                    <a href="{{ route('register') }}" class="rounded-md px-3 py-2 text-black dark:text-white">
-                                        Register
-                                    </a>
-                                @endif
-                            @endauth
-                        </nav>
-                    @endif
-                </header>
-
-                <!-- Section: Home -->
-                <section id="home" class="section">
-                    <h2 class="text-2xl font-semibold text-center">Home</h2>
-                    <p>Selamat datang di halaman Home.</p>
-                </section>
-
-                <!-- Section: Berita -->
-                <section id="berita" class="section">
-                    <h2 class="text-2xl font-semibold text-center">Berita</h2>
-                    <p>Berita terkini akan ditampilkan di sini.</p>
-                </section>
-
-                <!-- Section: Pengumuman -->
-                <section id="pengumuman" class="section">
-                    <h2 class="text-2xl font-semibold text-center">Pengumuman</h2>
-                    <p>Pengumuman terbaru akan ditampilkan di sini.</p>
-                </section>
-
-                <!-- Section: Statistik -->
-                <section id="statistik" class="section">
-                    <h2 class="text-2xl font-semibold text-center">Statistik</h2>
-                    <p>Statistik terkait akan ditampilkan di sini.</p>
-                </section>
-
-                <!-- Footer -->
-                <footer class="py-16 text-center text-sm text-black dark:text-white/70">
-                    Laravel v{{ Illuminate\Foundation\Application::VERSION }} (PHP v{{ PHP_VERSION }})
-                </footer>
-            </div>
-        </div>
-    </div>
-</body>
-</html> --}}

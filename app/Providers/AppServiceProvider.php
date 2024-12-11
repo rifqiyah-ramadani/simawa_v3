@@ -8,6 +8,8 @@ use Spatie\Permission\Models\Role;
 use App\Policies\RolePolicy;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 use App\Models\Permission;
+use App\Models\BuatPendaftaranBeasiswa;
+use App\Observers\BuatPendaftaranObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,5 +44,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('read role', function ($user) {
             return $user->hasRole('super_admin');
         });
+
+        // BuatPendaftaranBeasiswa::observe(BuatPendaftaranObserver::class);
    }
 }

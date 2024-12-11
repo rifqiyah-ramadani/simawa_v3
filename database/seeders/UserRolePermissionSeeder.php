@@ -63,7 +63,6 @@ class UserRolePermissionSeeder extends Seeder
                     'url' => 'konfigurasi',
                     'icon' => 'bi bi-gear-fill',
                     'permissions' => [
-                        
                         'role' => [
                             'Super Admin' => ['read', 'create', 'update', 'delete'],
                         ],
@@ -77,6 +76,18 @@ class UserRolePermissionSeeder extends Seeder
                             'Super Admin' => ['read', 'create', 'update', 'delete'],
                         ],
                         'akses_role' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                        ],
+                    ]
+                ],
+                'Master Informasi' => [
+                    'url' => 'master_informasi',
+                    'icon' => 'bi bi-newspaper',
+                    'permissions' => [
+                        'berita' => [
+                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                        ],
+                        'pengumuman' => [
                             'Super Admin' => ['read', 'create', 'update', 'delete'],
                         ],
                     ]
@@ -105,7 +116,7 @@ class UserRolePermissionSeeder extends Seeder
                 ],
                 'Kelola Beasiswa' => [
                     'url' => 'kelola_beasiswa',
-                    'icon' => 'bi bi-clipboard-fill',
+                    'icon' => 'bi bi-tools', 
                     'permissions' => [
                         'manajemen_pendaftaran' => [
                             'Super Admin' => ['read', 'create', 'update', 'delete'],
@@ -116,7 +127,7 @@ class UserRolePermissionSeeder extends Seeder
                             'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
                             'Operator Fakultas' =>  ['read', 'create', 'update', 'delete'],
                         ],
-                        'data_beasiswa' => [
+                        'data_penerima' => [
                             'Super Admin' => ['read', 'create', 'update', 'delete'],
                             'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
                             'Operator Fakultas' =>  ['read', 'create', 'update', 'delete'],
@@ -125,7 +136,7 @@ class UserRolePermissionSeeder extends Seeder
                 ],
                 'Beasiswa' => [
                     'url' => 'beasiswa',
-                    'icon' => 'bi bi-clipboard-fill',
+                    'icon' => 'bi bi-journal-bookmark-fill',
                     'permissions' => [
                         'pendaftaran_beasiswa' => [
                             'Mahasiswa' => ['read', 'create', 'update', 'delete'],

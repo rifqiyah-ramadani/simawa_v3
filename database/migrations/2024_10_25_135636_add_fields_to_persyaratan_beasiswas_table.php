@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('persyaratan_beasiswas', function (Blueprint $table) {
-            $table->string('kriteria');  // Contoh: 'IPK', 'program_reguler', 'umur'
-            $table->string('operator');  // Contoh: '>=', '=', '!='
-            $table->string('value');     // Contoh: '3.00', 'S1', '23'
+            $table->enum('type', ['tanpa_kriteria', 'dengan_kriteria'])
+                  ->default('tanpa_kriteria'); // Type menentukan apakah persyaratan memakai kriteria
+            $table->enum('operator', ['>=', '<=', '=', '<', '>', '!='])->nullable();  // Contoh: '>=', '=', '!='
+            $table->json('value')->nullable();  // Value kriteria (bisa teks, angka, atau opsi) Contoh: '3.00', 'S1', '23'
         });
     }
 

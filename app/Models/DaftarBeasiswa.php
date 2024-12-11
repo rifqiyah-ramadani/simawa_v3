@@ -14,6 +14,7 @@ class DaftarBeasiswa extends Model
     protected $fillable = [
         'kode_beasiswa',
         'nama_beasiswa',
+        'penyelenggara',
     ];
 
     // Relasi ke model BuatPendaftaranBeasiswa

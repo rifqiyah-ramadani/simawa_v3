@@ -23,16 +23,6 @@
         }
 
         /* Style untuk tombol */
-        .tombol-tambah {
-            background-color: #FEF3E2;
-            border-color: #FA4032;
-            color: #FA4032;
-        }
-        .tombol-tambah:hover {
-            background-color: #FAD2B1; 
-            border-color: #E53B1F;    
-            color: #E53B1F;
-        }
         .tombol-simpan {
             background-color: #007bff;
             border-color: #007bff;
@@ -96,7 +86,7 @@
                     <div class="card mb-4"> 
                         <!--begin::card header-->
                         <div class="card-header">
-                            <a href="#" class="btn text-dark tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
+                            <a href="#" class="btn btn-outline-primary tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
                         </div> 
                         <!--end::card header-->
 
@@ -145,7 +135,7 @@
                         <input type="text" class="form-control" id="nama_file"  placeholder="Enter Nama Berkas" name="nama_file" required>
                     </div>
                     <div class="col mb-3">
-                        <label for="keterangan" class="form-label fw-bold">Keterangan Tambahan:</label>
+                        <label for="keterangan" class="form-label fw-bold">Keterangan Tambahan (Opsional):</label>
                         <input type="text" class="form-control" id="keterangan" placeholder="Enter Keterangan Tambahan" name="keterangan">
                     </div> 
                 </div> 
@@ -357,6 +347,7 @@
                     console.log(pair[0] + ', ' + pair[1]);
                 }
 
+                
                 $.ajax({
                     url: var_url,
                     type: var_type,

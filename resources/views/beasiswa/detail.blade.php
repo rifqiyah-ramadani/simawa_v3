@@ -163,12 +163,12 @@
         <ul class="progressbar d-flex justify-content-between">
             @php $displayIndex = 1; @endphp <!-- Variabel indeks tampilan -->
             @foreach ($tahapans as $index => $tahapan)
-                @if ($tahapan['nama_tahapan'] === 'Pendaftaran Beasiswa')
+                @if (strtolower($tahapan['nama_tahapan']) === 'pendaftaran beasiswa')
                     <!-- Lewati tahapan "Pendaftaran Beasiswa" -->
                     @continue
                 @endif
     
-                @if ($isRolePertama && $hasNextValidasi && $tahapan['nama_tahapan'] !== 'Seleksi Administrasi')
+                @if ($isRolePertama && $hasNextValidasi && strtolower($tahapan['nama_tahapan']) !== 'Seleksi administrasi')
                     <!-- Jika role pertama dan memiliki validasi berikutnya, tampilkan hanya Seleksi Administrasi -->
                     @continue
                 @endif
@@ -185,13 +185,13 @@
         <div class="tab-content mt-4">
             @php $displayIndex = 1; @endphp <!-- Reset indeks tampilan untuk konten tab -->
             @foreach ($tahapans as $index => $tahapan)
-                @if ($tahapan['nama_tahapan'] !== 'Pendaftaran Beasiswa')
+                @if (strtolower($tahapan['nama_tahapan']) !== 'pendaftaran beasiswa')
                     <!-- Tampilkan konten tab untuk setiap tahapan kecuali "Pendaftaran Beasiswa" -->
                     <div class="tab-pane fade {{ $displayIndex === 1 ? 'show active' : '' }}" id="tab{{ $displayIndex }}" role="tabpanel"
                         data-tanggal-mulai="{{ $tahapan['tanggal_mulai'] }}" 
                         data-tanggal-akhir="{{ $tahapan['tanggal_akhir'] }}">
                         <!-- Tampilkan konten Seleksi Administrasi -->
-                        @if ($tahapan['nama_tahapan'] === 'Seleksi Administrasi')
+                        @if (strtolower($tahapan['nama_tahapan']) === 'seleksi administrasi')
                             <!-- Alert jika validasi sudah dilakukan -->
                             @if (in_array($pendaftaran->status, ['disetujui', 'ditolak']))
                                 <div class="alert alert-info text-center mb-4">
@@ -298,7 +298,6 @@
                                                 onclick="validate('setuju', {{ $pendaftaran->pendaftaran->id }})"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
-                                                title="Setujui Pendaftaran"
                                                 @if (!$isSeleksiAdministrasiActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
                                                     disabled
                                                 @endif>
@@ -310,7 +309,6 @@
                                                 onclick="validate('tolak', {{ $pendaftaran->pendaftaran->id }})"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
-                                                title="Tolak Pendaftaran"
                                                 @if (!$isSeleksiAdministrasiActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
                                                     disabled
                                                 @endif>
@@ -320,7 +318,7 @@
                                 </div>
                                 <!-- end card footer -->
                             </div>
-                        @elseif ($tahapan['nama_tahapan'] === 'Pengumuman seleksi administrasi')
+                        @elseif (strtolower($tahapan['nama_tahapan']) === 'pengumuman seleksi administrasi')
                             <!-- Konten Pengumuman Seleksi Administrasi -->
                             <div class="card shadow-sm rounded mb-4">
                                 <div class="card-header text-white" style="background-color: #4a90e2;">
@@ -333,12 +331,14 @@
                                         @php
                                             $statusClass = match($statusUsulanAwal) {
                                                 'lulus seleksi administrasi' => 'text-success',
+                                                'diterima' => 'text-success',
                                                 'diproses' => 'text-warning',
                                                 'ditolak' => 'text-danger',
                                                 default => 'text-secondary',
                                             };
                                             $statusIcon = match($statusUsulanAwal) {
                                                 'lulus seleksi administrasi' => 'fa-check-circle',
+                                                'diterima' => 'fa-check-circle',
                                                 'diproses' => 'fa-hourglass-half',
                                                 'ditolak' => 'fa-times-circle',
                                                 default => 'fa-question-circle',
@@ -353,23 +353,26 @@
                                         <p class="mb-0">
                                             Status terbaru dari usulan mahasiswa ini adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
                                             <br>
-                                            Anda tidak bisa melanjutkan validasi ke tahapan berikutnya.
+                                            Anda tidak perlu melanjutkan validasi ke tahapan berikutnya.
                                         </p>
                                     @endif
                                     @if($statusUsulanAwal === 'lulus seleksi administrasi')
                                         <p class="mb-0">
                                             Status terbaru dari usulan mahasiswa ini adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
                                             <br>
-                                            Silakan lanjutkan proses validasi atau peninjauan sesuai kebutuhan.
+                                            Silakan lanjutkan proses validasi agar mahasiswa bisa melanjutkan ke tahapan berikutnya.
+                                        </p>
+                                    @endif
+                                    @if($statusUsulanAwal === 'diterima')
+                                        <p class="mb-0">
+                                            Status terbaru dari usulan mahasiswa ini adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
+                                            <br>
+                                            Tidak perlu tindakan lebih lanjut yang perlu dilakukan.
                                         </p>
                                     @endif
                                 </div>
-                        
-                                <div class="card-footer text-center">
-                                    <button class="btn btn-primary" onclick="goToPreviousTab()">Kembali ke Tab Sebelumnya</button>
-                                </div>
                             </div>
-                        @elseif ($tahapan['nama_tahapan'] === 'Seleksi Wawancara')
+                        @elseif (strtolower($tahapan['nama_tahapan']) === 'seleksi wawancara')
                             @php
                                 // Tentukan tanggal sekarang dan rentang tanggal untuk Seleksi Wawancara
                                 $tanggalSekarang = \Carbon\Carbon::now();
@@ -424,19 +427,25 @@
 
                                         <!-- Tombol Validasi Seleksi Wawancara -->
                                         <div class="d-flex justify-content-center mt-4">
-                                            <button class="btn btn-success me-2 tombol-validasi-setuju"
+                                            <button class="btn btn-success me-2"
                                                     onclick="validate('setuju', {{ $pendaftaran->pendaftaran->id }})"
-                                                    @if ($pendaftaran->status === 'lulus seleksi wawancara' || $pendaftaran->status === 'ditolak' || !$isSeleksiWawancaraActive)
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
                                                         disabled
                                                     @endif>
-                                                Setujui
+                                                <i class="fa fa-check-circle"></i> Setujui Usulan
                                             </button>
-                                            <button class="btn btn-danger tombol-validasi-tolak"
+
+                                            <!-- Tombol Tolak Pendaftaran -->
+                                            <button class="btn btn-danger"
                                                     onclick="validate('tolak', {{ $pendaftaran->pendaftaran->id }})"
-                                                    @if ($pendaftaran->status === 'lulus seleksi wawancara' || $pendaftaran->status === 'ditolak' || !$isSeleksiWawancaraActive)
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
                                                         disabled
                                                     @endif>
-                                                Tolak
+                                                <i class="fa fa-times-circle"></i> Tolak Usulan
                                             </button>
                                         </div>
                                     @else
@@ -465,19 +474,25 @@
 
                                                         <!-- Tombol Validasi Seleksi Wawancara -->
                                                         <div class="d-flex justify-content-center mt-4">
-                                                            <button class="btn btn-success me-2 tombol-validasi-setuju"
+                                                            <button class="btn btn-success me-2"
                                                                     onclick="validate('setuju', {{ $pendaftaran->pendaftaran->id }})"
-                                                                    @if ($pendaftaran->status === 'lulus seleksi wawancara' || $pendaftaran->status === 'ditolak' || !$isSeleksiWawancaraActive)
+                                                                    data-bs-toggle="tooltip"
+                                                                    data-bs-placement="top"
+                                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
                                                                         disabled
                                                                     @endif>
-                                                                Setujui
+                                                                <i class="fa fa-check-circle"></i> Setujui Usulan
                                                             </button>
-                                                            <button class="btn btn-danger tombol-validasi-tolak"
+                
+                                                            <!-- Tombol Tolak Pendaftaran -->
+                                                            <button class="btn btn-danger"
                                                                     onclick="validate('tolak', {{ $pendaftaran->pendaftaran->id }})"
-                                                                    @if ($pendaftaran->status === 'lulus seleksi wawancara' || $pendaftaran->status === 'ditolak' || !$isSeleksiWawancaraActive)
+                                                                    data-bs-toggle="tooltip"
+                                                                    data-bs-placement="top"
+                                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
                                                                         disabled
                                                                     @endif>
-                                                                Tolak
+                                                                <i class="fa fa-times-circle"></i> Tolak Usulan
                                                             </button>
                                                         </div>
                                                     @else
@@ -530,7 +545,7 @@
                                     @endif
                                 </div>
                             </div>
-                        @elseif ($tahapan['nama_tahapan'] === 'Pengumuman Akhir')
+                        @elseif (strtolower($tahapan['nama_tahapan']) === 'pengumuman akhir' || strtolower($tahapan['nama_tahapan']) === 'pengumuman seleksi wawancara')
                             <!-- Konten Pengumuman Seleksi Administrasi -->
                             <div class="card shadow-sm rounded mb-4">
                                 <div class="card-header text-white" style="background-color: #4a90e2;">
@@ -541,14 +556,16 @@
                                     <h3 class="mb-3">Status Usulan Anda</h3>
                                     <div class="p-3 mb-3 rounded" style="background-color: #f7f9fc;">
                                         @php
-                                            $statusClass = match($statusUsulanAkhir) {
+                                            $statusClass = match($statusUsulanAwal) {
                                                 'lulus seleksi wawancara' => 'text-success',
+                                                'diterima' => 'text-success',
                                                 'diproses' => 'text-warning',
                                                 'ditolak' => 'text-danger',
                                                 default => 'text-secondary',
                                             };
-                                            $statusIcon = match($statusUsulanAkhir) {
+                                            $statusIcon = match($statusUsulanAwal) {
                                                 'lulus seleksi wawancara' => 'fa-check-circle',
+                                                'diterima' => 'fa-check-circle',
                                                 'diproses' => 'fa-hourglass-half',
                                                 'ditolak' => 'fa-times-circle',
                                                 default => 'fa-question-circle',
@@ -556,21 +573,28 @@
                                         @endphp
                         
                                         <i class="fa {{ $statusIcon }} fa-3x {{ $statusClass }}"></i>
-                                        <h4 class="mt-2 fw-bold {{ $statusClass }}">{{ ucfirst($statusUsulanAkhir) }}</h4>
+                                        <h4 class="mt-2 fw-bold {{ $statusClass }}">{{ ucfirst($statusUsulanAwal) }}</h4>
                                     </div>
                         
-                                    @if($statusUsulanAkhir === 'ditolak')
+                                    @if($statusUsulanAwal === 'ditolak')
                                         <p class="mb-0">
                                             Status terbaru dari usulan mahasiswa ini adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
                                             <br>
-                                            Anda tidak bisa melanjutkan validasi ke tahapan berikutnya.
+                                            Anda tidak perlu melanjutkan validasi ke tahapan berikutnya.
                                         </p>
                                     @endif
-                                    @if($statusUsulanAwal === 'lulus seleksi wawancara')
+                                    @if($statusUsulanAwal === 'lulus seleksi administrasi')
                                         <p class="mb-0">
-                                            Status terbaru dari usulan mahasiswa ini adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAkhir) }}</span>.
+                                            Status terbaru dari usulan mahasiswa ini adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
                                             <br>
-                                            Mahasiswa dinyatakan sebagai penerima beasiswa {{ $namaBeasiswa }}.
+                                            Silakan lanjutkan proses validasi agar mahasiswa bisa melanjutkan ke tahapan berikutnya.
+                                        </p>
+                                    @endif
+                                    @if($statusUsulanAwal === 'diterima')
+                                        <p class="mb-0">
+                                            Status terbaru dari usulan mahasiswa ini adalah: <span class="fw-bold">{{ ucfirst($statusUsulanAwal) }}</span>.
+                                            <br>
+                                            Tidak perlu tindakan lebih lanjut yang perlu dilakukan.
                                         </p>
                                     @endif
                                 </div>
@@ -606,200 +630,6 @@
     <!-- Select2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    {{-- <script>
-        $(document).ready(function() {
-            $('#berkasTable').DataTable({
-                "language": {
-                    "emptyTable": "Tidak ada berkas yang tersedia"
-                }
-            });
-
-            $('#pewawancara_ids').select2({
-                placeholder: "Pilih Nama Pewawancara",
-                allowClear: true,
-                width: '100%',
-                theme: 'bootstrap-5'
-            });
-
-            // Cari tab aktif berdasarkan rentang tanggal saat ini
-            // Fungsi untuk mencari tab aktif berdasarkan rentang tanggal saat ini
-            function findActiveTab() {
-                const tabs = $('.tab-pane');
-                const today = new Date();
-
-                let activeTabId = 'tab1'; // Default ke tab pertama jika tidak ada yang cocok
-                tabs.each(function() {
-                    const startDate = new Date($(this).data('tanggal-mulai'));
-                    const endDate = new Date($(this).data('tanggal-akhir'));
-
-                    // Cek apakah tanggal saat ini berada dalam rentang tanggal
-                    if (today >= startDate && today <= endDate) {
-                        activeTabId = $(this).attr('id');
-                        return false; // Berhenti jika menemukan tab aktif
-                    }
-                });
-
-                return activeTabId;
-            }
-
-            // Untuk menyimpan tab yang aktif ke localStorage
-            const activeTabKey = 'activeTab'; // Kunci untuk penyimpanan tab aktif di localStorage
-            let activeTab = localStorage.getItem(activeTabKey) || findActiveTab();  // Ambil nilai tab aktif dari localStorage
-            
-            // Jika ada tab aktif yang tersimpan, aktifkan tab tersebut
-            $('.tab-pane').removeClass('show active'); // Hapus kelas aktif dari semua tab
-            $(`#${activeTab}`).addClass('show active'); // Tambahkan kelas aktif ke tab yang sesuai
-            $('.progress-step').removeClass('active'); // Hapus kelas aktif dari semua step
-            $(`[data-step="${activeTab.replace('tab', '')}"]`).addClass('active'); // Aktifkan step yang sesuai
-
-            // Saat tab diklik, simpan tab yang aktif
-            document.querySelectorAll('.progress-step').forEach((step, index) => {
-                step.addEventListener('click', function () {
-                    let tabId = `tab${index + 1}`; // ID tab yang sesuai dengan step
-                    localStorage.setItem(activeTabKey, tabId); // Simpan ID tab ke localStorage
-
-                    // Hapus kelas aktif dari semua step dan tab, lalu tambahkan ke yang dipilih
-                    document.querySelectorAll('.progress-step').forEach(s => s.classList.remove('active'));
-                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('show', 'active'));
-                    step.classList.add('active');
-                    document.getElementById(tabId).classList.add('show', 'active');
-                });
-            });
-        });
-
-        // Untuk tombol validasi
-        $(function () {
-            $('[data-bs-toggle="tooltip"]').tooltip();
-        });
-
-        // Ajax setup dan fungsi untuk konfirmasi validasi (tidak berubah dari sebelumnya)
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-
-        function validate(action, pendaftaranId) {
-            Swal.fire({
-                title: action === 'setuju' ? 'Setujui Usulan?' : 'Tolak Usulan?',
-                text: "Apakah Anda yakin ingin melanjutkan?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#dc3545',
-                confirmButtonText: action === 'setuju' ? 'Ya, Setujui' : 'Ya, Tolak',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ route('beasiswa.lanjutkanValidasi') }}",
-                        method: "POST",
-                        data: {
-                            action: action,
-                            pendaftaranId: pendaftaranId,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            iziToast.success({ title: 'Sukses', message: response.message });
-                            setTimeout(() => location.reload(), 1000);
-
-                            // $('.tombol-validasi-setuju, .tombol-validasi-tolak').prop('disabled', true);
-                        },
-                        error: function(error) {
-                            iziToast.error({ title: 'Error', message: error.responseJSON.message });
-                            console.log("Error Details:", error.responseJSON);
-                        }
-                    });
-                }
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle Next and Previous buttons
-            const tabs = document.querySelectorAll('.tab-pane'); // Mengambil semua elemen dengan class 'tab-pane'
-            const nextButtons = document.querySelectorAll('.next-tab'); // Mengambil semua elemen dengan class 'next-tab' (tombol next)
-            const prevButtons = document.querySelectorAll('.prev-tab'); // Mengambil semua elemen dengan class 'prev-tab' (tombol prev)
-
-            // Nonaktifkan klik pada elemen tab di progress bar
-            document.querySelectorAll('.progress-step').forEach(step => {
-                step.addEventListener('click', (event) => {
-                    // Mencegah aksi klik pada progress-step agar pengguna tidak dapat mengubah tab secara manual melalui klik
-                    event.preventDefault();
-                });
-            });
-
-            let currentIndex = 0; // Inisialisasi index tab saat ini (dimulai dari tab pertama)
-
-            function showTab(index) {
-                // Fungsi untuk menampilkan tab berdasarkan indeks yang diberikan
-                tabs.forEach((tab, i) => {
-                    // Toggle kelas 'show' dan 'active' untuk menampilkan tab yang sesuai
-                    tab.classList.toggle('show', i === index);
-                    tab.classList.toggle('active', i === index);
-                });
-                currentIndex = index; // Perbarui indeks tab saat ini
-                updateButtons(); // Perbarui tombol next dan prev
-                updateProgress(); // Perbarui status progress bar
-            }
-
-            function updateButtons() {
-                const today = new Date();
-
-                // Mengambil data tanggal dari tab berikutnya, jika ada
-                if (currentIndex < tabs.length - 1) {
-                    const nextTab = tabs[currentIndex + 1];
-                    const startDate = new Date(nextTab.dataset.tanggalMulai);
-                    const endDate = new Date(nextTab.dataset.tanggalAkhir);
-                
-                    // Periksa apakah tanggal saat ini berada di rentang tanggal tab berikutnya
-                    // const isInDateRange = !isNaN(startDate) && !isNaN(endDate) && today >= startDate && today <= endDate;
-                    // Jika hari ini berada sebelum tanggal mulai, tombol Next dinonaktifkan
-                    const isPastDate = today >= endDate || today >= startDate;
-                    
-                    nextButtons.forEach(button => {
-                        button.disabled = !isPastDate  || currentIndex === tabs.length - 1;
-                    });
-                } else {
-                    // Nonaktifkan tombol Next jika sudah di tab terakhir
-                    nextButtons.forEach(button => button.disabled = true);
-                }
-
-                // Nonaktifkan tombol Prev jika di tab pertama
-                prevButtons.forEach(button => button.disabled = currentIndex === 0);
-            }
-
-
-            function updateProgress() {
-                // Fungsi untuk memperbarui status progress bar berdasarkan tab yang aktif
-                document.querySelectorAll('.progress-step').forEach((step, i) => {
-                    // Toggle kelas 'active' pada progress-step sesuai dengan tab yang aktif
-                    step.classList.toggle('active', i === currentIndex);
-                });
-            }
-
-            nextButtons.forEach(button => {
-                // Tambahkan event listener ke setiap tombol next
-                button.addEventListener('click', () => {
-                    // Pindah ke tab berikutnya jika masih ada tab berikutnya
-                    if (currentIndex < tabs.length - 1) {
-                        showTab(currentIndex + 1);
-                    }
-                });
-            });
-
-            prevButtons.forEach(button => {
-                // Tambahkan event listener ke setiap tombol prev
-                button.addEventListener('click', () => {
-                    // Pindah ke tab sebelumnya jika masih ada tab sebelumnya
-                    if (currentIndex > 0) {
-                        showTab(currentIndex - 1);
-                    }
-                });
-            });
-
-            showTab(currentIndex); // Tampilkan tab pertama secara default saat halaman dimuat
-        });
-    </script> --}}
     <script>
         function validate(action, pendaftaranId) {
             Swal.fire({
@@ -824,8 +654,6 @@
                         success: function(response) {
                             iziToast.success({ title: 'Sukses', message: response.message });
                             setTimeout(() => location.reload(), 1000);
-
-                            // $('.tombol-validasi-setuju, .tombol-validasi-tolak').prop('disabled', true);
                         },
                         error: function(error) {
                             iziToast.error({ title: 'Error', message: error.responseJSON.message });

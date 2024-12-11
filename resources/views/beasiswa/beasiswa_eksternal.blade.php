@@ -45,8 +45,12 @@
                             <h3 class="fw-bold">Beasiswa {{ $buatPendaftaran->beasiswa->nama_beasiswa }} - {{ $buatPendaftaran->tahun }}</h3>
                             
                             <!-- Status -->
-                            <span class="badge-status px-3 py-2" style="border-radius: 20px; background-color: #28a745; color: white; text-transform: capitalize;">
-                                {{ $buatPendaftaran->status }}
+                            <span class="badge-status px-3 py-2" 
+                            style="border-radius: 20px; 
+                                color: white; 
+                                text-transform: capitalize; 
+                                background-color: {{ $buatPendaftaran->status === 'dibuka' ? '#28a745' : '#dc3545' }}">
+                            {{ $buatPendaftaran->status }}
                             </span>
                         </div>
                     

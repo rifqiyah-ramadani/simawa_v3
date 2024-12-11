@@ -130,11 +130,13 @@
                                     <tr>
                                         <th style="width: 20px">No</th>
                                         <th style="width: 30px">Jenis Beasiswa</th>
-                                        <th>Nama Beasiswa</th>
+                                        <th style="width: 30px">Nama Beasiswa</th>
                                         <th>Tahun</th>
-                                        <th>Tanggal Mulai Pendaftaran</th>
-                                        <th>Tanggal Akhir Pendaftaran</th>
+                                        <th style="width: 50px">Tanggal Mulai Pendaftaran</th>
+                                        <th style="width: 50px">Tanggal Akhir Pendaftaran</th>
                                         <th>Status</th>
+                                        <th style="width: 50px">Mulai Berlaku Beasiswa</th>
+                                        <th style="width: 50px">Akhir Berlaku Beasiswa</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead> 
@@ -228,7 +230,7 @@
                         <input type="date" class="form-control" id="tanggal_berakhir" name="tanggal_berakhir" required>
                     </div>
                     <!-- Status -->
-                    <div class="mb-3">
+                    {{-- <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Status:
                             <span style="color: red;">*</span>
                         </label>
@@ -237,7 +239,7 @@
                             <option value="dibuka">Dibuka</option>
                             <option value="ditutup">Ditutup</option>
                         </select>
-                    </div>
+                    </div> --}}
                     <!-- Pilih Tahapan -->
                     <div class="mb-3">
                         <label for="tahapan" class="form-label fw-bold">Pilih Tahapan:
@@ -262,7 +264,7 @@
                                     </div>
                                 </div>
                             @endforeach
-                        </div>
+                        </div> 
                     </div>
                     <!-- Pilih Persyaratan -->
                     <div class="mb-3">
@@ -286,6 +288,22 @@
                             @endforeach
                         </select>
                     </div>
+
+                    <!-- Tanggal Mulai -->
+                    <div class="mb-3">
+                        <label for="mulai_berlaku" class="form-label fw-bold">Mulai Berlaku Beasiswa:
+                            <span style="color: red;">*</span>
+                        </label>
+                        <input type="date" class="form-control" id="mulai_berlaku" name="mulai_berlaku" required>
+                    </div>
+                    <!-- Tanggal Berakhir -->
+                    <div class="mb-3">
+                        <label for="akhir_berlaku" class="form-label fw-bold">Akhir Berlaku Beasiswa:
+                            <span style="color: red;">*</span>
+                        </label>
+                        <input type="date" class="form-control" id="akhir_berlaku" name="akhir_berlaku" required>
+                    </div>
+
                     <!-- Pilih Role Validasi -->
                     <div class="mb-3">
                         <label for="roles" class="form-label fw-bold">Pilih Role Validator dan Urutan Validasi:
@@ -388,6 +406,8 @@
                             }
                         }
                     },
+                    { data: 'mulai_berlaku', name: 'mulai_berlaku' },
+                    { data: 'akhir_berlaku', name: 'akhir_berlaku' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                 ]
             });
@@ -430,17 +450,26 @@
                 $('#tahun').val('');
                 $('#tanggal_mulai').val('');
                 $('#tanggal_berakhir').val('');
-                $('#status').val('');
                 $('#persyaratan').val([]).trigger('change');
                 $('#berkas').val([]).trigger('change');
+                $('#mulai_berlaku').val('');
+                $('#akhir_berlaku').val('');
                 $('#role-validasi-container').empty(); // Pastikan tidak ada role yang tersisa dari proses sebelumnya
                 addDefaultRoleRow(); // Tambahkan satu baris default untuk role dan urutan
-                $('#flyer').val(''); // Kosongkan field flyer
+                $('#flyer').val(null); // Kosongkan field flyer
+                $('#flyer-link').hide(); // Sembunyikan link flyer
                 $('#link_pendaftaran').val(''); // Kosongkan field link pendaftaran
+
+                // Reset checkbox tahapan dan input tanggal
+                // $('input[name="tahapans[]"]').prop('checked', false); // Uncheck semua tahapan
+                // $('input[name="tahapan_tanggal_mulai[]"]').prop('disabled', false).val(''); // Disable dan kosongkan tanggal mulai
+                // $('input[name="tahapan_tanggal_akhir[]"]').prop('disabled', false).val(''); // Disable dan kosongkan tanggal akhir
+                
                 $('#form-eksternal').hide(); // Sembunyikan form eksternal secara default
 
                 // Tampilkan modal pemilihan jenis beasiswa (internal/eksternal)
                 $('#jenisBeasiswaModal').modal('show');
+
                 // Ketika user klik tombol lanjutkan setelah memilih jenis beasiswa
                 $('.lanjutkan').off('click').on('click', function () {
                     const jenisBeasiswa = $('input[name="jenis_beasiswa"]:checked').val();
@@ -452,13 +481,11 @@
                     if (jenisBeasiswa === 'eksternal') {
                         $('#form-eksternal').show(); // Tampilkan field flyer dan link pendaftaran jika eksternal
                         $('#role-validasi-container').hide(); // Sembunyikan container role validasi
-                        $('#roles').prop('required', false); // Hilangkan sifat required dari roles
-                        $('input[name="urutan[]"]').prop('required', false); // Hilangkan sifat required dari urutan
+                        $('#role-validasi-container').find('select, input').prop('disabled', true); // Nonaktifkan input role
                     } else {
                         $('#form-eksternal').hide(); // Sembunyikan jika beasiswa internal
                         $('#role-validasi-container').show(); // Tampilkan container role validasi untuk internal
-                        $('#roles').prop('required', true); // Tambahkan required untuk roles
-                        $('input[name="urutan[]"]').prop('required', true); // Tambahkan required untuk urutan
+                        $('#role-validasi-container').find('select, input').prop('disabled', false); // Aktifkan kembali input role
                     }
 
                     // Tampilkan modal form utama
@@ -505,45 +532,58 @@
 
                 // Ambil data dari server untuk mengisi form edit
                 $.ajax({
-                    url: `manajemen_pendaftaran/${id}/edit`, // Endpoint edit sesuai dengan ID
+                    url: 'manajemen_pendaftaran/' + id + '/edit',
                     type: 'GET',
-                    success: function(response) {
+                    success: function (response) {
                         console.log("Response dari Server:", response);
-                        console.log("Jenis Beasiswa (edit):", response.result.jenis_beasiswa);
+
                         // Isi form dengan data yang diterima dari server
                         $('#daftar_beasiswas_id').val(response.result.daftar_beasiswas_id);
                         $('#tahun').val(response.result.tahun);
                         $('#tanggal_mulai').val(response.result.tanggal_mulai);
                         $('#tanggal_berakhir').val(response.result.tanggal_berakhir);
-                        $('#status').val(response.result.status);
-                       
+
                         // Pilih persyaratan dan berkas yang sudah ada
                         $('#persyaratan').val(response.result.persyaratan.map(item => item.id)).trigger('change');
                         $('#berkas').val(response.result.berkas_pendaftarans.map(item => item.id)).trigger('change');
-                        $('#jenisBeasiswaModal').modal('hide');
+                        $('#mulai_berlaku').val(response.result.mulai_berlaku);
+                        $('#akhir_berlaku').val(response.result.akhir_berlaku);
 
                         // Check jenis beasiswa
                         if (response.result.jenis_beasiswa === 'eksternal') {
+                            $('input[name="jenis_beasiswa"][value="eksternal"]').prop('checked', true);
                             $('#form-eksternal').show();
-                            $('#flyer').val('');
-                            $('#link_pendaftaran').val(response.result.link_pendaftaran);
                             $('#role-validasi-container').hide();
+                            $('#role-validasi-container').find('select, input').prop('disabled', true); // Nonaktifkan input role
+                            if (response.result.flyer) {
+                                $('#flyer').val(null); // Kosongkan input file
+                                $('#flyer-link')
+                                    .attr('href', '/storage/' + response.result.flyer) // Path sesuai konfigurasi storage
+                                    .text('Lihat Flyer')
+                                    .show();
+                            } else {
+                                $('#flyer-link').hide(); // Sembunyikan jika tidak ada file
+                            }
+                            $('#link_pendaftaran').val(response.result.link_pendaftaran);
                         } else {
+                            $('input[name="jenis_beasiswa"][value="internal"]').prop('checked', true);
                             $('#form-eksternal').hide();
                             $('#role-validasi-container').show();
+                            $('#role-validasi-container').find('select, input').prop('disabled', false); // Aktifkan kembali input role
                         }
+
 
                         // Kosongkan role validasi dan tambahkan sesuai data yang ada
                         $('#role-validasi-container').empty();
                         if (response.result.roles) {
-                            response.result.roles.forEach((role, index) => {
+                            response.result.roles.forEach(role => {
                                 const newRow = `
                                     <div class="row mb-2">
                                         <div class="col">
                                             <select class="form-control" name="roles[]" required>
                                                 <option value="" disabled>Pilih Role</option>
-                                                @foreach($roles as $role)
-                                                    <option value="{{ $role->id }}" ${role.id == {{ $role->id }} ? 'selected' : ''}>{{ $role->name }}</option>
+                                                @foreach($roles as $roleOption)
+                                                    <option value="{{ $roleOption->id }}" ${role.id == {{ $roleOption->id }} ? 'selected' : ''}>{{ $roleOption->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -558,22 +598,19 @@
                                 $('#role-validasi-container').append(newRow);
                             });
                         }
+
+                        // Tambahkan data tahapan
                         $('input[name="tahapans[]"]').each(function () {
                             const tahapanId = $(this).val();
-                            
-                            // Cek apakah `response.result.tahapan` tersedia dan memiliki data
                             const tahapanData = response.result.tahapan.find(tahapan => tahapan.id == tahapanId);
-                            
                             if (tahapanData) {
                                 $(this).prop('checked', true);
                                 $('#tahapan_tanggal_mulai_' + tahapanId).val(tahapanData.pivot.tanggal_mulai).prop('disabled', false);
                                 $('#tahapan_tanggal_akhir_' + tahapanId).val(tahapanData.pivot.tanggal_akhir).prop('disabled', false);
-                            } else {
-                                console.warn("Tahapan ID " + tahapanId + " tidak ditemukan dalam data tahapans.");
                             }
                         });
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         console.error("Error fetching data: ", xhr);
                     }
                 });
@@ -602,39 +639,38 @@
 
                 // Ambil data dari server untuk mengisi form detail
                 $.ajax({
-                     url: `/kelola_beasiswa/manajemen_pendaftaran/${id}/`,// Endpoint detail sesuai dengan ID
+                    url: `/kelola_beasiswa/manajemen_pendaftaran/${id}/`,// Endpoint detail sesuai dengan ID
                     type: 'GET',
                     success: function(response) {
                         const data = response.result;
                         
                         // Isi form dengan data yang diterima dari server
                         $('#daftar_beasiswas_id').val(data.daftar_beasiswas_id);
-                        $('#tahun').val(data.tahun);
-                        $('#tanggal_mulai').val(data.tanggal_mulai);
-                        $('#tanggal_berakhir').val(data.tanggal_berakhir);
-                        $('#status').val(data.status);
-                        $('#persyaratan').val(data.persyaratan.map(item => item.id)).trigger('change');
-                        $('#berkas').val(data.berkas_pendaftarans.map(item => item.id)).trigger('change');
-
-                       // Periksa nilai data.flyer di console untuk memastikan data ada
-                        console.log('Flyer URL:', data.flyer);
+                        $('#tahun').val(data.tahun).prop('disabled', true);
+                        $('#tanggal_mulai').val(data.tanggal_mulai).prop('disabled', true);
+                        $('#tanggal_berakhir').val(data.tanggal_berakhir).prop('disabled', true);
+                        $('#status').val(data.status).prop('disabled', true);
+                        $('#persyaratan').val(data.persyaratan.map(item => item.id)).trigger('change').prop('disabled', true);
+                        $('#berkas').val(data.berkas_pendaftarans.map(item => item.id)).trigger('change').prop('disabled', true);
+                        $('#mulai_berlaku').val(data.mulai_berlaku).prop('disabled', true); 
+                        $('#akhir_berlaku').val(data.akhir_berlaku).prop('disabled', true); 
 
                         if (data.jenis_beasiswa === 'eksternal') {
                             $('#form-eksternal').show();
-                            $('#flyer').val(''); // Kosongkan input file flyer
-                            $('#link_pendaftaran').val(data.link_pendaftaran);
                             $('#role-validasi-container').hide();
+
+                            $('#link_pendaftaran').val(data.link_pendaftaran).prop('disabled', true); // Set disabled untuk link_pendaftaran
 
                             // Tampilkan link flyer jika data flyer tersedia
                             if (data.flyer) {
-                                $('#flyer-link').attr('href', data.flyer).show(); // Set link ke flyer dan tampilkan
+                                $('#flyer-link').attr('href', data.flyer).show();
                             } else {
-                                $('#flyer-link').hide(); // Sembunyikan jika tidak ada flyer
+                                $('#flyer-link').hide();
                             }
                         } else {
                             $('#form-eksternal').hide();
                             $('#role-validasi-container').show();
-                            $('#flyer-link').hide(); // Sembunyikan link flyer jika bukan beasiswa eksternal
+                            $('#flyer-link').hide();
                         }
 
                         // Kosongkan role validasi dan tambahkan sesuai data yang ada
@@ -646,8 +682,8 @@
                                         <div class="col">
                                             <select class="form-control" name="roles[]" disabled>
                                                 <option value="" disabled>Pilih Role</option>
-                                                @foreach($roles as $role)
-                                                    <option value="{{ $role->id }}" ${role.id == {{ $role->id }} ? 'selected' : ''}>{{ $role->name }}</option>
+                                                @foreach($roles as $roleOption)
+                                                    <option value="{{ $roleOption->id }}" ${role.id == {{ $roleOption->id }} ? 'selected' : ''}>{{ $roleOption->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -670,8 +706,8 @@
                                 $('#tahapan_tanggal_akhir_' + tahapanId).val(tahapanData.pivot.tanggal_akhir).prop('disabled', true);
                             } else {
                                 $(this).prop('checked', false);
-                                $('#tahapan_tanggal_mulai_' + tahapanId).val('').prop('disabled', true);
-                                $('#tahapan_tanggal_akhir_' + tahapanId).val('').prop('disabled', true);
+                                $('#tahapan_tanggal_mulai_' + tahapanId).val('').prop('disabled', false);
+                                $('#tahapan_tanggal_akhir_' + tahapanId).val('').prop('disabled', false); 
                             }
                         });
 
@@ -692,7 +728,7 @@
                 });
             });
 
-                        // Proses delete data
+            // Proses delete data
             $('body').on('click', '.tombol-delete', function (e) {
                 e.preventDefault();
                 var id = $(this).data('id');
@@ -788,28 +824,27 @@
 
             // Fungsi untuk mengaktifkan semua field dalam form
             function enableForm() {
-                $('#daftar_beasiswas_id').attr('disabled', false);
-                $('#tahun').attr('disabled', false);
-                $('#tanggal_mulai').attr('disabled', false);
-                $('#tanggal_berakhir').attr('disabled', false);
-                $('#status').attr('disabled', false);
-                $('#persyaratan').attr('disabled', false).trigger('change');
-                $('#berkas').attr('disabled', false).trigger('change');
-                $('#role-validasi-container select').attr('disabled', false);
-                $('#role-validasi-container input').attr('disabled', false);
-                $('#flyer').attr('disabled', false); // Aktifkan field flyer
-                $('#link_pendaftaran').attr('disabled', false); // Aktifkan field link pendaftaran
-                $('.add-role').show(); // Tampilkan tombol tambah role
+                $('#daftar_beasiswas_id').prop('disabled', false).val('');
+                $('#tahun').prop('disabled', false).val('');
+                $('#tanggal_mulai').prop('disabled', false).val('');
+                $('#tanggal_berakhir').prop('disabled', false).val('');
+                $('#status').prop('disabled', false).val('');
+                $('#persyaratan').prop('disabled', false).trigger('change');
+                $('#berkas').prop('disabled', false).trigger('change');
+                $('#role-validasi-container select').prop('disabled', false);
+                $('#role-validasi-container input').prop('disabled', false);
+                $('#flyer').prop('disabled', false).val(null);
+                $('#link_pendaftaran').prop('disabled', false).val('');
+                $('input[name="tahapans[]"]').prop('disabled', false).prop('checked', false);
+                $('input[name="tahapan_tanggal_mulai[]"]').prop('disabled', false).val('');
+                $('input[name="tahapan_tanggal_akhir[]"]').prop('disabled', false).val('');
+                $('.add-role').show();
             }
 
             // Fungsi untuk simpan dan update data
             function simpan(id = '', closeModal = true) {
                 var var_url = id ? 'manajemen_pendaftaran/' + id : 'manajemen_pendaftaran';
-                var var_type = id ? 'PUT' : 'POST';
-
-                // Reset pesan kesalahan sebelumnya
-                $('.text-danger').remove();
-                $('.is-invalid').removeClass('is-invalid');
+                var var_type = id ? 'POST' : 'POST'; 
 
                 // Persiapkan form data untuk mengirim file jika ada flyer (eksternal)
                 var formData = new FormData();
@@ -817,7 +852,16 @@
                 formData.append('tahun', $('#tahun').val());
                 formData.append('tanggal_mulai', $('#tanggal_mulai').val());
                 formData.append('tanggal_berakhir', $('#tanggal_berakhir').val());
-                formData.append('status', $('#status').val());
+
+                // Validasi frontend: pastikan tanggal ada
+                if (!$('#tanggal_mulai').val() || !$('#tanggal_berakhir').val()) {
+                    iziToast.error({
+                        title: 'Error',
+                        message: 'Tanggal Mulai dan Tanggal Berakhir wajib diisi!',
+                        position: 'topRight'
+                    });
+                    return;
+                }
                 formData.append('jenis_beasiswa', $('input[name="jenis_beasiswa"]:checked').val()); // Jenis beasiswa (internal/eksternal)
 
                 // Tambahkan flyer jika jenis beasiswa eksternal dan ada file
@@ -825,12 +869,6 @@
                     formData.append('flyer', $('#flyer')[0].files[0]); // Menambahkan file flyer ke FormData
                 }
                 formData.append('link_pendaftaran', $('#link_pendaftaran').val()); // Menambahkan link pendaftaran jika ada
-                // if ($('input[name="jenis_beasiswa"]:checked').val() === 'eksternal') {
-                //     if ($('#flyer')[0].files.length > 0) {
-                //         formData.append('flyer', $('#flyer')[0].files[0]); // Menambahkan file flyer ke FormData
-                //     }
-                //     formData.append('link_pendaftaran', $('#link_pendaftaran').val()); // Menambahkan link pendaftaran
-                // }
 
                 // Menambahkan array persyaratan
                 $.each($('#persyaratan').val(), function (i, persyaratan_id) {
@@ -841,6 +879,9 @@
                 $.each($('#berkas').val(), function (i, berkas_id) {
                     formData.append('berkas[]', berkas_id); // Tambahkan berkas ke FormData
                 });
+
+                formData.append('mulai_berlaku', $('#mulai_berlaku').val());
+                formData.append('akhir_berlaku', $('#akhir_berlaku').val());
 
                 // Menambahkan roles dan urutan validasi
                 $('select[name="roles[]"]').each(function (i, role) {
@@ -857,6 +898,22 @@
                     formData.append('tahapan_tanggal_mulai[' + tahapanId + ']', $('#tahapan_tanggal_mulai_' + tahapanId).val());
                     formData.append('tahapan_tanggal_akhir[' + tahapanId + ']', $('#tahapan_tanggal_akhir_' + tahapanId).val());
                 });
+                // Jika ada id, tambahkan method untuk update PUT
+                if (id) {
+                    formData.append('_method', 'PUT'); // Override method PUT
+                }
+
+                // Tambahkan CSRF token
+                formData.append('_token', $('meta[name="csrf-token"]').attr('content')); // Penting!
+
+                // Debugging: Periksa apa yang ada di FormData
+                for (var pair of formData.entries()) {
+                    console.log(pair[0] + ', ' + pair[1]);
+                }
+
+                // Reset pesan kesalahan sebelumnya
+                $('.text-danger').remove();
+                $('.is-invalid').removeClass('is-invalid');
 
                 $.ajax({
                     url: var_url,
@@ -890,17 +947,18 @@
                                 $('#tahun').val('').removeClass('is-invalid');
                                 $('#tanggal_mulai').val('').removeClass('is-invalid');
                                 $('#tanggal_berakhir').val('').removeClass('is-invalid');
-                                $('#status').val('').removeClass('is-invalid');
                                 $('#persyaratan').val([]).trigger('change').removeClass('is-invalid'); // Reset persyaratan
                                 $('#berkas').val([]).trigger('change').removeClass('is-invalid'); // Reset berkas
+                                $('#mulai_berlaku').val('').removeClass('is-invalid');
+                                $('#akhir_berlaku').val('').removeClass('is-invalid');
                                 $('#roles').val([]).trigger('change').removeClass('is-invalid'); // Reset roles
                                 $('input[name="urutan[]"]').val('').removeClass('is-invalid'); // Reset urutan
                                 $('.text-danger').remove(); // Bersihkan pesan kesalahan sebelumnya
                                 $('#flyer').val(''); // Reset flyer
                                 $('#link_pendaftaran').val(''); // Reset link pendaftaran
                                 $('select[name="tahapans[]"]').val(null).trigger('change');
-                                $('input[name="tahapan_tanggal_mulai[]"]').val('');
-                                $('input[name="tahapan_tanggal_akhir[]"]').val('');
+                                $('input[name="tahapan_tanggal_mulai[]"]').val('').removeClass('is-invalid');
+                                $('input[name="tahapan_tanggal_akhir[]"]').val('').removeClass('is-invalid');
                             }
                         }
                     },

@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controller as Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\Role;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use App\Models\BuatPendaftaranBeasiswa;
 use App\Models\DaftarBeasiswa;
-use App\Models\ValidasiPendaftaranBeasiswa;
+use App\Models\TahapanBeasiswa;
 use App\Models\BerkasPendaftaran;
 use App\Models\PersyaratanBeasiswa;
-use App\Models\TahapanBeasiswa;
-use App\Models\Role;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
+use App\Models\BuatPendaftaranBeasiswa;
+use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use App\Models\ValidasiPendaftaranBeasiswa;
+use Illuminate\Routing\Controller as Controller;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class BuatPendaftaranController extends Controller
 {
@@ -90,11 +91,12 @@ class BuatPendaftaranController extends Controller
             'tahun' => 'required|integer',
             'tanggal_mulai' => 'required|date',
             'tanggal_berakhir' => 'required|date|after:tanggal_mulai',
-            'status' => 'required|in:dibuka,ditutup',
+            'status' => 'nullable|in:dibuka,ditutup',
             'persyaratan.*' => 'required|exists:persyaratan_beasiswas,id',
             'berkas.*' => 'required|exists:berkas_pendaftarans,id',
-            // Validasi roles dan urutan hanya untuk beasiswa internal
-            'roles.*' => $request->jenis_beasiswa === 'internal' ? 'required|exists:roles,id' : '',
+            'mulai_berlaku' => 'required|date',
+            'akhir_berlaku' => 'required|date|after:mulai_berlaku',
+            'roles.*' => $request->jenis_beasiswa === 'internal' ? 'required|exists:roles,id' : '', // Validasi roles dan urutan hanya untuk beasiswa internal
             'urutan.*' => $request->jenis_beasiswa === 'internal' ? 'required|integer|min:1' : '',
             'jenis_beasiswa' => 'required|in:internal,eksternal',
             'flyer' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi flyer untuk eksternal
@@ -108,11 +110,13 @@ class BuatPendaftaranController extends Controller
             'tanggal_mulai.required' => '*Tanggal mulai wajib diisi',
             'tanggal_berakhir.required' => '*Tanggal akhir wajib diisi',
             'tanggal_berakhir.after' => '*Tanggal akhir harus setelah tanggal mulai',
-            'status.required' => '*Status wajib dipilih',
             'persyaratan.*.required' => '*Persyaratan wajib dipilih',
             'persyaratan.*.exists' => '*Persyaratan yang dipilih tidak valid',
             'berkas.*.required' => '*Berkas wajib dipilih',
             'berkas.*.exists' => '*Berkas yang dipilih tidak valid',
+            'mulai_berlaku.required' => '*Mulai berlaku wajib diisi',
+            'akhir_berlaku.required' => '*Akhir berlaku wajib diisi',
+            'akhir_berlaku.after' => '*Akhir berlaku harus setelah mulai berlaku',
             'roles.*.required' => '*Role wajib dipilih untuk beasiswa internal',
             'roles.*.exists' => '*Role yang dipilih tidak valid',
             'urutan.*.required' => '*Urutan validasi wajib diisi untuk beasiswa internal',
@@ -125,59 +129,67 @@ class BuatPendaftaranController extends Controller
         // Jika validasi gagal
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
-        } else {
-            // Buat pendaftaran beasiswa baru
-            $buatPendaftaran = BuatPendaftaranBeasiswa::create([
-                'daftar_beasiswas_id' => $request->daftar_beasiswas_id,
-                'tahun' => $request->tahun,
-                'tanggal_mulai' => $request->tanggal_mulai,
-                'tanggal_berakhir' => $request->tanggal_berakhir,
-                'status' => $request->status,
-                'jenis_beasiswa' => $request->jenis_beasiswa,
-                'link_pendaftaran' => $request->link_pendaftaran,
-            ]);
-
-            // Jika ada flyer untuk beasiswa eksternal, upload file
-            if ($request->hasFile('flyer')) {
-                $flyerPath = $request->file('flyer')->store('flyers', 'public');
-                $buatPendaftaran->flyer = $flyerPath;
-                $buatPendaftaran->save();
-            }
+        } 
         
-            // Menyimpan persyaratan yang dipilih
-            if ($request->has('persyaratan')) {
-                $buatPendaftaran->persyaratan()->attach($request->persyaratan);
-            }
-    
-            // Simpan berkas pendaftaran yang dipilih
-            if ($request->has('berkas')) {
-                $buatPendaftaran->berkasPendaftarans()->attach($request->berkas);
-            }
+        $currentDate = now();
+        $status = ($currentDate >= $request->tanggal_mulai && $currentDate <= $request->tanggal_berakhir)
+            ? 'dibuka'
+            : 'ditutup';
 
-             // Simpan role validasi jika internal
-             if ($request->jenis_beasiswa === 'internal' && $request->has('roles')) {
-                foreach ($request->roles as $index => $role_id) {
-                    ValidasiPendaftaranBeasiswa::create([
-                        'buat_pendaftaran_id' => $buatPendaftaran->id,
-                        'role_id' => $role_id,
-                        'urutan' => $request->urutan[$index],
-                    ]);
-                }
-            }
+        // Buat pendaftaran beasiswa baru
+        $buatPendaftaran = BuatPendaftaranBeasiswa::create([
+            'daftar_beasiswas_id' => $request->daftar_beasiswas_id,
+            'tahun' => $request->tahun,
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'tanggal_berakhir' => $request->tanggal_berakhir,
+            'status' => $status, // Status otomatis
+            'mulai_berlaku' => $request->mulai_berlaku,
+            'akhir_berlaku' => $request->akhir_berlaku,
+            'jenis_beasiswa' => $request->jenis_beasiswa,
+            'link_pendaftaran' => $request->link_pendaftaran,
+        ]);
 
-            // Menyimpan tahapan dan tanggal mulai/akhir ke pivot table
-            if ($request->has('tahapans')) {
-                foreach ($request->tahapans as $tahapan_id) {
-                    $buatPendaftaran->tahapan()->attach($tahapan_id, [
-                        'tanggal_mulai' => $request->tahapan_tanggal_mulai[$tahapan_id],
-                        'tanggal_akhir' => $request->tahapan_tanggal_akhir[$tahapan_id],
-                    ]);
-                }
-            }
-    
-            // Jika berhasil menyimpan data
-            return response()->json(['success' => "Berhasil menyimpan data"]);
+        // Jika ada flyer untuk beasiswa eksternal, upload file
+        if ($request->hasFile('flyer')) {
+            $flyerPath = $request->file('flyer')->store('flyers', 'public');
+            $buatPendaftaran->flyer = $flyerPath;
+            $buatPendaftaran->save();
         }
+        
+        // Menyimpan persyaratan yang dipilih
+        if ($request->has('persyaratan')) {
+            $buatPendaftaran->persyaratan()->attach($request->persyaratan);
+        }
+    
+        // Simpan berkas pendaftaran yang dipilih
+        if ($request->has('berkas')) {
+            $buatPendaftaran->berkasPendaftarans()->attach($request->berkas);
+        }
+
+            // Simpan role validasi jika internal
+            if ($request->jenis_beasiswa === 'internal' && $request->has('roles')) {
+            foreach ($request->roles as $index => $role_id) {
+                ValidasiPendaftaranBeasiswa::create([
+                    'buat_pendaftaran_id' => $buatPendaftaran->id,
+                    'role_id' => $role_id,
+                    'urutan' => $request->urutan[$index],
+                ]);
+            }
+        }
+
+        // Menyimpan tahapan dan tanggal mulai/akhir ke pivot table
+        if ($request->has('tahapans')) {
+            foreach ($request->tahapans as $tahapan_id) {
+                $buatPendaftaran->tahapan()->attach($tahapan_id, [
+                    'tanggal_mulai' => $request->tahapan_tanggal_mulai[$tahapan_id],
+                    'tanggal_akhir' => $request->tahapan_tanggal_akhir[$tahapan_id],
+                ]);
+            }
+        }
+    
+        // Jika berhasil menyimpan data
+        return response()->json(['success' => "Berhasil menyimpan data"]);
+        
     }
 
     /**
@@ -196,17 +208,18 @@ class BuatPendaftaranController extends Controller
      */
     public function update(Request $request, $id)
     {
-
-        dd(request()->all());
+        Log::info('Request:', $request->all());
         // Validasi input
         $validate = Validator::make($request->all(), [
             'daftar_beasiswas_id' => 'required|exists:daftar_beasiswas,id',
             'tahun' => 'required|integer',
             'tanggal_mulai' => 'required|date',
             'tanggal_berakhir' => 'required|date|after:tanggal_mulai',
-            'status' => 'required|in:dibuka,ditutup',
+            'status' => 'nullable|in:dibuka,ditutup',
             'persyaratan.*' => 'required|exists:persyaratan_beasiswas,id',
             'berkas.*' => 'required|exists:berkas_pendaftarans,id',
+            'mulai_berlaku' => 'required|date',
+            'akhir_berlaku' => 'required|date|after:mulai_berlaku',
             'roles.*' => $request->jenis_beasiswa === 'internal' ? 'required|exists:roles,id' : '',
             'urutan.*' => $request->jenis_beasiswa === 'internal' ? 'required|integer|min:1' : '',
             'jenis_beasiswa' => 'required|in:internal,eksternal',
@@ -216,43 +229,48 @@ class BuatPendaftaranController extends Controller
             'tahapan_tanggal_mulai.*' => 'required|date',
             'tahapan_tanggal_akhir.*' => 'required|date|after:tahapan_tanggal_mulai.*',
         ]);
-
+    
         // Jika validasi gagal
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         }
-
-        // $persyaratanBeasiswa = PersyaratanBeasiswa::find($id);
+    
+        // Tentukan status berdasarkan tanggal
+        $currentDate = now();
+        $status = ($currentDate >= $request->tanggal_mulai && $currentDate <= $request->tanggal_berakhir)
+            ? 'dibuka'
+            : 'ditutup';
+    
         // Temukan data yang akan diperbarui
-        $buatPendaftaran = BuatPendaftaranBeasiswa::find($id);
+        $buatPendaftaran = BuatPendaftaranBeasiswa::findOrFail($id);
         $buatPendaftaran->update([
             'daftar_beasiswas_id' => $request->daftar_beasiswas_id,
             'tahun' => $request->tahun,
             'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_berakhir' => $request->tanggal_berakhir,
-            'status' => $request->status,
+            'status' => $status,
+            'mulai_berlaku' => $request->mulai_berlaku,
+            'akhir_berlaku' => $request->akhir_berlaku,
             'jenis_beasiswa' => $request->jenis_beasiswa,
             'link_pendaftaran' => $request->link_pendaftaran,
         ]);
-
-        // Jika ada flyer baru untuk beasiswa eksternal, upload dan update
+    
+        // Update flyer jika ada
         if ($request->hasFile('flyer')) {
             $flyerPath = $request->file('flyer')->store('flyers', 'public');
             $buatPendaftaran->flyer = $flyerPath;
             $buatPendaftaran->save();
         }
-
+    
         // Update persyaratan
         $buatPendaftaran->persyaratan()->sync($request->persyaratan);
-
+    
         // Update berkas pendaftaran
         $buatPendaftaran->berkasPendaftarans()->sync($request->berkas);
-
-        // Update roles jika beasiswa internal
+    
+        // Update roles untuk internal
         if ($request->jenis_beasiswa === 'internal' && $request->has('roles')) {
-            // Hapus validasi lama
-            $buatPendaftaran->validasiPendaftaran()->delete();
-            // Tambahkan validasi baru
+            $buatPendaftaran->validasi()->delete();
             foreach ($request->roles as $index => $role_id) {
                 ValidasiPendaftaranBeasiswa::create([
                     'buat_pendaftaran_id' => $buatPendaftaran->id,
@@ -261,7 +279,7 @@ class BuatPendaftaranController extends Controller
                 ]);
             }
         }
-
+    
         // Update tahapan
         if ($request->has('tahapans')) {
             $tahapanData = [];
@@ -272,10 +290,8 @@ class BuatPendaftaranController extends Controller
                 ];
             }
             $buatPendaftaran->tahapan()->sync($tahapanData);
-            // Log::info("Tahapan Data:", $tahapanData);
         }
-
-
+    
         return response()->json(['success' => "Data berhasil diperbarui"]);
     }
 
@@ -308,7 +324,7 @@ class BuatPendaftaranController extends Controller
 
         // Hapus relasi tahapan di tabel pivot
         $buatPendaftaran->tahapan()->detach();
-
+ 
         // Hapus file flyer dari storage jika ada
         if ($buatPendaftaran->flyer) {
             Storage::delete($buatPendaftaran->flyer);

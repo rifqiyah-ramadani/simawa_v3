@@ -19,20 +19,10 @@
         #myTable td {
             padding: 3px;
             text-align: center;
-            border: 1px solid #f2f2f2;
+            border: 1px solid #f2f2f2; 
         }
 
         /* Style untuk tombol */
-        .tombol-tambah {
-            background-color: #FEF3E2;
-            border-color: #FA4032;
-            color: #FA4032;
-        }
-        .tombol-tambah:hover {
-            background-color: #FAD2B1; 
-            border-color: #E53B1F;    
-            color: #E53B1F;
-        }
         .tombol-simpan {
             background-color: #007bff;
             border-color: #007bff;
@@ -84,7 +74,7 @@
                 <form> 
                     <div class="card mb-4"> 
                         <div class="card-header">
-                            <a href="#" class="btn text-dark tombol-tambah" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            <a href="#" class="btn btn-outline-primary tombol-tambah" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                 <i class="bi bi-plus"></i> Tambah Data
                             </a>
                         </div> 
@@ -95,6 +85,7 @@
                                         <th style="width: 20px">No</th>
                                         <th>Kode Beasiswa</th>
                                         <th>Nama Beasiswa</th>
+                                        <th>Penyelenggara Beasiswa</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead> 
@@ -121,15 +112,21 @@
                     <label for="kode_beasiswa" class="form-label fw-bold">Kode Beasiswa:
                         <span style="color: red;">*</span>
                     </label>
-                    <input type="text" class="form-control" id="kode_beasiswa" placeholder="Enter Kode Beasiswa" name="kode_beasiswa" required>
+                    <input type="text" class="form-control" id="kode_beasiswa" placeholder="Masukkan Kode Beasiswa" name="kode_beasiswa" required>
                 </div>
                 <div class="col mb-3">
                     <label for="nama_beasiswa" class="form-label fw-bold">Nama Beasiswa:
                         <span style="color: red;">*</span>
                     </label>
-                    <input type="text" class="form-control" id="nama_beasiswa" placeholder="Enter Nama Beasiswa" name="nama_beasiswa" required>
+                    <input type="text" class="form-control" id="nama_beasiswa" placeholder="Masukkan Nama Beasiswa" name="nama_beasiswa" required>
                 </div> 
             </div>
+            <div class="col mb-3">
+                <label for="penyelenggara" class="form-label fw-bold">Penyelenggara Beasiswa:
+                    <span style="color: red;">*</span>
+                </label>
+                <input type="text" class="form-control" id="penyelenggara" placeholder="Masukkan Penyelenggara Beasiswa" name="penyelenggara" required>
+            </div> 
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -161,6 +158,7 @@
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                     { data: 'kode_beasiswa', name: 'kode_beasiswa' },
                     { data: 'nama_beasiswa', name: 'nama_beasiswa' },
+                    { data: 'penyelenggara', name: 'penyelenggara' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false}
                 ]
             });
@@ -181,6 +179,7 @@
                 // Reset form field
                 $('#kode_beasiswa').val('');
                 $('#nama_beasiswa').val('');
+                $('#penyelenggara').val('');
                 $('.is-invalid').removeClass('is-invalid'); // Clear validation errors
                 $('.text-danger').remove();
                     
@@ -190,7 +189,6 @@
                 });
             });
 
-
             // Proses edit data
             $('body').on('click', '.tombol-edit', function (e) {
                 e.preventDefault();
@@ -198,6 +196,7 @@
 
                 $('#kode_beasiswa').val('');
                 $('#nama_beasiswa').val('');
+                $('#penyelenggara').val('');
                 $('.is-invalid').removeClass('is-invalid'); // Clear validation errors
                 $('.text-danger').remove(); 
 
@@ -209,6 +208,7 @@
                         $('#exampleModalLabel').text('Edit Daftar Beasiswa');
                         $('#kode_beasiswa').val(response.result.kode_beasiswa);
                         $('#nama_beasiswa').val(response.result.nama_beasiswa);
+                        $('#penyelenggara').val(response.result.penyelenggara);
                         $('.tombol-simpan').off('click').on('click', function () {
                             simpanDanTutup(id); // Simpan data dan tutup modal
                         });
@@ -275,7 +275,8 @@
                     type: var_type,
                     data: {
                         kode_beasiswa: $('#kode_beasiswa').val(),
-                        nama_beasiswa: $('#nama_beasiswa').val()
+                        nama_beasiswa: $('#nama_beasiswa').val(),
+                        penyelenggara: $('#penyelenggara').val()
                     },
                     success: function(response) {
                         if (response.errors) {
@@ -300,6 +301,7 @@
                                 // Bersihkan form untuk input baru
                                 $('#kode_beasiswa').val('').removeClass('is-invalid');
                                 $('#nama_beasiswa').val('').removeClass('is-invalid');
+                                $('#penyelenggara').val('').removeClass('is-invalid');
                                 $('.text-danger').remove();
                             }
                         }

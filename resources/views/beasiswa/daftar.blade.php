@@ -267,7 +267,7 @@
                 event.preventDefault(); // Mencegah submit form secara normal
 
                 $.ajax({
-                    url: $(this).attr('action'), // URL tujuan (controller)
+                    url: $(this).attr('action'), // URL tujuan (controller) 
                     type: $(this).attr('method'), // Tipe request (POST)
                     data: new FormData(this), // Data form
                     processData: false,

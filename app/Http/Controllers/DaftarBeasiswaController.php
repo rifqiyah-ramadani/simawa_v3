@@ -28,14 +28,14 @@ class DaftarBeasiswaController extends Controller
         if ($request->ajax()) {
             // ambil semua data roles di database
             $daftarBeasiswa = DaftarBeasiswa::all();
-            return DataTables::of($daftarBeasiswa)
+            return DataTables::of($daftarBeasiswa) 
                 ->addIndexColumn()
                 ->addColumn('aksi', function($daftarBeasiswa){
                     return view('konfigurasi.tombol')->with('data',$daftarBeasiswa);
                 })
                 ->make(true);
         }
-        return view('kelola_beasiswa.daftar_beasiswa');
+        return view('kelola_beasiswa.daftar_beasiswa'); 
     }
 
     /**
@@ -55,11 +55,13 @@ class DaftarBeasiswaController extends Controller
         $validate = Validator::make($request->all(), [
             'kode_beasiswa' => 'required|unique:daftar_beasiswas,kode_beasiswa',
             'nama_beasiswa' => 'required|unique:daftar_beasiswas,nama_beasiswa',
+            'penyelenggara' => 'required|string',
         ], [
             'kode_beasiswa.required' => '*Kode wajib diisi',
             'kode_beasiswa.unique' => '*Kode sudah ada, silakan masukkan yang lain',
             'nama_beasiswa.required' => '*Nama beasiswa wajib diisi',
             'nama_beasiswa.unique' => '*Nama beasiswa sudah ada, silakan masukkan yang lain',
+            'penyelenggara.required' => '*Penyelenggara beasiswa wajib diisi',
         ]);
     
         if ($validate->fails()) {
@@ -68,6 +70,7 @@ class DaftarBeasiswaController extends Controller
             $daftarBeasiswa = [
                 'kode_beasiswa' => $request->kode_beasiswa,
                 'nama_beasiswa' => $request->nama_beasiswa,
+                'penyelenggara' => $request->penyelenggara,
             ];
             DaftarBeasiswa::create($daftarBeasiswa);
             return response()->json(['success' => "Berhasil menyimpan data"]);
@@ -100,11 +103,13 @@ class DaftarBeasiswaController extends Controller
         $validate = Validator::make($request->all(), [
             'kode_beasiswa' => 'required:daftar_beasiswas,kode_beasiswa',
             'nama_beasiswa' => 'required:daftar_beasiswas,nama_beasiswa',
+            'penyelenggara' => 'required|string',
         ], [
             'kode_beasiswa.required' => '*Kode wajib diisi',
-            // 'kode_beasiswa.unique' => '*Kode sudah ada, silakan masukkan yang lain',
+            'kode_beasiswa.unique' => '*Kode sudah ada, silakan masukkan yang lain',
             'nama_beasiswa.required' => '*Nama beasiswa wajib diisi',
-            // 'nama_beasiswa.unique' => '*Nama beasiswa sudah ada, silakan masukkan yang lain',
+            'nama_beasiswa.unique' => '*Nama beasiswa sudah ada, silakan masukkan yang lain',
+            'penyelenggara.required' => '*Penyelenggara beasiswa wajib diisi',
         ]);
     
         if ($validate->fails()) {
@@ -114,6 +119,7 @@ class DaftarBeasiswaController extends Controller
             $daftarBeasiswa->update([
                 'kode_beasiswa' => $request->kode_beasiswa,
                 'nama_beasiswa' => $request->nama_beasiswa,
+                'penyelenggara' => $request->penyelenggara,
             ]);
             return response()->json(['success' => "Berhasil memperbarui data"]);
         }

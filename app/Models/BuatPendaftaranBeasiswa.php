@@ -20,6 +20,8 @@ class BuatPendaftaranBeasiswa extends Model
         'status',
         'flyer',
         'link_pendaftaran',
+        'mulai_berlaku',
+        'akhir_berlaku',
     ];
 
     // Relasi ke model daftar_beasiswas
@@ -62,7 +64,7 @@ class BuatPendaftaranBeasiswa extends Model
         return $this->belongsToMany(TahapanBeasiswa::class, 'pendaftaran_tahapan_beasiswa','pendaftaran_beasiswa_id', 'tahapan_beasiswa_id')
                     ->withPivot('tanggal_mulai', 'tanggal_akhir')
                     ->withTimestamps();
-    }
+    } 
 
     // Relasi one-to-many dengan PendaftaranBeasiswa
     public function pendaftaranBeasiswa()

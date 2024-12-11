@@ -14,10 +14,18 @@ return new class extends Migration
         Schema::create('buat_pendaftaran_beasiswas', function (Blueprint $table) {
             $table->id();
             $table->foreignID('daftar_beasiswas_id')->constrained('daftar_beasiswas')->onDelete('cascade'); // Relasi ke tabel daftar_beasiswa 
+            $table->enum('jenis_beasiswa', ['internal', 'eksternal']);
             $table->year('tahun');  // field tahun
             $table->date('tanggal_mulai');  // Tanggal mulai pendaftaran
             $table->date('tanggal_berakhir');  // Tanggal berakhir pendaftaran
-            $table->enum('status', ['dibuka', 'ditutup'])->default('dibuka');  // Status pendaftaran dibuka atau ditutup
+            // Menambahkan kolom flyer yang nullable
+            $table->string('flyer')->nullable();
+            // Menambahkan kolom link_pendaftaran yang nullable
+            $table->string('link_pendaftaran')->nullable();
+            // Menambahkan field kapan mulai 
+            $table->date('mulai_berlaku');
+            $table->date('akhir_berlaku');
+            $table->enum('status', ['dibuka', 'ditutup'])->default('ditutup');  // Status pendaftaran dibuka atau ditutup
             $table->timestamps();
         });
     }

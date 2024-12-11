@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PersyaratanBeasiswa;
+use App\Models\Kriteria;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\Facades\DataTables;
@@ -26,113 +27,184 @@ class PersyaratanBeasiswaController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            // ambil semua data roles di database
-            $persyaratanBeasiswa = PersyaratanBeasiswa::all();
+            // Muat data persyaratan dengan relasi ke tabel kriteria
+            $persyaratanBeasiswa = PersyaratanBeasiswa::with('kriteria')->get()->map(function ($item) {
+                $item->value = $item->value ? json_decode($item->value, true) : null; // Decode JSON ke array
+                return $item;
+            });
             return DataTables::of($persyaratanBeasiswa)
                 ->addIndexColumn()
+                ->addColumn('kriteria', function ($persyaratanBeasiswa) {
+                    return $persyaratanBeasiswa->kriteria?->nama_kriteria ?? '-';
+                })
                 ->addColumn('aksi', function($persyaratanBeasiswa){
                     return view('konfigurasi.tombol')->with('data',$persyaratanBeasiswa);
                 })
                 ->make(true);
         }
+
+        // Jika bukan permintaan AJAX, kembalikan data kriteria untuk dropdown
+        $kriteria = Kriteria::all();
     
-        return view('kelola_beasiswa.persyaratan_beasiswa');
-    }
+        return view('kelola_beasiswa.persyaratan_beasiswa', compact('kriteria'));
+    } 
 
     /**
-     * Show the form for creating a new resource.
+     * create persyaratan
      */
     public function create()
     {
-        return 'create page';
+        $kriteria = Kriteria::all()->map(function ($item) {
+            $item->opsi_dropdown = $item->tipe_input === 'dropdown' && $item->opsi_dropdown
+                ? json_decode($item->opsi_dropdown, true) // Decode JSON ke array
+                : []; // Pastikan selalu array, bahkan jika null
+            return $item;
+        });
+        return response()->json(['kriteria' => $kriteria]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store persyaratan
      */
     public function store(Request $request)
     {
         // Validasi dengan cek unik
-        $validate = Validator::make($request->all(), [
+        $validate = Validator::make($request->all(),[
             'nama_persyaratan' => 'required|unique:persyaratan_beasiswas,nama_persyaratan',
-            'keterangan' => 'nullable',
-            'kriteria' => 'required',
-            'operator' => 'required',
-            'value' => 'required',
-        ], [
+            'type' => 'required|in:tanpa_kriteria,dengan_kriteria',
+            'kriteria' => 'nullable|required_if:type,dengan_kriteria|exists:kriterias,id',
+            'operator' => 'nullable|required_if:type,dengan_kriteria|in:>=,<=,=,<,>,!=',
+            'value' => [
+                'nullable',
+                'required_if:type,dengan_kriteria',
+                function ($attribute, $value, $fail) use ($request) {
+                    $kriteria = Kriteria::find($request->kriteria);
+                    if ($kriteria && $kriteria->tipe_input === 'dropdown' && !is_array($value)) {
+                        $fail("The {$attribute} field must be an array.");
+                    } elseif ($kriteria && $kriteria->tipe_input !== 'dropdown' && is_array($value)) {
+                        $fail("The {$attribute} field must not be an array.");
+                    }
+                 },
+            ],
+        ],[
+            // pesan error
             'nama_persyaratan.required' => '*Nama persyaratan wajib diisi',
-            'nama_persyaratan.unique' => '*Nama persyaratan sudah ada, silakan masukkan yang lain',
-            'keterangan.nullable' => '*Keterangan tidak wajib diisi',
-            'kriteria.nullable' => '*Kriteria tidak wajib diisi',
-            'operator.nullable' => '*Operator tidak wajib dipilih',
-            'value.nullable' => '*Value tidak wajib diisi',
-        ]);
-    
+            'nama_persyaratan.unique' => '*Nama persyaratan sudah ada, silakan gunakan nama lain',
+            'type.required' => '*Tipe persyaratan wajib diisi',
+            'type.in' => '*Tipe persyaratan tidak valid',
+            'kriteria.required_if' => '*Kriteria wajib diisi jika menggunakan tipe dengan kriteria',
+            'kriteria.exists' => '*Kriteria yang dipilih tidak ditemukan',
+            'operator.required_if' => '*Operator wajib diisi jika menggunakan tipe dengan kriteria',
+            'operator.in' => '*Operator tidak valid',
+            'value.required_if' => '*Value wajib diisi jika menggunakan tipe dengan kriteria',
+            ]
+        );
+
+        // Jika validasi gagal
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
-        } else {
-            $persyaratanBeasiswa = [
-                'nama_persyaratan' => $request->nama_persyaratan,
-                'keterangan' => $request->keterangan,
-                'kriteria' => $request->kriteria,
-                'operator' => $request->operator,
-                'value' => $request->value,
-            ];
-            PersyaratanBeasiswa::create($persyaratanBeasiswa);
-            return response()->json(['success' => "Berhasil menyimpan data"]);
         }
+
+        // Simpan data persyaratan
+        $persyaratan = PersyaratanBeasiswa::create([
+            'nama_persyaratan' => $request->nama_persyaratan,
+            'keterangan' => $request->keterangan,
+            'type' => $request->type, // Ambil langsung dari request
+            'kriteria_id' => $request->type === 'dengan_kriteria' ? $request->kriteria : null,
+            'operator' => $request->type === 'dengan_kriteria' ? $request->operator : null,
+            'value' => $request->type === 'dengan_kriteria' && $request->value ? json_encode($request->value) : null,
+        ]);
+
+        return response()->json([
+            'success' => "Berhasil menyimpan data persyaratan",
+            'data' => $persyaratan,
+        ]);
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Edit persyaratan
      */
     public function edit($id)
     {
-        $persyaratanBeasiswa = PersyaratanBeasiswa::where('id', $id)->first();
-        return response()->json(['result' => $persyaratanBeasiswa]);
+        $persyaratan = PersyaratanBeasiswa::with('kriteria')->find($id);
+
+        if (!$persyaratan) {
+            return response()->json(['error' => 'Data tidak ditemukan.'], 404);
+        }
+    
+        // Dekode JSON value agar dapat digunakan di frontend
+        $persyaratan->value = $persyaratan->value ? json_decode($persyaratan->value, true) : null;
+    
+        // Ambil data kriteria
+        $kriteria = Kriteria::all()->map(function ($item) {
+            $item->opsi_dropdown = $item->tipe_input === 'dropdown' && $item->opsi_dropdown
+                ? json_decode($item->opsi_dropdown, true) // Decode JSON ke array
+                : []; // Pastikan selalu array, bahkan jika null
+            return $item;
+        });
+    
+        return response()->json(['persyaratan' => $persyaratan, 'kriteria' => $kriteria]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update persyaratan
      */
     public function update(Request $request, $id)
     {
-        // Validasi dengan cek unik
+         $persyaratan = PersyaratanBeasiswa::find($id);
+
+        if (!$persyaratan) {
+            return response()->json(['error' => 'Data tidak ditemukan.'], 404);
+        }
+
         $validate = Validator::make($request->all(), [
             'nama_persyaratan' => 'required|unique:persyaratan_beasiswas,nama_persyaratan,' . $id,
-            'keterangan' => 'nullable',
-            'kriteria' => 'required',
-            'operator' => 'required',
-            'value' => 'required',
-        ], [
+            'type' => 'required|in:tanpa_kriteria,dengan_kriteria',
+            'kriteria' => 'nullable|required_if:type,dengan_kriteria|exists:kriterias,id',
+            'operator' => 'nullable|required_if:type,dengan_kriteria|in:>=,<=,=,<,>,!=',
+            'value' => [
+                'nullable',
+                'required_if:type,dengan_kriteria',
+                function ($attribute, $value, $fail) use ($request) {
+                    $kriteria = Kriteria::find($request->kriteria);
+                    if ($kriteria && $kriteria->tipe_input === 'dropdown' && !is_array($value)) {
+                        $fail("The {$attribute} field must be an array.");
+                    } elseif ($kriteria && $kriteria->tipe_input !== 'dropdown' && is_array($value)) {
+                        $fail("The {$attribute} field must not be an array.");
+                    }
+                },
+            ],
+        ],[
             'nama_persyaratan.required' => '*Nama persyaratan wajib diisi',
-            'nama_persyaratan.unique' => '*Nama persyaratan sudah ada, silakan masukkan yang lain',
-            'keterangan.nullable' => '*Keterangan tidak wajib diisi',
-            'kriteria.nullable' => '*Kriteria tidak wajib diisi',
-            'operator.nullable' => '*Operator tidak wajib dipilih',
-            'value.nullable' => '*Value tidak wajib diisi',
-        ]);
+            'nama_persyaratan.unique' => '*Nama persyaratan sudah ada, silakan gunakan nama lain',
+            'type.required' => '*Tipe persyaratan wajib diisi',
+            'type.in' => '*Tipe persyaratan tidak valid',
+            'kriteria.required_if' => '*Kriteria wajib diisi jika menggunakan tipe dengan kriteria',
+            'kriteria.exists' => '*Kriteria yang dipilih tidak ditemukan',
+            'operator.required_if' => '*Operator wajib diisi jika menggunakan tipe dengan kriteria',
+            'operator.in' => '*Operator tidak valid',
+            'value.required_if' => '*Value wajib diisi jika menggunakan tipe dengan kriteria',
+            ]
+        );
+
         if ($validate->fails()) {
-            return response()->json(['errors' => $validate->errors()]);
-        } else {
-            $persyaratanBeasiswa = PersyaratanBeasiswa::find($id);
-            $persyaratanBeasiswa->update([
-                'nama_persyaratan' => $request->nama_persyaratan,
-                'keterangan' => $request->keterangan,
-                'kriteria' => $request->kriteria,
-                'operator' => $request->operator,
-                'value' => $request->value,
-            ]);
-            return response()->json(['success' => "Berhasil memperbarui data"]);
+            return response()->json([
+                'errors' => $validate->errors(),
+                'message' => 'Validasi gagal. Periksa kembali input yang Anda masukkan.',
+            ], 422);
         }
+
+        // Update data persyaratan
+        $persyaratan->update([
+            'nama_persyaratan' => $request->nama_persyaratan,
+            'keterangan' => $request->keterangan,
+            'type' => $request->type,
+            'kriteria_id' => $request->type === 'dengan_kriteria' ? $request->kriteria : null,
+            'operator' => $request->type === 'dengan_kriteria' ? $request->operator : null,
+            'value' => $request->type === 'dengan_kriteria' && $request->value ? json_encode($request->value) : null,
+        ]);
+
+        return response()->json(['success' => "Data persyaratan berhasil diperbarui.", 'data' => $persyaratan]);
     }
 
     /**

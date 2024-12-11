@@ -99,7 +99,7 @@ class RiwayatUsulanController extends Controller
     //     // Kembalikan view jika bukan permintaan AJAX
     //     return view('beasiswa.riwayat_usulan', compact('pendaftaranBeasiswa'));
     // }  
-    public function index(Request $request)
+    public function index(Request $request) 
     {
         $user = auth()->user();
 
@@ -163,8 +163,6 @@ class RiwayatUsulanController extends Controller
         // Ambil nama beasiswa dari data relasi
         $namaBeasiswa = $pendaftaran->buatPendaftaranBeasiswa->beasiswa->nama_beasiswa ?? 'Tidak diketahui';
 
-        // Ambil data tahapan yang terkait dengan pendaftaran
-        // $tahapans = $pendaftaran->buatPendaftaranBeasiswa->tahapan;
         // Ambil data tahapan beasiswa untuk ditampilkan dalam tabs
         $tahapans = $pendaftaran->buatPendaftaranBeasiswa->tahapan->map(function ($tahapan) {
             return [
@@ -174,16 +172,16 @@ class RiwayatUsulanController extends Controller
             ];
         });
 
-        // Status awal adalah "lulus seleksi administrasi" jika sudah pernah lulus pada tahap itu
-        $statusUsulanAwal = $pendaftaran->status === 'lulus seleksi administrasi' || 
-                            $pendaftaran->status === 'lulus seleksi wawancara' ? 
-                            'lulus seleksi administrasi' : $pendaftaran->status;
-
-        // Status akhir adalah "lulus seleksi wawancara" jika status sudah mencapai tahap ini
-        $statusUsulanAkhir = $pendaftaran->status === 'lulus seleksi wawancara' || 
-                            $pendaftaran->status === 'diterima' ? 
-                            'lulus seleksi wawancara' : $pendaftaran->status;
-
+        if ($pendaftaran->status === 'diterima') {
+        $statusUsulanAwal = 'diterima';
+        } elseif ($pendaftaran->status === 'ditolak') {
+            $statusUsulanAwal = 'ditolak';
+        } elseif ($pendaftaran->status === 'lulus seleksi administrasi' || $pendaftaran->pendaftaran->status === 'lulus seleksi wawancara') {
+            $statusUsulanAwal = 'lulus seleksi administrasi';
+        } else {
+            $statusUsulanAwal = $pendaftaran->status;
+        }
+ 
         // Ambil status langsung dari data pendaftaran
         $statusTampilan = $pendaftaran->status;
 
@@ -222,7 +220,6 @@ class RiwayatUsulanController extends Controller
             'statusTampilan', 
             'tahapans',
             'statusUsulanAwal',
-            'statusUsulanAkhir',
             'wawancara' 
         ));
     }

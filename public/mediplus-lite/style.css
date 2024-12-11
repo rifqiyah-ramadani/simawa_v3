@@ -1197,7 +1197,7 @@ body{
 .portfolio .single-pf img{
 	height:100%;
 	width:100%;
-	transition: transform 0.4s ease-in-out;
+	transition: transform 0.3s ease-in-out;
 }
 .portfolio .single-pf:hover img {
     transform: scale(1.05); /* Efek zoom pada gambar saat hover */
@@ -1918,13 +1918,13 @@ body{
 	background:#FDFDFD;
 	/* margin-top: 5px; */
 }
-/* .blog .blog-title{
-	text-align:center;
-} */
+
 .blog .section-title h2 {
 	font-weight: 600;
     color: #2C2D3F;
     position: relative;
+
+
     padding-bottom: 20px;
     margin-bottom: 24px;
 }
@@ -1939,7 +1939,11 @@ body{
 	transform: translateX(-50%);
     /* border-top: 1px dashed #ff9800;  */
 }
-
+/* Konsistensi tata letak */
+.tab-pane .news-body {
+    padding: 15px;
+    flex-grow: 1;
+}
 .blog .single-news {
 	background: #fff;
 	position: relative;
@@ -1947,6 +1951,15 @@ body{
 	-moz-transition: all 0.4s ease;
 	transition: all 0.4s ease;
 	box-shadow: 0px 0px 10px #00000014;
+
+	display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%; /* Maksimalkan tinggi */
+}
+.blog .single-news:hover {
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2); /* Shadow lebih besar */
+    transform: translateY(-5px); /* Geser sedikit ke atas */
 }
 .blog .single-news img{
 	width:100%;
@@ -1955,6 +1968,11 @@ body{
 	-webkit-transition:all 0.4s ease;
 	-moz-transition:all 0.4s ease;
 	transition:all 0.4s ease;
+	object-fit: cover;
+}
+.blog .single-news img:hover {
+    transform: scale(1.1); /* Zoom-in efek */
+    filter: brightness(90%); /* Sedikit mengurangi kecerahan */
 }
 .blog .single-news .news-head{
 	position:relative;
@@ -1968,20 +1986,6 @@ body{
 	padding: 30px;
 	left: 0;
 	z-index: 0;
-}
-.blog .single-news .news-content:before{
-	position:absolute;
-	content:"";
-	left:0;
-	bottom:0;
-	height:2px;
-	width:0%;
-	background:#ff9800;
-	opacity:0;
-	visibility:hidden;
-	-webkit-transition:all 0.4s ease;
-	-moz-transition:all 0.4s ease;
-	transition:all 0.4s ease;
 }
 .blog .single-news:hover .news-content:before{
 	opacity:1;
@@ -1997,6 +2001,8 @@ body{
 .blog .single-news .news-body h2 a{
 	color:#2C2D3F;
 	font-weight: 500;
+
+	transition: color 0.3s ease;
 }
 .blog .single-news .news-body h2 a:hover{
 	color: #ff9800;
@@ -2009,19 +2015,214 @@ body{
 	line-height: 23px;
 }
 .blog .single-news .news-body .date {
-	display: inline-block;
-	font-size: 14px;
-	margin-bottom: 5px;
-	background: #ff9800;
-	color: #fff;
-	padding: 4px 15px;
-	border-radius: 3px;
-	font-size: 14px;
-	margin-bottom: 10px;
+	display: inline-flex; /* Untuk merapikan isi */
+    align-items: center; /* Rata tengah ikon dan teks */
+    font-size: 13px;
+    margin-bottom: 10px;
+    background-color: #ff9800; /* Warna oranye */
+    color: #fff; /* Warna teks */
+    padding: 6px 12px; /* Spasi dalam */
+    border-radius: 20px; /* Membuat ujung membulat */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+    font-weight: 500; /* Membuat teks lebih tegas */
+    gap: 8px; /* Jarak antara ikon dan teks */
+    transition: all 0.3s ease; /* Animasi transisi */
+}
+.blog .single-news .news-body .date i {
+    font-size: 14px; /* Ukuran ikon */
+    margin-right: 5px; /* Jarak dengan teks */
 }
 .blog.grid .single-news{
 	margin-top:30px;
 }
+
+/* Pengaturan area "Pengumuman" */
+.pengumuman-left {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Tengah konten untuk keseimbangan */
+    border: 1px solid #f4f4f4; /* Tambahan border agar lebih rapi */
+    transition: all 0.3s ease;
+}
+/* Hover efek */
+.pengumuman-left:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px); /* Animasi hover */
+}
+/* Ikon besar */
+.pengumuman-left .icon-wrap {
+    background: #FFECB3;
+    color: #FF9800;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto; /* Tengah ikon */
+    font-size: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Judul */
+.pengumuman-left .title {
+    font-size: 22px;
+    color: #FF9800;
+    font-weight: 700;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+/* Paragraf */
+.pengumuman-left p {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Tombol */
+.btn-pengumuman {
+    display: inline-block; /* Untuk menyesuaikan padding dan tampilan inline */
+    color: #FF9800;
+    background: none; /* Tidak ada background awal */
+    border: 1px solid #FF9800;
+    font-weight: 600;
+    border-radius: 20px;
+    padding: 8px 20px;
+    text-transform: uppercase;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none; /* Menghapus garis bawah */
+    text-align: center; /* Untuk memastikan teks rata tengah */
+}
+.btn-pengumuman:hover {
+    background: #FF9800;
+    color: #ffffff;
+    border-radius: 20px; /* Pastikan tetap bulat */
+    text-decoration: none; /* Pastikan tidak ada garis bawah saat hover */
+}
+
+/* Daftar pengumuman */
+.pengumuman-list {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Setiap item pengumuman */
+.list-group-item {
+    padding: 20px;
+    border: none;
+    margin-bottom: 15px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pagination-wrap .btn {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.pagination-wrap .btn-warning {
+    background-color: #ff9800;
+    color: #ffffff;
+    border: none;
+}
+
+.pagination-wrap .btn-warning:hover {
+    background-color: #ffc107;
+    color: #ffffff;
+}
+
+.pagination-wrap .btn-secondary {
+    background-color: #e0e0e0;
+    color: #7c7c7c;
+    border: none;
+    cursor: not-allowed;
+}
+
+
+/* Efek hover */
+.list-group-item:hover {
+    background-color: #ffecd1;
+    transform: translateY(-4px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Konten utama pengumuman */
+.pengumuman-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Judul pengumuman */
+.pengumuman-content a {
+    font-weight: 600;
+    font-size: 16px;
+    color: #2C2D3F;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.3s ease;
+}
+
+.pengumuman-content a:hover {
+    color: #ff9800;
+}
+
+/* Tanggal pengumuman */
+.pengumuman-date .badge {
+    background: #ff9800;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 20px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pengumuman-date .badge i {
+    font-size: 12px;
+    color: #ffffff;
+}
+
+/* Hover efek untuk badge */
+.pengumuman-date .badge:hover {
+    background: #ffc107;
+    color: #ffffff;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+    .pengumuman-left, .pengumuman-list {
+        padding: 15px;
+    }
+
+    .pengumuman-content a {
+        font-size: 16px;
+    }
+
+    .list-group-item {
+        padding: 15px;
+    }
+}
+/* Atur batas teks konten */
+
 .nav-tabs {
     border: none;
     justify-content: center;
@@ -2034,8 +2235,8 @@ body{
     border-radius: 25px;
     padding: 12px 25px;
     color: #fff;
-    background-color: #d35400;
-    transition: all 0.3s ease;
+    background-color: gainsboro;
+    transition: background-color 0.3s ease, transform 0.3s ease;
     margin-right: 10px;
     text-align: center;
 }
@@ -2050,6 +2251,28 @@ body{
     background-color: #ffe0b3;
 	border: none;
 	outline: none;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center; /* Memastikan pagination berada di tengah */
+    padding: 10px 0; /* Memberikan sedikit ruang di atas dan bawah */
+}
+
+.pagination .page-item .page-link {
+    color: #ff9800; /* Warna biru default Bootstrap */
+    border-radius: 4px; /* Membuat sudut membulat */
+    margin: 0 3px; /* Memberikan jarak antar tombol */
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #ff9800; /* Warna biru saat aktif */
+    border-color: #ff9800; /* Warna border saat aktif */
+    color: #fff; /* Teks putih */
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d; /* Warna abu-abu untuk tombol disabled */
 }
 
 /* Blog Sidebar */
@@ -2084,7 +2307,7 @@ body{
 	bottom: -1px;
 	height: 100%;
 	width: 3px;
-	background: #1A76D1;
+	background: #ff9800;
 }
 .main-sidebar .single-widget:last-child{
 	margin:0;
@@ -2148,7 +2371,7 @@ body{
 	font-size:14px;
 }
 .main-sidebar .categor-list li a:hover{
-	color:#1A76D1;
+	color:#ff9800;
 	padding-left:7px;
 }
 .main-sidebar .categor-list li a i {
@@ -2174,10 +2397,15 @@ body{
 	display: inline-block;
 	padding: 17px 0;
 }
+.recent-post .title {
+    font-size: 18px;
+    font-weight: 600;
+}
 .main-sidebar .single-post:last-child{
 	padding-bottom:0px;
 	border:none;
 }
+
 .main-sidebar .single-post .image img{
 	float: left;
 	width: 80px;
@@ -2188,10 +2416,13 @@ body{
 	padding-left:100px;
 }
 .main-sidebar .single-post .content h5 {
-	line-height: 18px;
+	font-size: 16px;
+    margin: 0;
+    line-height: 1.4;
+	color: #FF9800;
 }
 .main-sidebar .single-post .content h5 a {
-	color: #2C2D3F;
+	color: #ff9800;
 	font-weight: 500;
 	font-size: 14px;
 	font-weight: 500;
@@ -2200,8 +2431,58 @@ body{
 	margin-bottom: 10px;
 	margin-top: 0;
 }
+.single-post .meta li {
+    display: flex;
+    align-items: center;
+}
+
+.single-post .meta li i {
+    margin-right: 5px;
+}
+
+#search-results {
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+#search-results .single-post {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+#search-results .single-post:last-child {
+    border-bottom: none;
+}
+
+#search-results .image img {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.recent-post p {
+    font-size: 14px;
+    color: #777;
+    margin-top: 10px;
+}
+.recent-post .single-post {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+.recent-post .single-post:last-child {
+    border-bottom: none;
+}
+
 .main-sidebar .single-post .content h5 a:hover{
-	color:#1A76D1;
+	color:#ff9800;
 }
 .main-sidebar .single-post .content .comment li{
 	color:#888;
@@ -2252,40 +2533,64 @@ body{
 	padding: 30px;
 	-webkit-box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.10);
 	-moz-box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.10);
-	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.10);
+	/* box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.10); */
+	box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.15);
 	border-radius: 8px;
 }
+
+/* News Head */
 .news-single .news-head{}
 .news-single .news-head img{
-	width:100%;
-	height:100%;
+	width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
 }
+
+/* News Title */
 .news-single .news-title {
-	font-size: 25px;
-	margin: 20px 0;
+	font-size: 28px;
+    font-weight: 700;
+    margin: 20px 0;
+    color: #333;
+    line-height: 1.3;
 }
 .news-single .news-title a {
 	color: #252525;
 	font-weight: 600;
 }
 .news-single .news-title a:hover {
-	color: #1A76D1;
+	color: #FF9800;
 }
+
+/* Category */
+.news-category .badge {
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
 /* Blog Meta */
 .news-single{
 	background:#fff;
 }
 .news-single .meta {
-	overflow: hidden;
 	border-top: 1px solid #ebebeb;
-	border-bottom: 1px solid #ebebeb;
-	width: 100%;
-	padding: 10px 0;
-	margin-bottom: 15px;
+    border-bottom: 1px solid #ebebeb;
+    padding: 10px 0;
+    font-size: 14px;
+    color: #555;
+	/* color: #666;
+    font-size: 14px;
+    display: flex;
+    align-items: center; */
 }
 .news-single .meta span {
-	margin-right: 10px;
-	display: inline-block;
+	/* margin-right: 10px;
+	display: inline-block; */
+	display: flex;
+    align-items: center;
+    margin-right: 20px;
 }
 .news-single .meta span:last-child{
 	margin:0;
@@ -2295,8 +2600,8 @@ body{
 	font-weight: 400;
 }
 .news-single .meta span i {
-	margin-right: 5px;
-	color:#1A76D1;
+	margin-right: 8px;
+	color:#FF9800;
 }
 .news-single .meta-left{
 	float:left;
@@ -2307,8 +2612,8 @@ body{
 	border-radius: 100%;
 	margin-right: 12px;
 }
-.news-single .meta-left .author {
-	float: left;
+.news-single .meta .author {
+	margin-left: auto; 
 }
 .news-single .meta-left span.date {
 	margin-top: 10px;
@@ -2327,8 +2632,10 @@ body{
 	margin:0;
 }
 .news-single .news-text p {
-	font-size: 14px;
-	margin-bottom:20px;
+	font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    color: #555;
 }
 /* Image Gallery */
 .news-single .image-gallery {
@@ -2366,37 +2673,80 @@ body{
 }
 /* Social Share */
 .news-single .social-share {
-	float: left;
+	list-style: none;
+    padding: 0px;
+    display: flex;
+    justify-content: flex-start;
+	flex-wrap: wrap; /* Agar tombol menyesuaikan jika layar sempit */
+    gap: 15px; /* Jarak antar tombol */
 }
 .news-single .social-share li {
-	float: left;
-}
-.news-single .social-share li span{
-	padding-left:5px;
+	margin-right: 0;
 }
 .news-single .social-share li.facebook a{
-	background:#5d82d1;
+	background: #3b5998;
 }
 .news-single .social-share li.twitter a{
 	background:#40bff5;
 }
-.news-single .social-share li.google-plus a{
-	background:#eb5e4c;
+.news-single .social-share li.instagram a{
+	background: linear-gradient(45deg, #fd1d1d, #833ab4, #fcb045);
 }
 .news-single .social-share li.linkedin a{
 	background:#238cc8;
 }
-.news-single .social-share li.pinterest a{
-	background:#e13138;
-}
 .news-single .social-share li a {
-	padding: 10px 20px;
-	display: block;
-	color: #fff;
+	display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Ikon di kiri, teks di kanan */
+    padding: 8px 8px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg, #FF9800 30%, #d35400 30%, #FF9800 100%);
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow default */
 }
-.news-single .social-share li a:hover{
-	background:#2B343E;
+/* Efek hover */
+.news-single .social-share li a:hover {
+    transform: scale(1.05); /* Membuat tombol membesar sedikit */
+    box-shadow: 0 8px 15px rgba(255, 152, 0, 0.4); /* Shadow lebih besar */
 }
+.news-single .social-share li a:hover i {
+    transform: scale(1.2); /* Ikon membesar saat hover */
+    color: #fff; /* Ikon tetap putih */
+}
+
+/* Ikon */
+.news-single .social-share li a i {
+    margin-right: 15px; /* Jarak antara ikon dan teks */
+    font-size: 22px; /* Ukuran ikon */
+    padding: 10px; /* Ruang di dalam ikon */
+    transition: all 0.3s ease; /* Animasi ikon */
+}
+
+/* Teks */
+.news-single .social-share li a span {
+    flex-grow: 1; /* Membuat teks tetap berada di posisi */
+    text-align: left; /* Pastikan teks sejajar ke kiri */
+    transition: color 0.3s ease; /* Transisi warna teks */
+}
+
+/* Memastikan ikon tetap di sebelah kiri dengan pembatas */
+.news-single .social-share li a::before {
+    content: '';
+    position: absolute;
+    left: 50px; /* Sesuaikan posisi pembatas dengan ukuran ikon */
+    top: 15%; /* Beri ruang vertikal agar tidak mepet */
+    bottom: 15%; /* Ruang vertikal */
+    width: 2px; /* Lebar garis pembatas */
+    background: rgba(255, 255, 255, 0.4); /* Warna pembatas (putih transparan) */
+}
+
 /* Prev Next Button */
 .news-single .prev-next {
 	float: right;

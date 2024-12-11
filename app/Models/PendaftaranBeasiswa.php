@@ -54,4 +54,26 @@ class PendaftaranBeasiswa extends Model
     {
         return $this->hasOne(Interview::class, 'pendaftaran_id');
     }
-}
+
+    /**
+     * Relasi ke model DataPenerima
+     * 
+     * Menghubungkan PendaftaranBeasiswa dengan penerima beasiswa
+     */
+    public function dataPenerima()
+    {
+        return $this->hasOne(DataPenerima::class, 'pendaftaran_beasiswa_id');
+    }
+
+    public function statusBeasiswa()
+    {
+        return $this->hasOneThrough(
+            PendaftaranBeasiswa::class,
+            User::class,
+            'id', // Foreign key di tabel `users`
+            'user_id', // Foreign key di tabel `pendaftaran_beasiswa`
+            'user_id', // Local key di tabel `detail_user`
+            'id' // Local key di tabel `users`
+        )->select('status'); // Ambil hanya kolom `status`
+    }
+} 
