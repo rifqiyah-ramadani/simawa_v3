@@ -13,9 +13,6 @@ class DataPenerima extends Model
 
     protected $fillable = [
         'pendaftaran_beasiswa_id',
-        'siakad_mhpspt_id',
-        'biaya_hidup',
-        'biaya_ukt',
         'status_penerima',
         'start_semester',
         'end_semester',

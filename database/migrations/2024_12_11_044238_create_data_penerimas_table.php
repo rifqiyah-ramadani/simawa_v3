@@ -19,9 +19,6 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 
-            $table->unsignedBigInteger('siakad_mhpspt_id')->nullable();
-            $table->float('biaya_hidup', 15, 2)->nullable();
-            $table->float('biaya_ukt', 15, 2)->nullable();
             $table->enum('status_penerima', ['sedang menerima', 'masa selesai'])->nullable();  // Enum untuk status penerima
             $table->string('start_semester')->nullable(); //
             $table->string('end_semester')->nullable(); // Semester akhir penerimaan

@@ -439,6 +439,25 @@
                 });
             });
 
+            $('#exampleModal').on('hidden.bs.modal', function () {
+                // Reset semua input di dalam modal
+                $(this).find('form')[0].reset();
+
+                // Kosongkan input tanggal mulai dan akhir tahapan
+                $('input[name="tahapan_tanggal_mulai[]"]').val('').prop('disabled', false);
+                $('input[name="tahapan_tanggal_akhir[]"]').val('').prop('disabled', false);
+
+                // Uncheck semua checkbox tahapan
+                $('input[name="tahapans[]"]').prop('checked', false);
+
+                // Kosongkan container role validasi
+                $('#role-validasi-container').empty();
+
+                // Sembunyikan elemen tertentu
+                $('#form-eksternal').hide();
+                $('#flyer-link').hide();
+            });
+
             // Proses tambah dan simpan data
             $('body').on('click', '.tombol-tambah', function (e) {
                 e.preventDefault();
@@ -482,10 +501,12 @@
                         $('#form-eksternal').show(); // Tampilkan field flyer dan link pendaftaran jika eksternal
                         $('#role-validasi-container').hide(); // Sembunyikan container role validasi
                         $('#role-validasi-container').find('select, input').prop('disabled', true); // Nonaktifkan input role
+                        $('label[for="roles"]').hide(); // Sembunyikan label role validasi
                     } else {
                         $('#form-eksternal').hide(); // Sembunyikan jika beasiswa internal
                         $('#role-validasi-container').show(); // Tampilkan container role validasi untuk internal
                         $('#role-validasi-container').find('select, input').prop('disabled', false); // Aktifkan kembali input role
+                        $('label[for="roles"]').show(); // Tampilkan kembali label role validasi
                     }
 
                     // Tampilkan modal form utama

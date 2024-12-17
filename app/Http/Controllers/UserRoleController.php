@@ -64,7 +64,6 @@ class UserRoleController extends Controller
             'name' => 'required',
             'nip' => 'nullable',
             'usertype' => 'required',
-            'password' => 'required|min:6',
             'roles' => 'required|array',
         ], [
             'username.required' => '*Username wajib diisi',
@@ -72,21 +71,22 @@ class UserRoleController extends Controller
             'name.required' => '*Nama wajib diisi',
             'nip.nullable' => '*NIP tidak wajib diisi',
             'usertype.required' => '*Jenis pengguna (usertype) wajib diisi',
-            'password.required' => '*Password wajib diisi',
-            'password.min' => '*Password minimal 6 karakter',
             'roles.required' => '*Role wajib dipilih',
         ]);
     
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         } else {
+            // Set password default
+            $defaultPassword = bcrypt('password'); // Password default adalah "password"
+    
             $users = User::create([
                 'username' => $request->username,
                 'name' => $request->name,
-                'nip' => $request->nip,  // Menyimpan NIP sebagai null jika tidak diisi
+                'nip' => $request->nip, // Menyimpan NIP sebagai null jika tidak diisi
                 'usertype' => $request->usertype,
-                'password' => bcrypt($request->password), // Hash password sebelum disimpan
-            ]);
+                'password' => $defaultPassword, // Password otomatis
+            ]);    
             
             // Assign role ke user yang baru dibuat
             $users->syncRoles($request->roles);
@@ -125,15 +125,12 @@ class UserRoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // \Log::info('Data diterima:', $request->all()); // Tambahkan ini untuk debug
-        
          // Validasi data yang masuk
         $validate = Validator::make($request->all(), [
             'username' => 'required|unique:users,username,' . $id, // Cek unik, kecuali untuk user ini sendiri
             'name' => 'required',
             'nip' => 'nullable',
             'usertype' => 'required',
-            'password' => 'nullable|min:6', // Password tidak wajib, tapi jika diisi harus minimal 6 karakter
             'roles' => 'required|array',
         ], [
             'username.required' => '*Username wajib diisi',
@@ -141,7 +138,6 @@ class UserRoleController extends Controller
             'name.required' => '*Nama wajib diisi',
             'nip.nullable' => '*NIP tidak wajib diisi',
             'usertype.required' => '*Jenis pengguna (usertype) wajib diisi',
-            'password.min' => '*Password minimal 6 karakter',
             'roles.required' => '*Role wajib dipilih',
         ]);
     

@@ -8,6 +8,7 @@ use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\UserRoleController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\AksesRoleController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InformasiController;
 use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\PermissionController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\DataPenerimaController;
 use App\Http\Controllers\RiwayatUsulanController;
 use App\Http\Controllers\DaftarBeasiswaController;
 use App\Http\Controllers\BuatPendaftaranController;
+use App\Http\Controllers\RiwayatBeasiswaController;
 use App\Http\Controllers\TahapanBeasiswaController;
 use App\Http\Controllers\BerkasPendaftaranController;
 use App\Http\Controllers\PendaftaranBeasiswaController;
@@ -27,14 +29,17 @@ Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 Route::get('/berita/{id}', [WelcomeController::class, 'show'])->name('berita.show');
 Route::get('/search', [WelcomeController::class, 'search'])->name('search');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';
@@ -125,6 +130,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/beasiswa/detail_riwayat/{id}', [RiwayatUsulanController::class, 'show'])->name('riwayat_usulan.show');
 
     // Route untuk data penerima beasiswa secara umum
-    Route::resource('/kelola_beasiswa/data_penerima', DataPenerimaController::class);
+    Route::resource('kelola_beasiswa/penerima_beasiswa', DataPenerimaController::class);
     Route::get('data_penerima/export', [DataPenerimaController::class, 'export'])->name('data_penerima.export');
+
+    // Route untuk riwayat beasiswa yang akan diakses oleh mahasiswa
+    Route::resource('beasiswa/riwayat_beasiswa', RiwayatBeasiswaController::class);
 });

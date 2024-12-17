@@ -37,19 +37,27 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+    // public function authenticate(): void
+    // {
+    //     $this->ensureIsNotRateLimited();
+
+    //     if (! Auth::attempt(['username' => $this->username, 'password' => $this->password], $this->boolean('remember'))) {
+    //         RateLimiter::hit($this->throttleKey());
+
+    //         throw ValidationException::withMessages([
+    //            'username' => __('auth.failed'),
+    //         ]);
+    //     }
+
+    //     RateLimiter::clear($this->throttleKey());
+    // }
     public function authenticate(): void
     {
-        $this->ensureIsNotRateLimited();
-
-        if (! Auth::attempt(['username' => $this->username, 'password' => $this->password], $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-               'username' => __('auth.failed'),
+        if (! Auth::attempt($this->only('username', 'password'), $this->boolean('remember'))) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'username' => __('Username atau password salah.'),
             ]);
         }
-
-        RateLimiter::clear($this->throttleKey());
     }
 
     /**

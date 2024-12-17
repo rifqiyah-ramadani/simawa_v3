@@ -6,9 +6,20 @@
     
     <style>
         /* Menambah padding dan border */
+        #myTable {
+            font-size: 1rem;
+            color: #333;
+            margin-top: 100px;
+        }
+        #myTable th {
+            background-color: #FA812F;
+            color: white; 
+            text-align: center;
+        }
         #myTable td {
-            padding: 5px;
-            border: 1px solid #f2f2f2;
+            padding: 3px;
+            text-align: center;
+            border: 1px solid #f2f2f2; 
         }
         /* Tambahkan gaya warna untuk status */
         .status-menunggu,
@@ -20,7 +31,7 @@
         .status-seleksi {
             color: green;
             font-weight: bold;
-        }
+        } 
         .status-ditolak {
             color: red;
             font-weight: bold;

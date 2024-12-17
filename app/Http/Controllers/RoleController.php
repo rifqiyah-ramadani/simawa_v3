@@ -58,21 +58,19 @@ class RoleController extends Controller
         // Validasi dengan cek unik
         $validate = Validator::make($request->all(), [
             'name' => 'required|unique:roles,name',
-            'guard_name' => 'required',
         ], [
             'name.required' => '*Role user wajib diisi',
             'name.unique' => '*Role user sudah ada, silakan masukkan yang lain',
-            'guard_name.required' => '*Guard name wajib diisi',
         ]);
     
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         } else {
-            $roles = [
+            // Buat role dengan guard_name default 'web'
+            Role::create([
                 'name' => $request->name,
-                'guard_name' => $request->guard_name,
-            ];
-            Role::create($roles);
+                'guard_name' => 'web', // Set otomatis
+            ]);
             return response()->json(['success' => "Berhasil menyimpan data"]);
         }
     }
@@ -103,11 +101,9 @@ class RoleController extends Controller
         // Validasi dengan cek unik, kecuali untuk data yang sedang diupdate
         $validate = Validator::make($request->all(), [
             'name' => 'required|unique:roles,name,' . $id,
-            'guard_name' => 'required',
         ], [
             'name.required' => '*Role user wajib diisi',
             'name.unique' => '*Role user sudah ada, silakan masukkan yang lain',
-            'guard_name.required' => 'Guard name wajib diisi',
         ]);
 
         if ($validate->fails()) {
@@ -116,7 +112,7 @@ class RoleController extends Controller
             $role = Role::find($id);
             $role->update([
                 'name' => $request->name,
-                'guard_name' => $request->guard_name,
+                'guard_name' => 'web',
             ]);
             return response()->json(['success' => "Berhasil memperbarui data"]);
         }

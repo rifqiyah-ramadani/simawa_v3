@@ -27,16 +27,6 @@
         }
 
         /* Style untuk tombol */
-        .tombol-tambah {
-            background-color: #FEF3E2;
-            border-color: #FA4032;
-            color: #FA4032;
-        }
-        .tombol-tambah:hover {
-            background-color: #FAD2B1; 
-            border-color: #E53B1F;    
-            color: #E53B1F;
-        }
         .tombol-simpan {
             background-color: #007bff;
             border-color: #007bff;
@@ -100,7 +90,7 @@
                     <div class="card mb-4"> 
                         <!--begin::card header-->
                         <div class="card-header">
-                            <a href="#" class="btn text-dark tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
+                            <a href="#" class="btn btn-outline-primary tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
                         </div> 
                         <!--end::card header-->
 
@@ -142,19 +132,25 @@
                {{-- Start form --}}
                 <div class="row">
                     <div class="col mb-3">
-                        <label for="name" class="form-label">Permission Name:</label>
+                        <label for="name" class="form-label">Permission Name:
+                            <span style="color: red;">*</span>
+                        </label>
                         <input type="text" class="form-control" id="name" placeholder="Enter Permission Name" name="name" required>
                     </div>
                     <div class="col mb-3">
-                        <label for="guard_name" class="form-label">Guard Name:</label>
+                        <label for="guard_name" class="form-label">Guard Name:
+                            <span style="color: red;">*</span>
+                        </label>
                         <input type="text" class="form-control" id="guard_name" placeholder="Enter Guard Name" name="guard_name">
                     </div> 
                 </div>
                 <div class="row">
                     <div class="col mb-3">
-                        <label for="navigation_id" class="form-label">Navigation:</label>
+                        <label for="navigation_id" class="form-label">Navigation:
+                            <span style="color: red;">*</span>
+                        </label>
                         <select id="navigation_id" name="navigation_id" class="form-control">
-                            <option value="">-- Select Navigation --</option>
+                            <option value="">-- Pilih Navigation --</option>
                             @foreach($navigations as $navigation)
                                 <option value="{{ $navigation->id }}">{{ $navigation->name }}</option>
                             @endforeach

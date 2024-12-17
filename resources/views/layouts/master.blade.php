@@ -43,7 +43,7 @@
         <footer class="app-footer"> <!--begin::To the end-->
             <div class="float-end d-none d-sm-inline">SIMAWA UNJA</div> <!--end::To the end--> <!--begin::Copyright--> <strong>
                 Copyright &copy; 2024&nbsp;
-                <a href="#" class="text-decoration-none">Universitas Jambi</a>.
+                <a href="#" class="text-decoration-none" style="color: #FF9800">Universitas Jambi</a>.
             </strong>
             All rights reserved.
             <!--end::Copyright-->

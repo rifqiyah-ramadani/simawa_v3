@@ -27,12 +27,6 @@ class UserRolePermissionSeeder extends Seeder
         DB::beginTransaction();
         try {
             // Buat user
-            $super_admin = User::create(array_merge([
-                'username' => '0001234567',
-                'name' => 'Reza',
-                'usertype' => 'pegawai',
-            ], $default_user_value));
-
             $operator_kemahasiswaan = User::create(array_merge([
                 'username' => '0007654321',
                 'name' => 'Farhan',
@@ -52,7 +46,6 @@ class UserRolePermissionSeeder extends Seeder
             ], $default_user_value));
 
             // Buat roles atau ambil jika sudah ada
-            $role_super_admin = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'web']);
             $role_operator_kemahasiswaan = Role::firstOrCreate(['name' => 'Operator Kemahasiswaan', 'guard_name' => 'web']);
             $role_operator_fakultas = Role::firstOrCreate(['name' => 'Operator Fakultas', 'guard_name' => 'web']);
             $role_mahasiswa = Role::firstOrCreate(['name' => 'Mahasiswa', 'guard_name' => 'web']);
@@ -64,19 +57,19 @@ class UserRolePermissionSeeder extends Seeder
                     'icon' => 'bi bi-gear-fill',
                     'permissions' => [
                         'role' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
-                        ],
-                        'permission' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' => ['read', 'create', 'update', 'delete'],
                         ],
                         'users' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' => ['read', 'create', 'update', 'delete'],
                         ],
                         'menu' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' => ['read', 'create', 'update', 'delete'],
+                        ],
+                        'permission' => [
+                            'Operator Kemahasiswaan' => ['read', 'create', 'update', 'delete'],
                         ],
                         'akses_role' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' => ['read', 'create', 'update', 'delete'],
                         ],
                     ]
                 ],
@@ -85,10 +78,10 @@ class UserRolePermissionSeeder extends Seeder
                     'icon' => 'bi bi-newspaper',
                     'permissions' => [
                         'berita' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' => ['read', 'create', 'update', 'delete'],
                         ],
                         'pengumuman' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
+                            'Operator Kemahasiswaan' => ['read', 'create', 'update', 'delete'],
                         ],
                     ]
                 ],
@@ -97,19 +90,15 @@ class UserRolePermissionSeeder extends Seeder
                     'icon' => 'bi bi-clipboard-fill',
                     'permissions' => [
                         'daftar_beasiswa' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
                             'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
                         ],
                         'persyaratan_beasiswa' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
                             'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
                         ],
                         'berkas_pendaftaran' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
                             'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
                         ],
                         'tahapan_beasiswa' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
                             'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
                         ],
                     ]
@@ -119,16 +108,13 @@ class UserRolePermissionSeeder extends Seeder
                     'icon' => 'bi bi-tools', 
                     'permissions' => [
                         'manajemen_pendaftaran' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
                             'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
                         ],
                         'usulan_beasiswa' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
                             'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
                             'Operator Fakultas' =>  ['read', 'create', 'update', 'delete'],
                         ],
                         'data_penerima' => [
-                            'Super Admin' => ['read', 'create', 'update', 'delete'],
                             'Operator Kemahasiswaan' =>  ['read', 'create', 'update', 'delete'],
                             'Operator Fakultas' =>  ['read', 'create', 'update', 'delete'],
                         ],
@@ -266,7 +252,6 @@ class UserRolePermissionSeeder extends Seeder
             // }            
 
             // Assign roles ke users
-            $super_admin->assignRole($role_super_admin);
             $operator_kemahasiswaan->assignRole($role_operator_kemahasiswaan);
             $operator_fakultas->assignRole($role_operator_fakultas);
             $mahasiswa->assignRole($role_mahasiswa);

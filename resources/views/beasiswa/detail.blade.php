@@ -168,7 +168,7 @@
                     @continue
                 @endif
     
-                @if ($isRolePertama && $hasNextValidasi && strtolower($tahapan['nama_tahapan']) !== 'Seleksi administrasi')
+                @if ($isRolePertama && $hasNextValidasi && strtolower($tahapan['nama_tahapan']) !== 'seleksi administrasi')
                     <!-- Jika role pertama dan memiliki validasi berikutnya, tampilkan hanya Seleksi Administrasi -->
                     @continue
                 @endif
@@ -252,6 +252,8 @@
                                         <tr><th>Semester</th><td>{{ $pendaftaran->pendaftaran->semester }}</td></tr>
                                         <tr><th>Alamat Lengkap</th><td>{{ $pendaftaran->pendaftaran->alamat_lengkap }}</td></tr>
                                         <tr><th>Telepon</th><td>{{ $pendaftaran->pendaftaran->telepon }}</td></tr>
+                                        <tr><th>Telepon</th><td>{{ $pendaftaran->pendaftaran->biaya_hidup }}</td></tr>
+                                        <tr><th>Telepon</th><td>{{ $pendaftaran->pendaftaran->biaya_ukt }}</td></tr>
                                     </table>
     
                                     <h5 class="mt-4 fw-bold"><i class="fa fa-folder-open"></i> Berkas Mahasiswa</h5>
@@ -431,7 +433,7 @@
                                                     onclick="validate('setuju', {{ $pendaftaran->pendaftaran->id }})"
                                                     data-bs-toggle="tooltip"
                                                     data-bs-placement="top"
-                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
+                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
                                                         disabled
                                                     @endif>
                                                 <i class="fa fa-check-circle"></i> Setujui Usulan
@@ -442,7 +444,7 @@
                                                     onclick="validate('tolak', {{ $pendaftaran->pendaftaran->id }})"
                                                     data-bs-toggle="tooltip"
                                                     data-bs-placement="top"
-                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
+                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
                                                         disabled
                                                     @endif>
                                                 <i class="fa fa-times-circle"></i> Tolak Usulan
@@ -478,7 +480,7 @@
                                                                     onclick="validate('setuju', {{ $pendaftaran->pendaftaran->id }})"
                                                                     data-bs-toggle="tooltip"
                                                                     data-bs-placement="top"
-                                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
+                                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
                                                                         disabled
                                                                     @endif>
                                                                 <i class="fa fa-check-circle"></i> Setujui Usulan
@@ -489,7 +491,7 @@
                                                                     onclick="validate('tolak', {{ $pendaftaran->pendaftaran->id }})"
                                                                     data-bs-toggle="tooltip"
                                                                     data-bs-placement="top"
-                                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, ['disetujui', 'ditolak']))
+                                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
                                                                         disabled
                                                                     @endif>
                                                                 <i class="fa fa-times-circle"></i> Tolak Usulan

@@ -23,6 +23,8 @@ class PendaftaranBeasiswa extends Model
         'IPK',
         'semester',
         'status',
+        'biaya_hidup',
+        'biaya_ukt',
     ];
 
     // Relasi ke BuatPendaftaranBeasiswa

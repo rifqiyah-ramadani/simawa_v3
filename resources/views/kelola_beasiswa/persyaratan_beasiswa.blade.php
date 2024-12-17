@@ -142,11 +142,11 @@
                             <label for="nama_persyaratan" class="form-label fw-bold">Nama Persyaratan
                                 <span style="color: red;">*</span>
                             </label>
-                            <input type="text" class="form-control" id="nama_persyaratan" name="nama_persyaratan" placeholder="Masukkan nama persyaratan">
+                            <input type="text" class="form-control" id="nama_persyaratan" name="nama_persyaratan" placeholder="Enter nama persyaratan">
                         </div>
                         <div class="col mb-3">
                             <label for="keterangan" class="form-label fw-bold">Keterangan (Opsional)</label>
-                            <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Masukkan keterangan tambahan">
+                            <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Enter keterangan tambahan">
                         </div>
                     </div>
                     <div class="row">
@@ -158,20 +158,18 @@
                                 <option value="tanpa_kriteria">Tanpa Kriteria</option>
                                 <option value="dengan_kriteria">Dengan Kriteria</option>
                             </select>
-                            <span class="form-text text-muted" style="font-style: italic;">Pilih apakah kriteria diperlukan atau tidak.</span>
+                            <span class="form-text text-muted" style="font-style: italic;">Pilih apakah kriteria diperlukan atau tidak untuk melakukan perbandingan persyaratan (beasiswa internal).</span>
                         </div>
                         <div class="col mb-3">
                             <label for="kriteria" class="form-label fw-bold">Kriteria</label>
                             <select class="form-select" id="kriteria" name="kriteria">
-                                <option value="">Pilih Kriteria</option>
+                                <option value="" disabled selected>--Pilih Kriteria--</option>
                                 @foreach ($kriteria as $item)
                                     <option 
                                         value="{{ $item->id }}" 
                                         data-tipe_input="{{ $item->tipe_input }}" 
                                         data-opsi_dropdown='{{ $item->opsi_dropdown }}'>
                                         {{ $item->nama_kriteria }}
-                                        {{-- data-opsi_dropdown="{{ $item->opsi_dropdown ?? '' }}">
-                                        {{ $item->nama_kriteria }} --}}
                                     </option>
                                 @endforeach
                             </select>
@@ -184,7 +182,7 @@
                         <div class="col mb-3">
                             <label for="operator" class="form-label fw-bold">Operator</label>
                             <select class="form-select" id="operator" name="operator">
-                                <option value="0">--Pilih Operator--</option>
+                                <option value="" disabled selected>--Pilih Operator--</option>
                                 <option value=">=">>= (Lebih dari atau sama dengan)</option>
                                 <option value="<="><= (Kurang dari atau sama dengan)</option>
                                 <option value="=">= (Sama dengan)</option>
@@ -220,7 +218,7 @@
 
 <!-- Modal Kriteria -->
 <div class="modal fade" id="modalKriteria" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-md">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Tambah Kriteria</h5>
@@ -229,27 +227,39 @@
             <div class="modal-body">
                 <form id="formKriteria">
                     <div class="mb-3">
-                        <label for="nama_kriteria" class="form-label">Nama Kriteria</label>
-                        <input type="text" class="form-control" id="nama_kriteria" name="nama_kriteria">
+                        <label for="nama_kriteria" class="form-label fw-bold">Nama Kriteria
+                            <span style="color: red;">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="nama_kriteria" name="nama_kriteria" placeholder="Enter Nama Kriteria">
                     </div>
                     <div class="mb-3">
-                        <label for="tipe_input" class="form-label">Tipe Input</label>
+                        <label for="tipe_input" class="form-label fw-bold">Tipe Input
+                            <span style="color: red;">*</span>
+                        </label>
                         <select class="form-select" id="tipe_input" name="tipe_input">
+                            <option value="" disabled selected>--Pilih Tipe Input-- </option>
                             <option value="text">Text</option>
                             <option value="number">Number</option>
                             <option value="dropdown">Dropdown</option>
                         </select>
                     </div>
                     <div class="mb-3" id="dropdown-options" style="display: none;">
-                        <label for="opsi_dropdown" class="form-label">Opsi Dropdown</label>
-                        <textarea id="opsi_dropdown" class="form-control" name="opsi_dropdown"></textarea>
+                        <label for="opsi_dropdown" class="form-label fw-bold">Opsi Dropdown</label>
+                        <textarea id="opsi_dropdown" class="form-control" name="opsi_dropdown" placeholder="Misalkan S1,S2,S3"></textarea>
+                        <span class="form-text text-muted" style="font-style: italic;">
+                            Masukkan satu atau lebih opsi dropdown
+                        </span>
                     </div>
                     <div class="mb-3">
-                        <label for="key_detail_user" class="form-label">Field Detail User</label>
+                        <label for="key_detail_user" class="form-label fw-bold">Field Detail User</label>
                         <select class="form-select" id="key_detail_user" name="key_detail_user">
+                            <option value="" disabled selected>Pilih Detail User</option> <!-- Tambahkan opsi default -->
                             <!-- Dropdown ini akan diisi secara dinamis dari server -->
                         </select>
-                    </div>
+                        <span class="form-text text-muted" style="font-style: italic;">
+                            Field ini digunakan agar bisa menyamakan data persyaratan dengan detail user
+                        </span>
+                    </div>                    
                 </form>
             </div>
             <div class="modal-footer">
@@ -606,7 +616,8 @@
                     type: 'GET',
                     success: function (response) {
                         const fieldDropdown = $('#key_detail_user');
-                        fieldDropdown.empty(); // Kosongkan dropdown terlebih dahulu
+                        fieldDropdown.empty();
+                        fieldDropdown.append('<option value="" disabled selected>--Pilih Detail User--</option>');
                         response.fields.forEach(field => {
                             fieldDropdown.append(`<option value="${field}">${field}</option>`);
                         });

@@ -23,16 +23,6 @@
         }
 
         /* Style untuk tombol */
-        .tombol-tambah {
-            background-color: #FEF3E2;
-            border-color: #FA4032;
-            color: #FA4032;
-        }
-        .tombol-tambah:hover {
-            background-color: #FAD2B1; 
-            border-color: #E53B1F;    
-            color: #E53B1F;
-        }
         .tombol-simpan {
             background-color: #007bff;
             border-color: #007bff;
@@ -96,7 +86,7 @@
                     <div class="card mb-4"> 
                         <!--begin::card header-->
                         <div class="card-header">
-                            <a href="#" class="btn text-dark tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
+                            <a href="#" class="btn btn-outline-primary tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
                         </div> 
                         <!--end::card header-->
 
@@ -137,13 +127,11 @@
                 {{-- start form --}}
                 <div class="row">
                     <div class="col mb-3">
-                        <label for="role" class="form-label">Role User:</label>
+                        <label for="role" class="form-label fw-bold">Role User:
+                            <span style="color: red;">*</span>
+                        </label>
                         <input type="role" class="form-control" id="name" placeholder="Enter Role User" name="name" required>
                     </div>
-                    <div class="col mb-3">
-                      <label for="guard_name" class="form-label">Guard Name:</label>
-                      <input type="guard_name" class="form-control" id="guard_name" placeholder="Enter Guard Name" name="guard_name" required>
-                    </div> 
                 </div> {{-- end form --}}   
         </div>
         <div class="modal-footer">
@@ -206,7 +194,7 @@
                 success: function (response) {
                     $('#exampleModal').modal('show');
                     $('#name').val(response.result.name);
-                    $('#guard_name').val(response.result.guard_name);
+                    // $('#guard_name').val(response.result.guard_name);
                     $('.tombol-simpan').off('click').on('click', function () {
                         simpan(id);
                     });
@@ -269,7 +257,7 @@
                 type: var_type,
                 data: {
                     name: $('#name').val(),
-                    guard_name: $('#guard_name').val()
+                    // guard_name: $('#guard_name').val()
                 },
                 success: function(response) {
                     if (response.errors) {
@@ -296,7 +284,7 @@
 
         $('#exampleModal').on('hidden.bs.modal', function () {
             $('#name').val('').removeClass('is-invalid');
-            $('#guard_name').val('').removeClass('is-invalid');
+            // $('#guard_name').val('').removeClass('is-invalid');
             $('.text-danger').remove(); // Bersihkan pesan kesalahan saat modal ditutup
         });
 

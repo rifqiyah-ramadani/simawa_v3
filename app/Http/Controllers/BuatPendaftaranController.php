@@ -36,13 +36,21 @@ class BuatPendaftaranController extends Controller
             // Ambil data dengan relasi beasiswa
             $buatPendaftaran = BuatPendaftaranBeasiswa::with('beasiswa')->get();
             
-            // Pengecekan status pendaftaran
             foreach ($buatPendaftaran as $pendaftaran) {
-                $currentDate = now();
-                if ($currentDate->lt($pendaftaran->tanggal_mulai) || $currentDate->gt($pendaftaran->tanggal_berakhir)) {
-                    $pendaftaran->update(['status' => 'ditutup']);
+                $currentDate = now()->startOfDay();
+                $tanggalMulai = \Carbon\Carbon::parse($pendaftaran->tanggal_mulai)->startOfDay();
+                $tanggalBerakhir = \Carbon\Carbon::parse($pendaftaran->tanggal_berakhir)->endOfDay();
+            
+                if ($currentDate < $tanggalMulai || $currentDate > $tanggalBerakhir) {
+                    if ($pendaftaran->status !== 'ditutup') {
+                        $pendaftaran->update(['status' => 'ditutup']);
+                    }
+                } else {
+                    if ($pendaftaran->status !== 'dibuka') {
+                        $pendaftaran->update(['status' => 'dibuka']);
+                    }
                 }
-            }
+            }            
 
             return DataTables::of($buatPendaftaran)
                 ->addIndexColumn()
@@ -131,10 +139,13 @@ class BuatPendaftaranController extends Controller
             return response()->json(['errors' => $validate->errors()]);
         } 
         
-        $currentDate = now();
-        $status = ($currentDate >= $request->tanggal_mulai && $currentDate <= $request->tanggal_berakhir)
+        $currentDate = now()->startOfDay();
+        $tanggalMulai = \Carbon\Carbon::parse($request->tanggal_mulai)->startOfDay();
+        $tanggalBerakhir = \Carbon\Carbon::parse($request->tanggal_berakhir)->endOfDay();
+        
+        $status = ($currentDate >= $tanggalMulai && $currentDate <= $tanggalBerakhir)
             ? 'dibuka'
-            : 'ditutup';
+            : 'ditutup';        
 
         // Buat pendaftaran beasiswa baru
         $buatPendaftaran = BuatPendaftaranBeasiswa::create([

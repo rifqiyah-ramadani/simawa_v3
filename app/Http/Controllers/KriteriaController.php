@@ -29,9 +29,15 @@ class KriteriaController extends Controller
     {
         // Ambil daftar kolom dari tabel detail_user
         $columns = Schema::getColumnListing('detail_users');
-
-        return response()->json(['message' => 'Modal kriteria ditampilkan', 'fields' => $columns]);
+    
+        // Hapus field id, created_at, dan updated_at
+        $filteredColumns = array_filter($columns, function ($column) {
+            return !in_array($column, ['id', 'created_at', 'updated_at']);
+        });
+    
+        return response()->json(['message' => 'Modal kriteria ditampilkan', 'fields' => array_values($filteredColumns)]);
     }
+    
 
     /**
      * Store persyaratan

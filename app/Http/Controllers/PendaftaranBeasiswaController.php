@@ -125,18 +125,20 @@ class PendaftaranBeasiswaController extends Controller
             // Cek apakah user sudah mengisi form pendaftaran sebelumnya
             $pendaftaranUser = $buatPendaftaran->pendaftaranBeasiswa()->where('user_id', $user->id)->first();
 
-            // Ambil tahapan pendaftaran beasiswa dari tahapan yang sudah di-set
-            $tahapanAdministrasi = $buatPendaftaran->tahapan()->where('nama_tahapan', 'Pendaftaran Beasiswa')->first();
-
+            // Ambil tahapan yang cocok dengan "Pendaftaran Beasiswa" atau "Pendaftaran Berkas"
+            $tahapanAdministrasi = $buatPendaftaran->tahapan()
+            ->whereRaw('LOWER(nama_tahapan) = ?', [strtolower('Pendaftaran Beasiswa')])
+            ->orWhereRaw('LOWER(nama_tahapan) = ?', [strtolower('Pendaftaran Berkas')])
+            ->first();
             // Cek jika tahapan seleksi administrasi tidak ada
             if (!$tahapanAdministrasi) {
                 return view('beasiswa.daftar')->withErrors('Tahapan pendaftaran beasiswa tidak ditemukan');
             }
 
             // Parse tanggal mulai dan berakhir sebagai objek Carbon
-            $currentDate = now();
-            $tahapanDimulai = \Carbon\Carbon::parse($tahapanAdministrasi->pivot->tanggal_mulai);
-            $tahapanBerakhir = \Carbon\Carbon::parse($tahapanAdministrasi->pivot->tanggal_akhir)->endOfDay();
+            $currentDate = now()->startOfDay(); // Hanya ambil tanggal hari ini tanpa waktu
+            $tahapanDimulai = \Carbon\Carbon::parse($tahapanAdministrasi->pivot->tanggal_mulai)->startOfDay(); // Pastikan tanggal mulai tanpa waktu
+            $tahapanBerakhir = \Carbon\Carbon::parse($tahapanAdministrasi->pivot->tanggal_akhir)->endOfDay(); // Pastikan tanggal akhir hingga akhir hari
 
             // Kondisi untuk menentukan tampilan
             $showForm = false;
@@ -273,6 +275,8 @@ class PendaftaranBeasiswaController extends Controller
             'alamat_lengkap' => 'required|string',
             'telepon' => 'required|string|max:20',
             'berkas.*' => 'required|file|mimes:pdf,jpeg,png|max:2048',
+            'biaya_hidup' => 'required|numeric',
+            'biaya_ukt' => 'required|numeric',
         ]);
 
         if ($validate->fails()) {
@@ -331,6 +335,8 @@ class PendaftaranBeasiswaController extends Controller
                 'telepon' => $request->telepon,
                 'IPK' => $request->IPK,
                 'semester' => $request->semester,
+                'biaya_hidup' => $request->biaya_hidup,
+                'biaya_ukt' => $request->biaya_ukt,
                 'user_id' => auth()->user()->id,
                 'buat_pendaftaran_beasiswa_id' => $buatPendaftaranId,
             ]);

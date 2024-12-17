@@ -3,7 +3,8 @@
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" />
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <style>
         /* Style untuk tampilan tabel */
         #myTable {
@@ -97,9 +98,9 @@
                                     <tr>
                                         <th style="width: 20px">No</th>
                                         <th style="width: 300px">Nama Berkas</th>
-                                        <th style="width: 100px">Keterangan Tambahan</th>
-                                        <th>Template Path</th>
-                                        <th>Aksi</th>
+                                        <th style="width: 300px">Keterangan Tambahan</th>
+                                        <th style="width: 200px">Template Path</th>
+                                        <th style="text-align: center">Aksi</th>
                                     </tr>
                                 </thead> 
                             </table>
@@ -189,17 +190,40 @@
                     {
                         data: 'template_path_url',
                         name: 'template_path',
-                        orderable: false,
-                        searchable: false,
                         render: function(data, type, row) {
-                            return data ? `<a href="${data}" target="_blank">Download Template</a>` : '<span class="text-muted">Tidak tersedia</span>';
+                            if (data) {
+                                // Ikon berdasarkan ekstensi
+                                let fileExtension = data.split('.').pop().toLowerCase();
+                                let icon;
+
+                                switch (fileExtension) {
+                                    case 'jpg': case 'jpeg': case 'png': case 'gif':
+                                        icon = '<i class="fas fa-file-image text-success" style="font-size: 50px;"></i>';
+                                        break;
+                                    case 'pdf':
+                                        icon = '<i class="fas fa-file-pdf text-danger" style="font-size: 50px;"></i>';
+                                        break;
+                                    case 'doc': case 'docx':
+                                        icon = '<i class="fas fa-file-word text-primary" style="font-size: 50px;"></i>';
+                                        break;
+                                    default:
+                                        icon = '<i class="fas fa-file-alt text-secondary" style="font-size: 50px;"></i>';
+                                }
+
+                                // Tampilkan ikon dengan tautan
+                                return `<a href="${data}" target="_blank" style="text-decoration: none; color: inherit;">${icon}</a>`;
+                            }
+                            return '<span class="text-muted">Tidak ada file</span>';
                         }
                     },
                     {
                         data: 'aksi',
                         name: 'aksi',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        render: function(data, type, row) {
+                            return `<div style="text-align: center; vertical-align: middle;">${data}</div>`;
+                        }
                     }
                 ]
                 

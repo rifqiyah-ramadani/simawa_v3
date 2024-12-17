@@ -13,14 +13,14 @@
         }
         #myTable th {
             background-color: #FA812F;
-            color: white;
+            color: white; 
             text-align: center;
         }
         #myTable td {
             padding: 3px;
             text-align: center;
             border: 1px solid #f2f2f2; 
-        }
+        } 
 
         /* Style untuk tombol */
         .tombol-simpan {

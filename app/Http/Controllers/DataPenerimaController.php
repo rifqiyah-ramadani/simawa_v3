@@ -8,12 +8,12 @@ use App\Models\User;
 use App\Models\Interview;
 use Illuminate\Support\Str;
 use App\Models\DataPenerima;
+use App\Models\BuatPendaftaranBeasiswa;
+use App\Models\DaftarBeasiswa;
 use Illuminate\Http\Request;
 use App\Models\PendaftaranBeasiswa;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
-use App\Models\BuatPendaftaranBeasiswa;
-use App\Models\DaftarBeasiswa;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Routing\Controller as Controller;
@@ -57,8 +57,6 @@ class DataPenerimaController extends Controller
     
                     DataPenerima::create([
                         'pendaftaran_beasiswa_id' => $pendaftaran->id,
-                        'biaya_hidup' => null,
-                        'biaya_ukt' => null,
                         'status_penerima' => $statusPenerima, // Simpan status yang dihitung
                         'start_semester' => null,
                         'end_semester' => null,
@@ -110,6 +108,10 @@ class DataPenerimaController extends Controller
                     // Ambil NIM mahasiswa
                     return $dataPenerima->pendaftaranBeasiswa->nim ?? '-';
                 })
+                ->addColumn('fakultas', function ($dataPenerima) {
+                    // Ambil jurusan mahasiswa
+                    return $dataPenerima->pendaftaranBeasiswa->fakultas ?? '-';
+                })
                 ->addColumn('jurusan', function ($dataPenerima) {
                     // Ambil jurusan mahasiswa
                     return $dataPenerima->pendaftaranBeasiswa->jurusan ?? '-';
@@ -138,7 +140,7 @@ class DataPenerimaController extends Controller
         }
     
         // Jika request bukan AJAX, render view
-        return view('kelola_beasiswa.data_penerima');
+        return view('kelola_beasiswa.penerima_beasiswa');
     }
 
     /**
@@ -163,9 +165,6 @@ class DataPenerimaController extends Controller
     {
         // Validasi input dari form
         $request->validate([
-            'siakad_mhpspt_id' => 'nullable|integer',
-            'biaya_hidup' => 'nullable|numeric',
-            'biaya_ukt' => 'nullable|numeric',
             'start_semester' => 'nullable|string|max:255',
             'end_semester' => 'nullable|string|max:255',
             'status_penerima' => 'nullable|in:sedang menerima,masa selesai',
@@ -176,11 +175,8 @@ class DataPenerimaController extends Controller
     
         // Perbarui data berdasarkan input
         $dataPenerima->update([
-            'siakad_mhpspt_id' => $request->siakad_mhpspt_id,
-            'biaya_hidup' => $request->biaya_hidup,
-            'biaya_ukt' => $request->biaya_ukt,
             'start_semester' => $request->start_semester,
-            'end_semester' => $request->end_semester,
+            'end_semester' => $request->end_semester, 
             'status_penerima' => $request->status_penerima,
         ]);
     
@@ -203,9 +199,11 @@ class DataPenerimaController extends Controller
     /**
      * Fungsi export data
      */
-    public function export()
+    public function export(Request $request)
     {
-        return Excel::download(new DataPenerimaExport, 'data_penerima.xlsx');
+        $fakultas = $request->input('fakultas'); // Ambil parameter fakultas dari request
+        return Excel::download(new DataPenerimaExport($fakultas), 'penerima_beasiswa.xlsx');
+        // return Excel::download(new DataPenerimaExport, 'penerima_beasiswa.xlsx');
     }
 
     /**

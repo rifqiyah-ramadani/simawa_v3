@@ -23,16 +23,6 @@
         }
 
         /* Style untuk tombol */
-        .tombol-tambah {
-            background-color: #FEF3E2;
-            border-color: #FA4032;
-            color: #FA4032;
-        }
-        .tombol-tambah:hover {
-            background-color: #FAD2B1; 
-            border-color: #E53B1F;    
-            color: #E53B1F;
-        }
         .tombol-simpan {
             background-color: #007bff;
             border-color: #007bff;
@@ -84,7 +74,7 @@
                 <form> 
                     <div class="card mb-4"> 
                         <div class="card-header">
-                            <a href="#" class="btn text-dark tombol-tambah" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            <a href="#" class="btn btn-outline-primary tombol-tambah" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                 <i class="bi bi-plus"></i> Tambah Data
                             </a>
                         </div> 
@@ -93,7 +83,7 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 20px">No</th>
-                                        <th>Kategori Informasi</th>
+                                        <th style="width: 100px">Kategori Informasi</th>
                                         <th>Judul</th>
                                         <th>Konten</th>
                                         <th>Tanggal Publikasi</th>
@@ -124,21 +114,21 @@
             </div>
             <div class="row">
                 <div class="mb-3">
-                    <label for="judul" class="form-label">Judul
+                    <label for="judul" class="form-label fw-bold">Judul
                         <span style="color: red;">*</span>
                     </label>
-                    <input type="text" class="form-control" id="judul" name="judul" required>
+                    <input type="text" class="form-control" id="judul" name="judul" placeholder="Enter Judul Berita" required>
                 </div>
                 <div class="mb-3">
-                    <label for="content" class="form-label">Konten
+                    <label for="content" class="form-label fw-bold">Konten
                         <span style="color: red;">*</span>
                     </label>
-                    <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+                    <textarea class="form-control" id="content" name="content" rows="4" placeholder="Enter Konten Berita" required></textarea>
                 </div>
             </div>
             <div class="row">
                 <div class="mb-3">
-                    <label for="image" class="form-label">Gambar (Opsional)
+                    <label for="image" class="form-label fw-bold">Gambar (Opsional)
                     </label>
                     <input type="file" class="form-control" id="image" name="image">
                     <span style="color: gray; font-size: 14px;">Format gambar: jpeg, png, jpg, gif.</span>
@@ -193,9 +183,9 @@
                             if (data) {
                                 // Menggunakan asset() dengan asumsi 'data' adalah path yang disimpan
                                 let url = '{{ asset('storage') }}/' + data;
-                                return `<a href="${url}" target="_blank" class="btn btn-link">Lihat Gambar</a>`;
+                                return `<img src="${url}" alt="Gambar" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">`;
                             }
-                            return '-';
+                            return '<span class="text-muted">Tidak ada gambar</span>';
                         }
                     },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
@@ -257,9 +247,19 @@
                     // Isi form dengan data yang diambil
                     $('#judul').val(response.informasi.judul);
                     $('#content').val(response.informasi.content);
-                    // Tampilkan gambar lama (jika ada)
+
+                    // Tampilkan tautan gambar lama (jika ada)
+                    $('#image').next('small').remove(); // Hapus informasi file lama sebelumnya
                     if (response.informasi.image) {
-                        $('#image').after('<small>File sebelumnya: ' + response.informasi.image + '</small>');
+                        let url = '{{ asset('storage') }}/' + response.informasi.image;
+                        $('#image').after(`
+                            <small>
+                                File sebelumnya: 
+                                <a href="${url}" target="_blank" class="text-primary">
+                                    ${response.informasi.image}
+                                </a>
+                            </small>
+                        `);
                     }
                     
                     // Tambahkan event listener untuk tombol Simpan

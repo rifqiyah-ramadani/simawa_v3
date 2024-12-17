@@ -39,48 +39,61 @@
                 <div class="row g-0">
                   <div class="col-lg-6">
                     <div class="card-body p-md-5 mx-md-4">
-      
                       <div class="text-center">
-                        <img src="{{asset('images/logo.png')}}" alt="SIMAWA Logo" style="width: 100px;" alt="logo">
+                        <img src="{{ asset('images/logo.png') }}" alt="SIMAWA Logo" style="width: 100px;" />
                         <h4 class="mt-3 mb-3 pb-1">SISTEM INFORMASI KEMAHASISWAAN UNIVERSITAS JAMBI</h4>
                       </div>
-
+                    
                       <!-- Form Login -->
                       <form action="{{ route('login') }}" method="POST">
                         @csrf
+                    
                         <!-- Username Field -->
-                        <div class="mb-3 mt-3">
+                        <div class="mb-3">
                           <label for="username" class="form-label">Username:</label>
-                          <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" value="{{ old('username') }}" placeholder="Enter username" required>
+                          <input type="text" 
+                                 class="form-control @error('username') is-invalid @enderror" 
+                                 id="username" 
+                                 name="username" 
+                                 value="{{ old('username') }}" 
+                                 placeholder="Enter username" 
+                                 required>
                           @error('username')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
+                            <div class="invalid-feedback">
+                              {{ $message }}
+                            </div>
                           @enderror
                         </div>
+                    
                         <!-- Password Field -->
                         <div class="mb-3">
                           <label for="password" class="form-label">Password:</label>
-                          <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" placeholder="Enter password" required>
+                          <input type="password" 
+                                 class="form-control @error('password') is-invalid @enderror" 
+                                 id="password" 
+                                 name="password" 
+                                 placeholder="Enter password" 
+                                 required>
                           @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
+                            <div class="invalid-feedback">
+                              {{ $message }}
+                            </div>
                           @enderror
                         </div>
+                    
                         <!-- Remember Me -->
                         <div class="form-check mb-3">
-                          <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="remember"> Remember me
-                          </label>
+                          <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                          <label class="form-check-label" for="remember">Remember Me</label>
                         </div>
+                    
                         <!-- Submit Button -->
                         <div class="d-grid">
-                          <button type="submit" class="btn btn-block text-white" style="background-color: #ff9800">Masuk</button>
+                          <button type="submit" class="btn btn-block text-white" style="background-color: #ff9800;">Masuk</button>
                         </div>
                       </form>
-      
                     </div>
+                    
                   </div>
                   <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
                     <div class="text-white px-3 py-4 p-md-5 mx-md-4">

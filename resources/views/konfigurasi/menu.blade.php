@@ -22,17 +22,7 @@
             border: 1px solid #f2f2f2;
         }
 
-        /* Style untuk tombol */
-        .tombol-tambah {
-            background-color: #FEF3E2;
-            border-color: #FA4032;
-            color: #FA4032;
-        }
-        .tombol-tambah:hover {
-            background-color: #FAD2B1; 
-            border-color: #E53B1F;    
-            color: #E53B1F;
-        }
+        /* Style untuk tombol */}
         .tombol-simpan {
             background-color: #007bff;
             border-color: #007bff;
@@ -96,7 +86,7 @@
                     <div class="card mb-4"> 
                         <!--begin::card header-->
                         <div class="card-header">
-                            <a href="#" class="btn text-dark tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
+                            <a href="#" class="btn btn-outline-primary tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
                         </div> 
                         <!--end::card header-->
 
@@ -138,33 +128,40 @@
         </div>
         <div class="modal-body">
                 {{-- start form --}}
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="name" class="form-label fw-bold">Nama Menu:
+                            <span style="color: red;">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter Nama Menu" required>
+                    </div>
+                    <div class="col mb-3">
+                        <label for="url" class="form-label fw-bold">URL
+                            <span style="color: red;">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="url" name="url" placeholder="Enter URL" required>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col mb-3">
-                        <label for="url" class="form-label">URL</label>
-                        <input type="text" class="form-control" id="url" name="url" required>
-                    </div>
-                    <div class="col mb-3">
-                        <label for="icon" class="form-label">Icon</label>
-                        <input type="text" class="form-control" id="icon" name="icon">
-                    </div>
-                </div> 
-                <div class="row">
-                    <div class="mb-3">
-                        <label for="main_menu" class="form-label">Main Menu</label>
+                        <label for="main_menu" class="form-label fw-bold">Main Menu</label>
                         <select class="form-control" id="main_menu" name="main_menu">
-                            <option value="">Select Main Menu</option>
+                            <option value="">--Select Main Menu--</option>
                             @foreach($mainMenus as $menu)
                                 <option value="{{ $menu->id }}">{{ $menu->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col mb-3">
-                        <label for="sort" class="form-label">Sort Order</label>
-                        <input type="number" class="form-control" id="sort" name="sort">
+                        <label for="icon" class="form-label fw-bold">Icon (Opsional)</label>
+                        <input type="text" class="form-control" id="icon" name="icon" placeholder="Enter Icon">
+                        <span class="form-text text-muted" style="font-style: italic;">Masukkan icon jika merupakan menu utama</span>
+                    </div>
+                </div> 
+                <div class="row">
+                    <div class="col mb-3">
+                        <label for="sort" class="form-label fw-bold">Urutan Submenu (Opsional)</label>
+                        <input type="number" class="form-control" id="sort" name="sort" placeholder="masukkan urutan submenu">
                     </div>
                 </div> 
                 {{-- end form --}}   
@@ -197,7 +194,17 @@
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                     { data: 'name', name: 'name' },
                     { data: 'url', name: 'url' },
-                    { data: 'icon', name: 'icon' },
+                    // { data: 'icon', name: 'icon' },
+                    {
+                        data: 'icon', 
+                        name: 'icon',
+                        render: function(data, type, row) {
+                            // Render data as an icon (e.g., using Font Awesome)
+                            return `<i class="${data}"></i>`;
+                        },
+                        orderable: false,
+                        searchable: false
+                    },
                     { data: 'main_menu', name: 'main_menu' },
                     { data: 'sort', name: 'sort' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false}
@@ -338,6 +345,5 @@
             });
         });
     </script>
-    
-    
+
 @endpush

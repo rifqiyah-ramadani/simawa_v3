@@ -223,6 +223,8 @@
                                         <tr><th>Semester</th><td>{{ $pendaftaran->semester }}</td></tr>
                                         <tr><th>Alamat Lengkap</th><td>{{ $pendaftaran->alamat_lengkap }}</td></tr>
                                         <tr><th>Telepon</th><td>{{ $pendaftaran->telepon }}</td></tr>
+                                        <tr><th>Telepon</th><td>{{ $pendaftaran->biaya_hidup }}</td></tr>
+                                        <tr><th>Telepon</th><td>{{ $pendaftaran->biaya_ukt }}</td></tr>
                                     </table>
     
                                     <h5 class="mt-4 fw-bold"><i class="fa fa-folder-open"></i> Berkas Mahasiswa</h5>

@@ -27,16 +27,6 @@
         }
 
         /* Style untuk tombol */
-        .tombol-tambah {
-            background-color: #FEF3E2;
-            border-color: #FA4032;
-            color: #FA4032;
-        }
-        .tombol-tambah:hover {
-            background-color: #FAD2B1; 
-            border-color: #E53B1F;    
-            color: #E53B1F;
-        }
         .tombol-simpan {
             background-color: #007bff;
             border-color: #007bff;
@@ -100,7 +90,7 @@
                     <div class="card mb-4"> 
                         <!--begin::card header-->
                         <div class="card-header">
-                            <a href="#" class="btn text-dark tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
+                            <a href="#" class="btn btn-outline-primary tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
                         </div> 
                         <!--end::card header-->
 
@@ -145,22 +135,29 @@
                {{-- field kolom username dan name --}}
                 <div class="row">
                     <div class="col mb-3">
-                        <label for="username" class="form-label">Username:</label>
+                        <label for="username" class="form-label fw-bold">Username:
+                            <span style="color: red;">*</span>
+                        </label>
                         <input type="text" class="form-control" id="username" placeholder="Enter Username" name="username" required>
                     </div>
                     <div class="col mb-3">
-                        <label for="name" class="form-label">Nama User:</label>
+                        <label for="name" class="form-label fw-bold">Nama User:
+                            <span style="color: red;">*</span>
+                        </label>
                         <input type="text" class="form-control" id="name" placeholder="Enter Nama" name="name" required>
                     </div> 
                 </div>
                 {{-- field kolom nip dan usertype --}}
                 <div class="row">
                     <div class="col mb-3">
-                        <label for="nip" class="form-label">NIP:</label>
+                        <label for="nip" class="form-label fw-bold">NIP (Opsional):</label>
                         <input type="text" class="form-control" id="nip" placeholder="Enter NIP" name="nip" required>
+                        <span class="form-text text-muted" style="font-style: italic;">Masukkan NIP jika ada</span>
                     </div>
                     <div class="col mb-3">
-                        <label for="usertype" class="form-label">UserType:</label>
+                        <label for="usertype" class="form-label fw-bold">UserType:
+                            <span style="color: red;">*</span>
+                        </label>
                         <input type="text" class="form-control" id="usertype" placeholder="Enter UserType" name="usertype" required>
                     </div> 
                 </div>
@@ -168,12 +165,11 @@
                 {{-- field kolom password dan roles --}}
                 <div class="row">
                     <div class="col mb-3">
-                        <label for="password" class="form-label">Password:</label>
-                        <input type="password" class="form-control" id="password" placeholder="Enter Password" name="password" required>
-                    </div>
-                    <div class="col mb-3">
-                        <label for="roles" class="form-label">Roles:</label>
+                        <label for="roles" class="form-label fw-bold">Roles:
+                            <span style="color: red;">*</span>
+                        </label>
                         <select id="roles" name="roles[]" class="form-control" multiple="multiple" required>
+                            <option value="">Select Role User</option>
                             @foreach($roles as $role)
                                 <option value="{{ $role->name }}">{{ $role->name }}</option>
                             @endforeach
@@ -230,7 +226,7 @@
 
         $('#userModal').on('shown.bs.modal', function () {
             $('#roles').select2({
-                placeholder: "Select roles",
+                placeholder: "--Pilih roles--",
                 allowClear: true,
                 width: '100%',
                 theme: 'bootstrap-5'
@@ -326,7 +322,6 @@
                         name: $('#name').val(),
                         nip: $('#nip').val(),
                         usertype: $('#usertype').val(),
-                        password: $('#password').val(),
                         roles: $('#roles').val(),
                     },
                     success: function(response) {
@@ -355,7 +350,6 @@
                 $('#name').val('').removeClass('is-invalid');
                 $('#nip').val('').removeClass('is-invalid');
                 $('#usertype').val('').removeClass('is-invalid');
-                $('#password').val('').removeClass('is-invalid');
                 $('#roles').val([]).trigger('change');
                 $('.text-danger').remove();
             });

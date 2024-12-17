@@ -170,11 +170,22 @@
                                 {{-- Field IPK dan Semester --}}
                                 <div class="row">
                                     <div class="col mb-3">
-                                        <label for="semester" class="form-label fw-bold">Semester
+                                        <label for="semester" class="form-label fw-bold">Jurusan:
                                             <span style="color: red;">*</span>
                                         </label>
-                                        <input type="text" class="form-control" id="semester" placeholder="Enter Semester" name="semester" required>
+                                        <select class="form-control" id="semester" name="semester" required>
+                                            <option value="" disabled selected>--Pilih Semester--</option>
+                                            <option value="1">Semester 1</option>
+                                            <option value="2">Semester 2</option>
+                                            <option value="3">Semester 3</option>
+                                            <option value="4">Semester 4</option>
+                                            <option value="5">Semester 5</option>
+                                            <option value="6">Semester 6</option>
+                                            <option value="7">Semester 7</option>
+                                            <option value="8">Semester 8</option>
+                                        </select>
                                     </div>
+                        
                                     <div class="col mb-3">
                                         <label for="IPK" class="form-label fw-bold">IPK Semester Terakhir
                                             <span style="color: red;">*</span>
@@ -197,6 +208,17 @@
                                         </label>
                                         <input type="text" class="form-control" id="telepon" placeholder="Enter Telepon" name="telepon" required>
                                     </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <label for="biaya_hidup" class="form-label fw-bold">Biaya Hidup</label>
+                                        <input type="number" step="0.01" name="biaya_hidup" id="biaya_hidup" class="form-control">
+                                    </div>
+                                    <div class="col mb-3">
+                                        <label for="biaya_ukt" class="form-label fw-bold">Biaya UKT</label>
+                                        <input type="number" step="0.01" name="biaya_ukt" id="biaya_ukt" class="form-control">
+                                    </div> 
                                 </div>
 
                                 {{-- Field Berkas Pendaftaran --}}

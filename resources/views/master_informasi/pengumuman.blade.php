@@ -3,6 +3,7 @@
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
     <style>
         /* Style untuk tampilan tabel */
@@ -23,16 +24,6 @@
         }
 
         /* Style untuk tombol */
-        .tombol-tambah {
-            background-color: #FEF3E2;
-            border-color: #FA4032;
-            color: #FA4032;
-        }
-        .tombol-tambah:hover {
-            background-color: #FAD2B1; 
-            border-color: #E53B1F;    
-            color: #E53B1F;
-        }
         .tombol-simpan {
             background-color: #007bff;
             border-color: #007bff;
@@ -84,7 +75,7 @@
                 <form> 
                     <div class="card mb-4"> 
                         <div class="card-header">
-                            <a href="#" class="btn text-dark tombol-tambah" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            <a href="#" class="btn btn-outline-primary tombol-tambah" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                 <i class="bi bi-plus"></i> Tambah Data
                             </a>
                         </div> 
@@ -123,16 +114,17 @@
             </div>
             <div class="row">
                 <div class="mb-3">
-                    <label for="judul" class="form-label">Judul
+                    <label for="judul" class="form-label fw-bold">Judul
                         <span style="color: red;">*</span>
                     </label>
-                    <input type="text" id="judul" name="judul" class="form-control" required>
+                    <input type="text" id="judul" name="judul" class="form-control" placeholder="Enter Judul Pengumuman" required>
                 </div>
                 <div class="mb-3">
-                    <label for="file" class="form-label">File 
-                        <span style="color: gray; font-size: 12px;">Format: pdf, doc, docx.</span>
+                    <label for="file" class="form-label fw-bold">File 
+                        <span style="color: red;">*</span>
                     </label>
                     <input type="file" class="form-control" id="file" name="file" required>
+                    <span style="color: gray; font-size: 12px;">Format: pdf, doc, docx.</span>
 
                     <!-- Menambahkan elemen untuk menampilkan file yang sudah diupload -->
                     <div id="current-file-container" style="display: none;">
@@ -171,15 +163,36 @@
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                     { data: 'kategori_informasi', name: 'kategori_informasi' },
                     { data: 'judul', name: 'judul' },
-                    { 
-                        data: 'file', 
+                    {
+                        data: 'file',
                         name: 'file',
                         render: function(data, type, row) {
                             if (data) {
-                                let url = '{{ asset('storage') }}/' + data; 
-                                return `<a href="${url}" target="_blank" class="btn btn-link">Download File</a>`;
+                                let url = '{{ asset('storage') }}/' + data;
+
+                                // Periksa ekstensi file
+                                let fileExtension = data.split('.').pop().toLowerCase();
+                                let icon;
+
+                                // Tentukan ikon berdasarkan ekstensi file
+                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                    icon = '<i class="fas fa-file-image text-success" style="font-size: 20px;"></i>'; // Ikon gambar
+                                } else if (fileExtension === 'pdf') {
+                                    icon = '<i class="fas fa-file-pdf text-danger" style="font-size: 50px;"></i>'; // Ikon PDF
+                                } else if (['doc', 'docx'].includes(fileExtension)) {
+                                    icon = '<i class="fas fa-file-word text-primary" style="font-size: 20px;"></i>'; // Ikon Word
+                                } else {
+                                    icon = '<i class="fas fa-file-alt text-secondary" style="font-size: 20px;"></i>'; // Ikon file default
+                                }
+
+                                // Ikon yang bisa diklik untuk membuka file
+                                return `
+                                    <a href="${url}" target="_blank" style="text-decoration: none; color: inherit;">
+                                        ${icon}
+                                    </a>
+                                `;
                             }
-                            return '-'; // Jika file kosong
+                            return '<span class="text-muted">Tidak ada file</span>'; // Jika file kosong
                         }
                     },
                     { data: 'publish_date', name: 'publish_date' },

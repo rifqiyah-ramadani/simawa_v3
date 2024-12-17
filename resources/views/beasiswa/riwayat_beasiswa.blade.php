@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
+    
     <style>
         /* Style untuk tampilan tabel */
         #myTable {
@@ -49,36 +49,44 @@
 
 @section('content')
 <main class="app-main"> 
+    <!--begin::App Content Header-->
     <div class="app-content-header"> 
+        <!--begin::Container-->
         <div class="container-fluid"> 
+            <!--begin::Row-->
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Kelola Beasiswa - Data Penerima</h3>
+                    <h3 class="mb-0">Beasiswa - Riwayat Beasiswa</h3>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
                         <li class="breadcrumb-item active" aria-current="page">
-                            Kelola Beasiswa
+                            Beasiswa
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">
-                            Data Penerima
+                            Riwayat Beasiswa
                         </li>
                     </ol>
                 </div>
             </div> 
+            <!--end::Row-->
         </div> 
+        <!--end::Container-->
     </div> 
-
+    <!--end::App Content Header--> 
+    
+    <!--begin::App Content-->
     <div class="app-content"> 
+        <!--begin::Container-->
         <div class="container-fluid"> 
+            <!--begin::Row-->
             <div class="col-md-12"> 
+                <!--begin::form-->
                 <form> 
+                    <!--begin::card-->
                     <div class="card mb-4"> 
-                        <div class="card-header justify-content-between">
-                            <button class="btn btn-outline-primary tombol-export"><i class="fa fa-file-export me-2"></i> Export Data</button>
-                            <button class="btn btn-outline-success tombol-import"><i class="fa fa-file-import me-2"></i> Import Data</button>
-                        </div>
+                        <!--begin::card body-->
                         <div class="card-body"> 
                             <table class="table table-bordered mb-3" id="myTable">
                                 <thead>
@@ -97,14 +105,19 @@
                                     </tr>
                                 </thead> 
                             </table>
-                        </div> 
+                        </div> <!--end::card body-->
                     </div>
+                    <!--end::card-->
                 </form> 
+                <!--end::form-->
             </div> 
+            <!-- /.col -->
         </div> 
+        <!--end::Container-->
     </div> 
+    <!--end::App Content--> 
 
-    <!-- Modal Form -->
+        <!-- Modal Form -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <form id="editForm">
@@ -168,10 +181,6 @@
                         </div>
                         
                         <!-- Field Editable -->
-                        <div class="col mb-3">
-                            <label for="siakad_mhpspt_id" class="form-label fw-bold">Siakad mhpspt id</label>
-                            <input type="number" step="0.01" name="siakad_mhpspt_id" id="siakad_mhpspt_id" class="form-control">
-                        </div>
                         <div class="row">
                             <div class="col mb-3">
                                 <label for="biaya_hidup" class="form-label fw-bold">Biaya Hidup</label>
@@ -195,10 +204,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary tombol-close" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary tombol-simpan">
-                            <i class="bi bi-save me-1"></i>Simpan Data</button>
-                        </div>
+                        <button type="button" class="btn btn-secondary tombol-close" data-bs-dismiss="modal">Close</button></div>
                     </div>
                 </div>
             </form>
@@ -206,158 +212,72 @@
     </div>
 </main> 
 
-@endsection
+<!-- Modal -->
 
+<!--end::App Main-->
+@endsection
 
 @push('script')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    
+    {{-- script datatables --}}
     <script>
-        $(document).ready(function() {
+       $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
             $('#myTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{!! route('data_penerima.index') !!}",
+                    url: "{{ route('riwayat_beasiswa.index') }}",
+                    type: 'GET'
                 },
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                    { data: 'nama_beasiswa', name: 'nama_beasiswa' },
-                    { data: 'nama_lengkap', name: 'nama_lengkap' },
-                    { data: 'nim', name: 'nim' },
-                    { data: 'jurusan', name: 'jurusan' },
-                    { data: 'semester', name: 'semester' },
-                    { data: 'telepon', name: 'telepon' },
-                    { data: 'mulai_berlaku', name: 'mulai_berlaku' },
-                    { data: 'akhir_berlaku', name: 'akhir_berlaku' },
+                    { data: 'pendaftaran_beasiswa.buat_pendaftaran_beasiswa.beasiswa.nama_beasiswa', name: 'nama_beasiswa' },
+                    { data: 'pendaftaran_beasiswa.nama_lengkap', name: 'nama_lengkap' },
+                    { data: 'pendaftaran_beasiswa.nim', name: 'nim' },
+                    { data: 'pendaftaran_beasiswa.jurusan', name: 'jurusan' },
+                    { data: 'pendaftaran_beasiswa.semester', name: 'semester' },
+                    { data: 'pendaftaran_beasiswa.telepon', name: 'telepon' },
+                    { data: 'pendaftaran_beasiswa.buat_pendaftaran_beasiswa.mulai_berlaku', name: 'mulai_berlaku' },
+                    { data: 'pendaftaran_beasiswa.buat_pendaftaran_beasiswa.akhir_berlaku', name: 'akhir_berlaku' },
                     { data: 'status_penerima', name: 'status_penerima' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                 ]
             });
 
-            // GLOBAL SETUP
-            $.ajaxSetup({
-                headers:{
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            })
-
-            // Tombol Export
-            $('.tombol-export').on('click', function(e) {
-                e.preventDefault();
-                window.location.href = "{{ route('data_penerima.export') }}";
-            });
-
-            // Tombol Edit
-            $('#myTable').on('click', '.tombol-edit', function(e) {
-                e.preventDefault();
-                const id = $(this).data('id');
-                $.get("{{ url('kelola_beasiswa/data_penerima') }}/" + id + "/edit", function(data) {
-                    // Isi form dengan data yang diambil
-                    $('#dataId').val(data.id);
-                    $('#nama_mahasiswa').val(data.pendaftaran_beasiswa.nama_lengkap).attr('disabled', true);
-                    $('#nim').val(data.pendaftaran_beasiswa.nim).attr('disabled', true);
-                    $('#jurusan').val(data.pendaftaran_beasiswa.jurusan).attr('disabled', true);
-                    $('#semester').val(data.pendaftaran_beasiswa.semester).attr('disabled', true);
-                    $('#telepon').val(data.pendaftaran_beasiswa.telepon).attr('disabled', true);
-                    $('#nama_beasiswa').val(data.pendaftaran_beasiswa.buat_pendaftaran_beasiswa.beasiswa.nama_beasiswa).attr('disabled', true);
-                    $('#mulai_berlaku').val(data.pendaftaran_beasiswa.buat_pendaftaran_beasiswa.mulai_berlaku).attr('disabled', true);
-                    $('#akhir_berlaku').val(data.pendaftaran_beasiswa.buat_pendaftaran_beasiswa.akhir_berlaku).attr('disabled', true);
-
-                    // Isi daftar file uploads
-                    const fileUploads = data.pendaftaran_beasiswa.file_uploads || [];
-                    const fileList = fileUploads.map(file => {
-                        const fileName = file.berkas_pendaftaran?.nama_file || 'Tidak diketahui';
-                        const filePath = file.file_path ? "{{ asset('storage') }}/" + file.file_path : '#';
-
-                        // Template untuk setiap file
-                        return `
-                            <a href="${filePath}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="fa fa-file me-2 text-primary"></i> ${fileName}
-                                </div>
-                                <span class="badge bg-secondary">
-                                    <i class="fa fa-download"></i> Download
-                                </span>
-                            </a>
-                        `;
-                    }).join('');
-
-                    // Isi div file uploads
-                    $('#file_uploads').html(fileList || `
-                        <div class="list-group-item text-center text-muted">
-                            Tidak ada file yang diunggah
-                        </div>
-                    `);
-
-                    // Isi data editable
-                    $('#siakad_mhpspt_id').val(data.siakad_mhpspt_id);
-                    $('#biaya_hidup').val(data.biaya_hidup);
-                    $('#biaya_ukt').val(data.biaya_ukt);
-                    $('#start_semester').val(data.start_semester);
-                    $('#end_semester').val(data.end_semester);
-                    $('#status_penerima').val(data.status_penerima);
-
-                    // Tampilkan modal
-                    $('#editModal').modal('show');
-                });
-            });
-
-            // Submit Form Edit
-            $('#editForm').on('submit', function(e) {
-                e.preventDefault();
-                const id = $('#dataId').val();
-                const formData = $(this).serialize();
-
-                $.ajax({
-                    url: "{{ url('kelola_beasiswa/data_penerima') }}/" + id, // Tambahkan prefix kelola_beasiswa
-                    method: "PUT",
-                    data: formData,
-                    success: function(response) {
-                        $('#editModal').modal('hide');
-                        $('#myTable').DataTable().ajax.reload();
-                        iziToast.success({
-                            title: 'Sukses!',
-                            message: response.message,
-                            position: 'topRight'
-                        });
-                    },
-                    error: function(xhr) {
-                        iziToast.error({
-                            title: 'Error!',
-                            message: xhr.responseJSON.message,
-                            position: 'topRight'
-                        });
-                    }
-                });
-            });
-
-            $('#editModal').on('hidden.bs.modal', function() {
-                // Kembalikan semua field ke kondisi editable
-                $('#editForm input, #editForm select').attr('disabled', false);
-                $('.tombol-simpan').show(); // Tampilkan tombol submit kembali
-            });
-
-            // Tombol Detail
-            $('#myTable').on('click', '.tombol-detail', function(e) {
+             // Tombol Detail
+             $('#myTable').on('click', '.tombol-detail', function(e) {
                 e.preventDefault();
                 const id = $(this).data('id');
 
                 // AJAX Request untuk mendapatkan data detail
-                $.get("{{ url('kelola_beasiswa/data_penerima') }}/" + id, function(data) {
+                $.get("{{ url('beasiswa/riwayat_beasiswa') }}/" + id, function(data) {
                     // Isi form dengan data yang diambil
                     $('#dataId').val(data.id);
                     $('#nama_mahasiswa').val(data.pendaftaran_beasiswa.nama_lengkap).attr('disabled', true);
                     $('#nim').val(data.pendaftaran_beasiswa.nim).attr('disabled', true);
+                    $('#fakultas').val(data.pendaftaran_beasiswa.fakultas).attr('disabled', true);
                     $('#jurusan').val(data.pendaftaran_beasiswa.jurusan).attr('disabled', true);
                     $('#semester').val(data.pendaftaran_beasiswa.semester).attr('disabled', true);
                     $('#telepon').val(data.pendaftaran_beasiswa.telepon).attr('disabled', true);
                     $('#nama_beasiswa').val(data.pendaftaran_beasiswa.buat_pendaftaran_beasiswa.beasiswa.nama_beasiswa).attr('disabled', true);
                     $('#mulai_berlaku').val(data.pendaftaran_beasiswa.buat_pendaftaran_beasiswa.mulai_berlaku).attr('disabled', true);
                     $('#akhir_berlaku').val(data.pendaftaran_beasiswa.buat_pendaftaran_beasiswa.akhir_berlaku).attr('disabled', true);
+                    $('#biaya_hidup').val(data.pendaftaran_beasiswa.biaya_hidup).attr('disabled', true);
+                    $('#biaya_ukt').val(data.pendaftaran_beasiswa.biaya_ukt).attr('disabled', true);
+
+                    // Nonaktifkan field editable
+                    $('#start_semester').val(data.start_semester).attr('disabled', true);
+                    $('#end_semester').val(data.end_semester).attr('disabled', true);
 
                     // Isi daftar file uploads
                     const fileUploads = data.pendaftaran_beasiswa.file_uploads || [];
@@ -384,14 +304,6 @@
                             Tidak ada file yang diunggah
                         </div>
                     `);
-
-                    // Nonaktifkan field editable
-                    $('#siakad_mhpspt_id').val(data.siakad_mhpspt_id).attr('disabled', true);
-                    $('#biaya_hidup').val(data.biaya_hidup).attr('disabled', true);
-                    $('#biaya_ukt').val(data.biaya_ukt).attr('disabled', true);
-                    $('#start_semester').val(data.start_semester).attr('disabled', true);
-                    $('#end_semester').val(data.end_semester).attr('disabled', true);
-
                     // Sembunyikan tombol submit di footer
                     $('.tombol-simpan').hide();
 
@@ -400,6 +312,5 @@
                 });
             });
         });
-    </script>  
-    
+    </script> 
 @endpush
