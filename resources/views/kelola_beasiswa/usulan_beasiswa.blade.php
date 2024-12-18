@@ -124,7 +124,7 @@
                     { data: 'nama_beasiswa', name: 'nama_beasiswa' },
                     { data: 'nama_lengkap', name: 'nama_lengkap' },
                     { data: 'nim', name: 'nim' },
-                    { data: 'fakultas', name: 'fakultas' },
+                    { data: 'nama_fakultas', name: 'nama_fakultas' },
                     { data: 'jurusan', name: 'jurusan' },
                     { data: 'status', name: 'status' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false }

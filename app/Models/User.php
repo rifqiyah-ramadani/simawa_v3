@@ -18,6 +18,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'fakultas_id',
         'username',
         'name',
         'nip',
@@ -58,5 +59,10 @@ class User extends Authenticatable
     public function detailUser()
     {
         return $this->hasOne(DetailUser::class);
+    }
+
+    public function fakultas()
+    {
+        return $this->belongsTo(Fakultas::class, 'fakultas_id');
     }
 }

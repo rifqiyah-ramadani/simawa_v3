@@ -4,13 +4,10 @@ namespace App\Exports;
 
 use App\Models\DataPenerima;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings; // Import interface
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class DataPenerimaExport implements FromCollection, WithHeadings
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
     protected $fakultas; // Properti untuk menyimpan filter fakultas
 
     public function __construct($fakultas = null)
@@ -18,21 +15,19 @@ class DataPenerimaExport implements FromCollection, WithHeadings
         $this->fakultas = $fakultas; // Menyimpan filter fakultas
     }
 
-    /**
-    * @return \Illuminate\Support\Collection
-    */
     public function collection()
     {
         // Query data berdasarkan fakultas jika parameter diberikan
         $query = DataPenerima::with([
             'pendaftaranBeasiswa.buatPendaftaranBeasiswa.beasiswa', // Relasi ke beasiswa
-            'pendaftaranBeasiswa.fileUploads.berkasPendaftaran' // Relasi ke file uploads
+            'pendaftaranBeasiswa.fakultas', // Relasi fakultas
+            'pendaftaranBeasiswa.fileUploads.berkasPendaftaran', // Relasi ke file uploads
         ]);
 
-        // Filter berdasarkan fakultas
+        // Filter berdasarkan fakultas jika parameter diberikan
         if ($this->fakultas) {
-            $query->whereHas('pendaftaranBeasiswa', function ($q) {
-                $q->where('fakultas', $this->fakultas);
+            $query->whereHas('pendaftaranBeasiswa.fakultas', function ($q) {
+                $q->where('nama_fakultas', $this->fakultas); // Sesuaikan filter dengan nama_fakultas
             });
         }
 
@@ -40,16 +35,16 @@ class DataPenerimaExport implements FromCollection, WithHeadings
             return [
                 'nama_mahasiswa' => $item->pendaftaranBeasiswa->nama_lengkap ?? '-',
                 'nim' => $item->pendaftaranBeasiswa->nim ?? '-',
-                'fakultas' => $item->pendaftaranBeasiswa->fakultas ?? '-',
+                'fakultas' => $item->pendaftaranBeasiswa->fakultas->nama_fakultas ?? '-', // Ambil nama_fakultas
                 'jurusan' => $item->pendaftaranBeasiswa->jurusan ?? '-',
                 'semester' => $item->pendaftaranBeasiswa->semester ?? '-',
                 'telepon' => $item->pendaftaranBeasiswa->telepon ?? '-',
                 'nama_beasiswa' => $item->pendaftaranBeasiswa->buatPendaftaranBeasiswa->beasiswa->nama_beasiswa ?? '-',
                 'mulai_berlaku' => $item->pendaftaranBeasiswa->buatPendaftaranBeasiswa->mulai_berlaku ?? '-',
                 'akhir_berlaku' => $item->pendaftaranBeasiswa->buatPendaftaranBeasiswa->akhir_berlaku ?? '-',
+                'status_penerima' => $item->status_penerima ?? '-', // Pastikan sesuai dengan controller
                 'biaya_hidup' => $item->pendaftaranBeasiswa->biaya_hidup ?? '-',
                 'biaya_ukt' => $item->pendaftaranBeasiswa->biaya_ukt ?? '-',
-                'status_penerima' => $item->status_penerima ?? '-',
                 'start_semester' => $item->start_semester ?? '-',
                 'end_semester' => $item->end_semester ?? '-',
                 'file_uploads' => $item->pendaftaranBeasiswa->fileUploads->pluck('file_path')->implode(', ') ?? '-',

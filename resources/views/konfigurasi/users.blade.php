@@ -175,6 +175,19 @@
                             @endforeach
                         </select>
                     </div> 
+
+                    <div class="col mb-3 fakultas-group" style="display: none;">
+                        <label for="fakultas_id" class="form-label fw-bold">Fakultas:
+                            <span style="color: red;">*</span>
+                        </label>
+                        <select id="fakultas_id" name="fakultas_id" class="form-control">
+                            <option value="">-- Pilih Fakultas --</option>
+                            @foreach ($fakultas as $item)
+                                <option value="{{ $item->id }}">{{ $item->nama_fakultas }}</option>
+                            @endforeach
+                        </select>
+                    </div> 
+
                 </div>
                 {{-- end form --}}
         </div>
@@ -232,8 +245,18 @@
                 theme: 'bootstrap-5'
             });
         });
-        
 
+        // Menampilkan input fakultas jika role "Operator Fakultas" dipilih
+        $('#roles').on('change', function () {
+            const selectedRoles = $(this).val();
+            if (selectedRoles && selectedRoles.includes('Operator Fakultas')) {
+                $('.fakultas-group').show();
+            } else {
+                $('.fakultas-group').hide();
+                $('#fakultas_id').val(''); // Reset fakultas_id jika tidak dibutuhkan
+            }
+        });
+        
         // Proses tambah dan simpan data
         $('body').on('click', '.tombol-tambah', function (e) {
             e.preventDefault();
@@ -257,6 +280,14 @@
                     $('#nip').val(response.user.nip);
                     $('#usertype').val(response.user.usertype);
                     $('#roles').val(response.roles).trigger('change');
+                    // Isi fakultas_id jika ada
+                    if (response.roles.includes('Operator Fakultas')) {
+                        $('#fakultas_id').val(response.fakultas_id).show();
+                        $('.fakultas-group').show();
+                    } else {
+                        $('#fakultas_id').val('').hide();
+                        $('.fakultas-group').hide();
+                    }
                     $('.tombol-simpan').off('click').on('click', function () {
                         simpan(id);
                     });
@@ -323,6 +354,7 @@
                         nip: $('#nip').val(),
                         usertype: $('#usertype').val(),
                         roles: $('#roles').val(),
+                        fakultas_id: $('#fakultas_id').val(), // Tambahkan fakultas_id
                     },
                     success: function(response) {
                         if (response.errors) {
@@ -351,6 +383,7 @@
                 $('#nip').val('').removeClass('is-invalid');
                 $('#usertype').val('').removeClass('is-invalid');
                 $('#roles').val([]).trigger('change');
+                $('#fakultas_id').val('').trigger('change');
                 $('.text-danger').remove();
             });
 

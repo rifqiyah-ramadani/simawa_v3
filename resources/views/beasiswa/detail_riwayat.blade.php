@@ -217,7 +217,7 @@
                                     <table class="table table-hover table-striped">
                                         <tr><th>Nama Lengkap</th><td>{{ $pendaftaran->nama_lengkap }}</td></tr>
                                         <tr><th>NIM</th><td>{{ $pendaftaran->nim }}</td></tr>
-                                        <tr><th>Fakultas</th><td>{{ $pendaftaran->fakultas }}</td></tr>
+                                        <tr><th>Fakultas</th><td>{{ $pendaftaran->fakultas->nama_fakultas }}</td></tr>
                                         <tr><th>Jurusan</th><td>{{ $pendaftaran->jurusan }}</td></tr>
                                         <tr><th>IPK</th><td>{{ $pendaftaran->IPK }}</td></tr>
                                         <tr><th>Semester</th><td>{{ $pendaftaran->semester }}</td></tr>

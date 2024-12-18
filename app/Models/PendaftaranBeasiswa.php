@@ -16,7 +16,7 @@ class PendaftaranBeasiswa extends Model
         'user_id',
         'nama_lengkap',
         'nim',
-        'fakultas',
+        'fakultas_id',
         'jurusan',
         'alamat_lengkap',
         'telepon',
@@ -26,6 +26,12 @@ class PendaftaranBeasiswa extends Model
         'biaya_hidup',
         'biaya_ukt',
     ];
+
+
+    public function fakultas()
+    {
+        return $this->belongsTo(Fakultas::class, 'fakultas_id');
+    }
 
     // Relasi ke BuatPendaftaranBeasiswa
     public function buatPendaftaranBeasiswa()

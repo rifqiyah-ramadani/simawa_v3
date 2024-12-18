@@ -129,8 +129,8 @@
                         </div>
 
                         <div class="col mb-3">
-                            <label for="fakultas" class="form-label fw-bold">Fakultas</label>
-                            <input type="text" id="fakultas" class="form-control" disabled>
+                            <label for="nama_fakultas" class="form-label fw-bold">Fakultas</label>
+                            <input type="text" id="nama_fakultas" class="form-control" disabled>
                         </div>
                         <div class="row">
                             <div class="col mb-3">
@@ -227,7 +227,7 @@
                     { data: 'nama_beasiswa', name: 'nama_beasiswa' },
                     { data: 'nama_lengkap', name: 'nama_lengkap' },
                     { data: 'nim', name: 'nim' },
-                    { data: 'fakultas', name: 'fakultas' },
+                    { data: 'nama_fakultas', name: 'nama_fakultas' },
                     { data: 'jurusan', name: 'jurusan' },
                     { data: 'semester', name: 'semester' },
                     { data: 'telepon', name: 'telepon' },
@@ -260,7 +260,7 @@
                     $('#dataId').val(data.id);
                     $('#nama_mahasiswa').val(data.pendaftaran_beasiswa.nama_lengkap).attr('disabled', true);
                     $('#nim').val(data.pendaftaran_beasiswa.nim).attr('disabled', true);
-                    $('#fakultas').val(data.pendaftaran_beasiswa.fakultas).attr('disabled', true);
+                    $('#nama_fakultas').val(data.pendaftaran_beasiswa.fakultas.nama_fakultas).attr('disabled', true);
                     $('#jurusan').val(data.pendaftaran_beasiswa.jurusan).attr('disabled', true);
                     $('#semester').val(data.pendaftaran_beasiswa.semester).attr('disabled', true);
                     $('#telepon').val(data.pendaftaran_beasiswa.telepon).attr('disabled', true);
@@ -352,7 +352,7 @@
                     $('#dataId').val(data.id);
                     $('#nama_mahasiswa').val(data.pendaftaran_beasiswa.nama_lengkap).attr('disabled', true);
                     $('#nim').val(data.pendaftaran_beasiswa.nim).attr('disabled', true);
-                    $('#fakultas').val(data.pendaftaran_beasiswa.fakultas).attr('disabled', true);
+                    $('#nama_fakultas').val(data.pendaftaran_beasiswa.fakultas.nama_fakultas).attr('disabled', true);
                     $('#jurusan').val(data.pendaftaran_beasiswa.jurusan).attr('disabled', true);
                     $('#semester').val(data.pendaftaran_beasiswa.semester).attr('disabled', true);
                     $('#telepon').val(data.pendaftaran_beasiswa.telepon).attr('disabled', true);

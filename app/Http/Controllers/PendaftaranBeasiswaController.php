@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controller as Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Models\User;
+use App\Models\Fakultas;
+use App\Models\DetailUser;
+use App\Models\FileUpload;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\BerkasPendaftaran;
+use App\Models\PendaftaranBeasiswa;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 use App\Models\BuatPendaftaranBeasiswa;
-use App\Models\PendaftaranBeasiswa;
-use App\Models\DetailUser;
-use App\Models\BerkasPendaftaran;
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Validator;
 use App\Models\ValidasiPendaftaranBeasiswa;
 use App\Models\ValidasiPendaftaranMahasiswa;
-use App\Models\FileUpload;
-use App\Models\User;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Routing\Controller as Controller;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PendaftaranBeasiswaController extends Controller
 {
@@ -96,6 +98,8 @@ class PendaftaranBeasiswaController extends Controller
         
         // Ambil detail user dari tabel detail_user
         $detailUser = DetailUser::where('user_id', $user->id)->first();
+        // Ambil data fakultas dari database
+        $fakultas = Fakultas::all();
 
         // Ambil data pendaftaran beserta relasi terkait
         $buatPendaftaran = BuatPendaftaranBeasiswa::with('persyaratan', 'beasiswa', 'berkasPendaftarans')->findOrFail($pendaftaranId);
@@ -175,7 +179,7 @@ class PendaftaranBeasiswaController extends Controller
         // Kembalikan view dengan data pendaftaran, persyaratan, dan template_path
         return view('beasiswa.daftar', compact(
             'buatPendaftaran', 'hasilValidasi', 'semuaTerpenuhi', 
-            'berkasPendaftaran', 'templatePath', 'alertMessage', 'showForm', 'persyaratan'
+            'berkasPendaftaran', 'templatePath', 'alertMessage', 'showForm', 'persyaratan', 'fakultas'
         ));
     }
  
@@ -201,26 +205,55 @@ class PendaftaranBeasiswaController extends Controller
             $operator = $syarat->operator;
             $value = $syarat->value ? json_decode($syarat->value, true) : null;    
 
+            Log::info("Validating Persyaratan: {$syarat->nama_persyaratan}", [
+                'userValue' => $userValue,
+                'operator' => $operator,
+                'value' => $value,
+                'type' => $kriteria->tipe_input
+            ]);
+
             $isValid = false;
 
             // Validasi berdasarkan tipe input
             switch ($kriteria->tipe_input) {
                 case 'dropdown':
-                    // Jika tipe dropdown, cek apakah userValue ada dalam array value
                     if (is_array($value)) {
-                        $isValid = in_array($userValue, $value);
+                        Log::info("Dropdown Validation: Checking if '{$userValue}' exists or compares with " . json_encode($value));
+                
+                        // Jika input mengandung 'Semester', ubah ke numerik untuk perbandingan
+                        if (Str::contains(strtolower($userValue), 'semester')) {
+                            $userNumericValue = $this->extractNumericValue($userValue);
+                            $valueNumeric = $this->extractNumericValue($value[0]); // Ambil angka dari value pertama
+                
+                            Log::info("Extracted Semester Values: userNumericValue = {$userNumericValue}, valueNumeric = {$valueNumeric}");
+                
+                            // Lakukan perbandingan numerik
+                            if (is_numeric($userNumericValue) && is_numeric($valueNumeric)) {
+                                $isValid = $this->compareNumeric($userNumericValue, $operator, $valueNumeric);
+                            } else {
+                                Log::warning("Failed to extract valid numeric values for Semester comparison.");
+                                $isValid = false;
+                            }
+                        } else {
+                            // Default: cek keberadaan dalam array
+                            $isValid = in_array($userValue, $value);
+                        }
                     } else {
+                        Log::warning("Dropdown value is invalid or null for '{$syarat->nama_persyaratan}'");
                         $isValid = false;
                     }
                     break;
+                
                 case 'number':
                 case 'text':
                     // Jika tipe number/text, bandingkan dengan operator
                     if ($operator) {
+                        Log::info("Number/Text Validation: Comparing '{$userValue}' {$operator} '{$value}'");
                         $isValid = $this->compareValues($userValue, $operator, $value);
                     }
                     break;    
                 default:
+                    Log::warning("Unknown input type for '{$syarat->nama_persyaratan}': {$kriteria->tipe_input}");
                     $isValid = false;
             }
 
@@ -239,25 +272,113 @@ class PendaftaranBeasiswaController extends Controller
     /**
      * Fungsi untuk membandingkan nilai berdasarkan operator.
      */
+    // private function compareValues($userValue, $operator, $value)
+    // {
+    //     switch ($operator) {
+    //         case '>=':
+    //             return $userValue >= $value;
+    //         case '<=':
+    //             return $userValue <= $value;
+    //         case '=':
+    //             return $userValue == $value;
+    //         case '>':
+    //             return $userValue > $value;
+    //         case '<':
+    //             return $userValue < $value;
+    //         case '!=':
+    //             return $userValue != $value;
+    //         default:
+    //             return false;
+    //     }
+    // }
     private function compareValues($userValue, $operator, $value)
     {
-        switch ($operator) {
-            case '>=':
-                return $userValue >= $value;
-            case '<=':
-                return $userValue <= $value;
-            case '=':
-                return $userValue == $value;
-            case '>':
-                return $userValue > $value;
-            case '<':
-                return $userValue < $value;
-            case '!=':
-                return $userValue != $value;
-            default:
+        Log::info("Original Input: userValue = $userValue, value = $value, operator = $operator");
+    
+        // Periksa jika input mengandung 'Semester', konversi ke angka terlebih dahulu
+        if (Str::contains(strtolower($userValue), 'semester') || Str::contains(strtolower($value), 'semester')) {
+            $userNumericValue = $this->extractNumericValue($userValue);
+            $valueNumeric = $this->extractNumericValue($value);
+        
+            Log::info("Extracted Semester Values: userNumericValue = $userNumericValue, valueNumeric = $valueNumeric");
+        
+            if (is_numeric($userNumericValue) && is_numeric($valueNumeric)) {
+                return $this->compareNumeric($userNumericValue, $operator, $valueNumeric);
+            } else {
+                Log::error("Failed to extract numeric values for comparison: userValue = $userValue, value = $value");
                 return false;
+            }
+        }        
+    
+        // Fallback: Jika tipe input bukan 'Semester', cek jika nilai numerik langsung
+        if (is_numeric($userValue) && is_numeric($value)) {
+            Log::info("Comparing numeric directly: userValue = $userValue, value = $value, operator = $operator");
+            return $this->compareNumeric($userValue, $operator, $value);
+        }
+    
+        // Fallback terakhir ke perbandingan string
+        return $this->compareStrings($userValue, $operator, $value);
+    }
+    
+    /**
+     * Ekstrak angka dari string jika ada, contoh: "Semester 3" => 3.
+     */
+    private function extractNumericValue($input)
+    {
+        if (is_numeric($input)) {
+            return (int) $input; // Jika input sudah angka, kembalikan sebagai integer
+        }
+    
+        if (is_string($input)) {
+            preg_match('/\d+/', $input, $matches); // Cari angka dalam string
+            Log::info("Extracted numeric value: " . ($matches[0] ?? 'null') . " from input: $input");
+            return isset($matches[0]) ? (int) $matches[0] : null; // Ambil angka pertama jika ada
+        }
+    
+        return null; // Jika tidak ditemukan angka
+    }
+    
+    /**
+     * Perbandingan numerik berdasarkan operator.
+     */
+    private function compareNumeric($userNumericValue, $operator, $valueNumeric)
+    {
+        Log::info("Comparing numeric: $userNumericValue $operator $valueNumeric");
+    
+        if (!is_numeric($userNumericValue) || !is_numeric($valueNumeric)) {
+            Log::error("Invalid numeric values: userValue = $userNumericValue, value = $valueNumeric");
+            return false;
+        }
+    
+        switch ($operator) {
+            case '>=': return $userNumericValue >= $valueNumeric;
+            case '<=': return $userNumericValue <= $valueNumeric;
+            case '=':  return $userNumericValue == $valueNumeric;
+            case '>':  return $userNumericValue > $valueNumeric;
+            case '<':  return $userNumericValue < $valueNumeric;
+            case '!=': return $userNumericValue != $valueNumeric;
+            default:   return false;
         }
     }
+    
+    /**
+     * Perbandingan string berdasarkan operator.
+     */
+    private function compareStrings($userValue, $operator, $value)
+    {
+        Log::info("Comparing strings: userValue = $userValue, value = $value, operator = $operator");
+    
+        switch ($operator) {
+            case '=':  return $userValue === $value;
+            case '!=': return $userValue !== $value;
+            case '>':  return strcmp($userValue, $value) > 0;
+            case '<':  return strcmp($userValue, $value) < 0;
+            case '>=': return strcmp($userValue, $value) >= 0;
+            case '<=': return strcmp($userValue, $value) <= 0;
+            default:   return false;
+        }
+    }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -268,7 +389,7 @@ class PendaftaranBeasiswaController extends Controller
         $validate = Validator::make($request->all(), [
             'nama_lengkap' => 'required|string|max:255',
             'nim' => 'required|string|max:255',
-            'fakultas' => 'required|string|max:255',
+            'fakultas_id' => 'required|exists:fakultas,id',
             'jurusan' => 'required|string|max:255',
             'IPK' => 'required|numeric|between:0,4.00',
             'semester' => 'required|string|max:255',
@@ -329,7 +450,7 @@ class PendaftaranBeasiswaController extends Controller
             $pendaftaran = PendaftaranBeasiswa::create([
                 'nama_lengkap' => $request->nama_lengkap,
                 'nim' => $request->nim,
-                'fakultas' => $request->fakultas,
+                'fakultas_id' => $request->fakultas_id, // Ambil fakultas_id dari form
                 'jurusan' => $request->jurusan,
                 'alamat_lengkap' => $request->alamat_lengkap,
                 'telepon' => $request->telepon,
@@ -372,14 +493,46 @@ class PendaftaranBeasiswaController extends Controller
         /// Ambil template validasi berdasarkan buat_pendaftaran_id
         $templateValidasi = ValidasiPendaftaranBeasiswa::where('buat_pendaftaran_id', $buatPendaftaranId)->get();
 
-        // Buat validasi untuk mahasiswa berdasarkan template
+        // // Buat validasi untuk mahasiswa berdasarkan template
+        // foreach ($templateValidasi as $validasi) {
+        //     ValidasiPendaftaranMahasiswa::create([
+        //         'pendaftaran_id' => $pendaftaran->id,
+        //         'role_id' => $validasi->role_id,
+        //         'urutan' => $validasi->urutan,
+        //         'status' => 'menunggu',  // Status awal validasi
+        //     ]);
+        // }
+         // Tambahkan validasi berdasarkan template
         foreach ($templateValidasi as $validasi) {
-            ValidasiPendaftaranMahasiswa::create([
-                'pendaftaran_id' => $pendaftaran->id,
-                'role_id' => $validasi->role_id,
-                'urutan' => $validasi->urutan,
-                'status' => 'menunggu',  // Status awal validasi
-            ]);
+            // Jika role adalah "Operator Fakultas", cocokkan fakultas mahasiswa
+            if ($validasi->role->name === 'Operator Fakultas') {
+                $operatorFakultas = User::where('fakultas_id', $pendaftaran->fakultas_id)
+                    ->whereHas('roles', function ($query) {
+                        $query->where('name', 'Operator Fakultas');
+                    })
+                    ->first();
+                Log::info('Fakultas ID Mahasiswa: ', ['fakultas_id' => $pendaftaran->fakultas_id]);
+                Log::info('Operator Fakultas:', ['user' => $operatorFakultas]);
+
+                if ($operatorFakultas) {
+                    ValidasiPendaftaranMahasiswa::create([
+                        'pendaftaran_id' => $pendaftaran->id,
+                        'role_id' => $validasi->role_id,
+                        'user_id' => $operatorFakultas->id,
+                        'urutan' => $validasi->urutan,
+                        'status' => 'menunggu',
+                    ]);
+                }
+            } else {
+                // Tambahkan validasi untuk role lainnya (selain Operator Fakultas)
+                ValidasiPendaftaranMahasiswa::create([
+                    'pendaftaran_id' => $pendaftaran->id,
+                    'role_id' => $validasi->role_id,
+                    'user_id' => null, // Untuk role yang tidak terkait user tertentu
+                    'urutan' => $validasi->urutan,
+                    'status' => 'menunggu',
+                ]);
+            }
         }
 
         // Jika berhasil menyimpan data

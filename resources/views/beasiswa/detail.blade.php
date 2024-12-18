@@ -246,14 +246,14 @@
                                     <table class="table table-hover table-striped">
                                         <tr><th>Nama Lengkap</th><td>{{ $pendaftaran->pendaftaran->nama_lengkap }}</td></tr>
                                         <tr><th>NIM</th><td>{{ $pendaftaran->pendaftaran->nim }}</td></tr>
-                                        <tr><th>Fakultas</th><td>{{ $pendaftaran->pendaftaran->fakultas }}</td></tr>
+                                        <tr><th>Fakultas</th><td>{{ $namaFakultas }}</td></tr>
                                         <tr><th>Jurusan</th><td>{{ $pendaftaran->pendaftaran->jurusan }}</td></tr>
                                         <tr><th>IPK</th><td>{{ $pendaftaran->pendaftaran->IPK }}</td></tr>
                                         <tr><th>Semester</th><td>{{ $pendaftaran->pendaftaran->semester }}</td></tr>
                                         <tr><th>Alamat Lengkap</th><td>{{ $pendaftaran->pendaftaran->alamat_lengkap }}</td></tr>
                                         <tr><th>Telepon</th><td>{{ $pendaftaran->pendaftaran->telepon }}</td></tr>
-                                        <tr><th>Telepon</th><td>{{ $pendaftaran->pendaftaran->biaya_hidup }}</td></tr>
-                                        <tr><th>Telepon</th><td>{{ $pendaftaran->pendaftaran->biaya_ukt }}</td></tr>
+                                        <tr><th>Biaya Hidup</th><td>{{ $pendaftaran->pendaftaran->biaya_hidup }}</td></tr>
+                                        <tr><th>Biaya UKT</th><td>{{ $pendaftaran->pendaftaran->biaya_ukt }}</td></tr>
                                     </table>
     
                                     <h5 class="mt-4 fw-bold"><i class="fa fa-folder-open"></i> Berkas Mahasiswa</h5>

@@ -22,7 +22,7 @@
             <!--begin::Row-->
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Beasiswa - Pendaftaran Beasiswa</h3>
+                    <h3 class="mb-0">Beasiswaaaaa - Pendaftaran Beasiswa</h3>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
@@ -118,24 +118,14 @@
                                 {{-- Field Fakultas dan Jurusan --}}
                                 <div class="row">
                                     <div class="col mb-3">
-                                        <label for="fakultas" class="form-label fw-bold">Fakultas:
+                                        <label for="fakultas_id" class="form-label fw-bold">Fakultas:
                                             <span style="color: red;">*</span>
                                         </label>
-                                        <select class="form-control" id="fakultas" name="fakultas" required>
-                                            <option value="" disabled selected>--Pilih Fakultas--</option>
-                                                <option value="Fakultas Keguruan dan Ilmu Pendidikan">Fakultas Keguruan dan Ilmu Pendidikan</option>
-                                                <option value="Fakultas Hukum">Fakultas Hukum</option>
-                                                <option value="Fakultas Ekonomi dan Bisnis">Fakultas Ekonomi dan Bisnis</option>
-                                                <option value="Fakultas Pertanian">Fakultas Pertanian</option>
-                                                <option value="Fakultas Peternakan">Fakultas Peternakan</option>
-                                                <option value="Fakultas Sains dan Teknologi">Fakultas Sains dan Teknologi</option>
-                                                <option value="Fakultas Kedokteran dan Ilmu Kesehatan">Fakultas Kedokteran dan Ilmu Kesehatan</option>
-                                                <option value="Fakultas Ilmu Sosial dan Politik">Fakultas Ilmu Sosial dan Politik</option>
-                                                <option value="Fakultas Ilmu Budaya">Fakultas Ilmu Budaya</option>
-                                                <option value="Fakultas Teknologi Pertanian">Fakultas Teknologi Pertanian</option>
-                                                <option value="Fakultas Ilmu Keolahragaan">Fakultas Ilmu Keolahragaan</option>
-                                                <option value="Fakultas Kehuatanan">Fakultas Kehuatanan</option>
-                                                <option value="Fakultas Kesehatan Masyarakat">Fakultas Kesehatan Masyarakat</option>
+                                        <select name="fakultas_id" id="fakultas_id" class="form-control" required>
+                                            <option value="" disabled selected>-- Pilih Fakultas --</option>
+                                            @foreach ($fakultas as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nama_fakultas }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="col mb-3">
@@ -154,8 +144,20 @@
                                             <option value="Pendidikan Fisika">Pendidikan Fisika</option>
                                             <option value="Pendidikan Guru PAUD">Pendidikan Guru PAUD</option>
                                             <option value="Sistem Informasi">Sistem Informasi</option>
+                                            <option value="Kimia">Kimia</option>
+                                            <option value="Farmasi">Farmasi</option>
+                                            <option value="Matematika">Matematika</option>
+                                            <option value="Biologi">Biologi</option>
+                                            <option value="Fisika">Fisika</option>
+                                            <option value="Matematika">Matematika</option>
+                                            <option value="Kimia Industri">Kimia Industri</option>
                                             <option value="Teknik Sipil">Teknik Sipil</option>
                                             <option value="Teknik Kimia">Teknik Kimia</option>
+                                            <option value="Teknik Geologi">Teknik Geologi</option>
+                                            <option value="Teknik Pertambangan">Teknik Pertambangan</option>
+                                            <option value="Teknik Geofisika">Teknik Geofisika</option>
+                                            <option value="Teknik Lingkungan">Teknik Lingkungan</option>
+                                            <option value="Teknik Elektro">Teknik Elektro</option>
                                             <option value="Kehutanan">Kehutanan</option>
                                             <option value="Peternakan">Peternakan</option>
                                             <option value="Perikanan">Perikanan</option>

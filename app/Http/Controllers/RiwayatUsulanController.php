@@ -27,7 +27,7 @@ class RiwayatUsulanController extends Controller
         $user = auth()->user();
 
         // Ambil data pendaftaran beasiswa dengan relasi yang sesuai
-        $pendaftaranBeasiswa = PendaftaranBeasiswa::with('buatPendaftaranBeasiswa.beasiswa', 'buatPendaftaranBeasiswa.tahapan')
+        $pendaftaranBeasiswa = PendaftaranBeasiswa::with('buatPendaftaranBeasiswa.beasiswa', 'buatPendaftaranBeasiswa.tahapan', 'fakultas')
                                     ->where('user_id', $user->id)
                                     ->orderBy('created_at', 'desc')
                                     ->get();
@@ -44,7 +44,7 @@ class RiwayatUsulanController extends Controller
                         'nama_beasiswa' => $item->buatPendaftaranBeasiswa->beasiswa->nama_beasiswa ?? '-',
                         'nama_lengkap' => $item->nama_lengkap,
                         'nim' => $item->nim,
-                        'fakultas' => $item->fakultas,
+                        'fakultas' => $item->fakultas->nama_fakultas ?? '-',
                         'jurusan' => $item->jurusan,
                         'status' => 'ditolak', // Langsung set status tampilan ke "ditolak"
                     ];
@@ -55,7 +55,7 @@ class RiwayatUsulanController extends Controller
                     'nama_beasiswa' => $item->buatPendaftaranBeasiswa->beasiswa->nama_beasiswa ?? '-',
                     'nama_lengkap' => $item->nama_lengkap,
                     'nim' => $item->nim,
-                    'fakultas' => $item->fakultas,
+                    'fakultas' => $item->fakultas->nama_fakultas,
                     'jurusan' => $item->jurusan,
                     'status' => $item->status, // Gunakan status tampilan
                 ];
@@ -79,6 +79,7 @@ class RiwayatUsulanController extends Controller
         $pendaftaran = PendaftaranBeasiswa::with([
             'buatPendaftaranBeasiswa.tahapan',
             'buatPendaftaranBeasiswa.beasiswa',
+            'fakultas', // Relasi ke fakultas
             'fileUploads.berkasPendaftaran',
             'interview'
         ])->findOrFail($id);
@@ -105,7 +106,7 @@ class RiwayatUsulanController extends Controller
             $statusUsulanAwal = $pendaftaran->status;
         }
  
-        // Ambil status langsung dari data pendaftaran
+        // Ambil status langsung dari data pendaftaran 
         $statusTampilan = $pendaftaran->status;
 
         // Ambil berkas yang diunggah oleh mahasiswa dan tampilkan dengan informasi file

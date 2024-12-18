@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controller as Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use App\Models\Role;
 use App\Models\User; 
-use Yajra\DataTables\Facades\DataTables;
+use App\Models\Fakultas;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Routing\Controller as Controller;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class UserRoleController extends Controller
 {
@@ -41,7 +42,8 @@ class UserRoleController extends Controller
                 ->make(true);
         }
         $roles = Role::all(); // Ambil semua roles
-        return view('konfigurasi.users', compact('roles')); // Pass roles ke view utama
+        $fakultas = Fakultas::all();
+        return view('konfigurasi.users', compact('roles','fakultas')); // Pass roles ke view utama
     }
 
     /**
@@ -50,7 +52,8 @@ class UserRoleController extends Controller
     public function create()
     {
         $roles = Role::all(); // Ambil semua role dari database
-        return view('konfigurasi.users', compact('roles'));
+        $fakultas = Fakultas::all();
+        return view('konfigurasi.users', compact('roles', 'fakultas'));
     }
 
     /**
@@ -65,6 +68,7 @@ class UserRoleController extends Controller
             'nip' => 'nullable',
             'usertype' => 'required',
             'roles' => 'required|array',
+            'fakultas_id' => 'required_if:roles,Operator Fakultas|exists:fakultas,id', // Validasi fakultas_id
         ], [
             'username.required' => '*Username wajib diisi',
             'username.unique' => '*Username sudah ada, silakan masukkan yang lain',
@@ -72,6 +76,8 @@ class UserRoleController extends Controller
             'nip.nullable' => '*NIP tidak wajib diisi',
             'usertype.required' => '*Jenis pengguna (usertype) wajib diisi',
             'roles.required' => '*Role wajib dipilih',
+            'fakultas_id.required_if' => '*Fakultas wajib dipilih untuk role Operator Fakultas',
+            'fakultas_id.exists' => '*Fakultas tidak valid',
         ]);
     
         if ($validate->fails()) {
@@ -86,6 +92,8 @@ class UserRoleController extends Controller
                 'nip' => $request->nip, // Menyimpan NIP sebagai null jika tidak diisi
                 'usertype' => $request->usertype,
                 'password' => $defaultPassword, // Password otomatis
+
+                'fakultas_id' => $request->roles && in_array('Operator Fakultas', $request->roles) ? $request->fakultas_id : null,
             ]);    
             
             // Assign role ke user yang baru dibuat
@@ -108,15 +116,18 @@ class UserRoleController extends Controller
      */
     public function edit(string $id)
     {
-        // Ambil data user beserta roles-nya berdasarkan ID
-        $users = User::with('roles')->findOrFail($id);
+        // Ambil data user beserta roles-nya dan fakultas
+        $users = User::with(['roles', 'fakultas'])->findOrFail($id);
         $roles = Role::all(); // Ambil semua roles yang tersedia
+        $fakultas = Fakultas::all(); // Ambil semua fakultas
 
-        // Mengembalikan data user dan roles untuk diisi dalam form
+        // Mengembalikan data user, roles, dan fakultas untuk diisi dalam form
         return response()->json([
             'user' => $users,
             'roles' => $users->roles->pluck('name'), // Mengambil nama role yang dimiliki user
-            'allRoles' => $roles->pluck('name'), // Mengambil semua nama role yang tersedia
+            'allRoles' => $roles->pluck('name'), // Semua nama role yang tersedia
+            'fakultas_id' => $users->fakultas_id, // Mengambil fakultas_id jika ada
+            'allFakultas' => $fakultas, // Semua fakultas
         ]);
     }
 
@@ -125,42 +136,44 @@ class UserRoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-         // Validasi data yang masuk
+        // Validasi data yang masuk
         $validate = Validator::make($request->all(), [
-            'username' => 'required|unique:users,username,' . $id, // Cek unik, kecuali untuk user ini sendiri
+            'username' => 'required|unique:users,username,' . $id,
             'name' => 'required',
             'nip' => 'nullable',
             'usertype' => 'required',
             'roles' => 'required|array',
+            'fakultas_id' => 'required_if:roles,Operator Fakultas|exists:fakultas,id', // Validasi fakultas_id
         ], [
             'username.required' => '*Username wajib diisi',
             'username.unique' => '*Username sudah ada, silakan masukkan yang lain',
             'name.required' => '*Nama wajib diisi',
-            'nip.nullable' => '*NIP tidak wajib diisi',
-            'usertype.required' => '*Jenis pengguna (usertype) wajib diisi',
-            'roles.required' => '*Role wajib dipilih',
+            'fakultas_id.required_if' => '*Fakultas wajib dipilih jika role adalah Operator Fakultas',
+            'fakultas_id.exists' => '*Fakultas tidak valid',
         ]);
     
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
-        } else {
-            $users = User::findOrFail($id);
-    
-            // Update data user
-            $users->update([
-                'username' => $request->username,
-                'name' => $request->name,
-                'nip' => $request->nip,  // Menyimpan NIP sebagai null jika tidak diisi
-                'usertype' => $request->usertype,
-                'password' => $request->password ? bcrypt($request->password) : $users->password, // Jika password diisi, hash dan update
-            ]);
-    
-            // Sinkronisasi roles dengan data yang baru
-            $users->syncRoles($request->roles);
-    
-            return response()->json(['success' => "Berhasil memperbarui data"]);
         }
+    
+        $users = User::findOrFail($id);
+    
+        // Update data user
+        $users->update([
+            'username' => $request->username,
+            'name' => $request->name,
+            'nip' => $request->nip,
+            'usertype' => $request->usertype,
+            'password' => $request->password ? bcrypt($request->password) : $users->password,
+            'fakultas_id' => in_array('Operator Fakultas', $request->roles) ? $request->fakultas_id : null,
+        ]);
+    
+        // Sinkronisasi roles
+        $users->syncRoles($request->roles);
+    
+        return response()->json(['success' => "Berhasil memperbarui data"]);
     }
+    
 
     /**
      * Remove the specified resource from storage.

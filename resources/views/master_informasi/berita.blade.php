@@ -87,7 +87,7 @@
                                         <th>Judul</th>
                                         <th>Konten</th>
                                         <th>Tanggal Publikasi</th>
-                                        <th style="width: 100px">Gambar (Opsional)</th>
+                                        <th style="width: 100px">Gambar</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead> 
@@ -128,7 +128,7 @@
             </div>
             <div class="row">
                 <div class="mb-3">
-                    <label for="image" class="form-label fw-bold">Gambar (Opsional)
+                    <label for="image" class="form-label fw-bold">Gambar
                     </label>
                     <input type="file" class="form-control" id="image" name="image">
                     <span style="color: gray; font-size: 14px;">Format gambar: jpeg, png, jpg, gif.</span>

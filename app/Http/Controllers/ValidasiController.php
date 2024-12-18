@@ -29,39 +29,105 @@ class ValidasiController extends Controller
         $this->middleware('can:delete kelola_beasiswa/usulan_beasiswa')->only('destroy');
     }
 
+    // public function index(Request $request)
+    // {
+    //     if ($request->ajax()) {
+    //         $user = auth()->user();
+    //         $role = $user->roles->first();
+
+    //         // Query untuk role user saat ini, hanya menampilkan data sesuai urutan dan status validasi
+    //         $validasiQuery = ValidasiPendaftaranMahasiswa::with(['pendaftaran.buatPendaftaranBeasiswa.beasiswa'])
+    //             ->where('role_id', $role->id)
+    //             ->whereIn('status', ['menunggu', 'diproses', 'disetujui', 'ditolak', 'lulus seleksi wawancara'])  
+    //             ->where(function ($query) use ($role) {
+    //                 $query->where('urutan', 1) // Menampilkan semua role urutan pertama
+    //                     ->orWhereHas('pendaftaran.validasi', function ($subQuery) {
+    //                         // Memastikan data muncul di role berikutnya hanya jika role sebelumnya sudah disetujui
+    //                         $subQuery->where('status', 'disetujui');
+    //                     });
+
+    //                 // Jika role adalah Operator Fakultas, filter berdasarkan fakultas_id
+    //                 if ($role->name === 'Operator Fakultas') {
+    //                     $query->whereHas('pendaftaran', function ($q) use ($user) {
+    //                         $q->where('fakultas', $user->fakultas_id);
+    //                     });
+    //                 }
+    //             })
+    //             ->orderBy('urutan'); // Urutkan berdasarkan urutan untuk struktur tampilan yang benar
+
+    //         $validasi = $validasiQuery->get();
+
+    //         // Mapping data untuk menampilkan nama beasiswa dan informasi lainnya
+    //         $data = $validasi->map(function ($item) {
+    //             $pendaftaran = $item->pendaftaran;
+    //             $buatPendaftaran = $pendaftaran->buatPendaftaranBeasiswa;
+    //             $namaBeasiswa = $buatPendaftaran->beasiswa->nama_beasiswa ?? '-';
+
+    //             return [
+    //                 'id' => $item->id,
+    //                 'nama_beasiswa' => $namaBeasiswa,
+    //                 'nama_lengkap' => $pendaftaran->nama_lengkap ?? '-',
+    //                 'nim' => $pendaftaran->nim ?? '-',
+    //                 'fakultas' => $pendaftaran->fakultas ?? '-',
+    //                 'jurusan' => $pendaftaran->jurusan ?? '-',
+    //                 'status' => $item->status,
+    //             ];
+    //         });
+
+    //         return DataTables::of($data)
+    //             ->addIndexColumn()
+    //             ->addColumn('aksi', function ($data) {
+    //                 return view('beasiswa.tombol_validasi', compact('data'));
+    //             })
+    //             ->make(true);
+    //     }
+
+    //     return view('kelola_beasiswa.usulan_beasiswa');
+    // }
     public function index(Request $request)
     {
         if ($request->ajax()) {
             $user = auth()->user();
             $role = $user->roles->first();
 
-            // Query untuk role user saat ini, hanya menampilkan data sesuai urutan dan status validasi
-            $validasiQuery = ValidasiPendaftaranMahasiswa::with(['pendaftaran.buatPendaftaranBeasiswa.beasiswa'])
+            // Query validasi sesuai role user saat ini
+            $validasiQuery = ValidasiPendaftaranMahasiswa::with([
+                'pendaftaran.buatPendaftaranBeasiswa.beasiswa', 
+                'pendaftaran.fakultas' 
+            ])
                 ->where('role_id', $role->id)
-                ->whereIn('status', ['menunggu', 'diproses', 'disetujui', 'ditolak', 'lulus seleksi wawancara'])  
-                ->where(function ($query) use ($role) {
-                    $query->where('urutan', 1) // Menampilkan semua role urutan pertama
+                ->whereIn('status', ['menunggu', 'diproses', 'disetujui', 'ditolak', 'lulus seleksi wawancara'])
+                ->where(function ($query) use ($role, $user) {
+                    $query->where('urutan', 1)
                         ->orWhereHas('pendaftaran.validasi', function ($subQuery) {
-                            // Memastikan data muncul di role berikutnya hanya jika role sebelumnya sudah disetujui
                             $subQuery->where('status', 'disetujui');
                         });
-                })
-                ->orderBy('urutan'); // Urutkan berdasarkan urutan untuk struktur tampilan yang benar
+                });
 
-            $validasi = $validasiQuery->get();
+            // Tambahkan filter fakultas jika role adalah Operator Fakultas
+            if ($role->name === 'Operator Fakultas') {
+                Log::info('Filtering Fakultas untuk Operator:', ['fakultas_id' => $user->fakultas_id]);
+                $validasiQuery->whereHas('pendaftaran', function ($query) use ($user) {
+                    $query->where('fakultas_id', $user->fakultas_id);
+                });
+            }
 
-            // Mapping data untuk menampilkan nama beasiswa dan informasi lainnya
+            // Ambil data setelah semua kondisi diterapkan
+            $validasi = $validasiQuery->orderBy('urutan')->get();
+
+            // Mapping data untuk DataTables
             $data = $validasi->map(function ($item) {
                 $pendaftaran = $item->pendaftaran;
                 $buatPendaftaran = $pendaftaran->buatPendaftaranBeasiswa;
                 $namaBeasiswa = $buatPendaftaran->beasiswa->nama_beasiswa ?? '-';
+                $namaFakultas = $pendaftaran->fakultas->nama_fakultas ?? '-';
 
                 return [
                     'id' => $item->id,
                     'nama_beasiswa' => $namaBeasiswa,
                     'nama_lengkap' => $pendaftaran->nama_lengkap ?? '-',
                     'nim' => $pendaftaran->nim ?? '-',
-                    'fakultas' => $pendaftaran->fakultas ?? '-',
+                    'nama_fakultas' => $namaFakultas,
                     'jurusan' => $pendaftaran->jurusan ?? '-',
                     'status' => $item->status,
                 ];
@@ -75,9 +141,9 @@ class ValidasiController extends Controller
                 ->make(true);
         }
 
-        return view('kelola_beasiswa.usulan_beasiswa');
+        return view('kelola_beasiswa.usulan_beasiswa'); 
     }
-     
+
     /**
      * Fungsi untuk menampilkan detail 
      */
@@ -87,12 +153,13 @@ class ValidasiController extends Controller
         $pendaftaran = ValidasiPendaftaranMahasiswa::with([
             'pendaftaran.buatPendaftaranBeasiswa.tahapan', // Relasi tahapan
             'pendaftaran.buatPendaftaranBeasiswa.beasiswa', // Relasi buatPendaftaranBeasiswa
-            'pendaftaran.fileUploads.berkasPendaftaran' // File uploads mahasiswa
+            'pendaftaran.fileUploads.berkasPendaftaran', // File uploads mahasiswa
+            'pendaftaran.fakultas' 
         ])->findOrFail($id);
     
         // Ambil nama beasiswa dari relasi buatPendaftaranBeasiswa
         $namaBeasiswa = $pendaftaran->pendaftaran->buatPendaftaranBeasiswa->beasiswa->nama_beasiswa ?? 'Tidak diketahui';
-    
+        $namaFakultas = $pendaftaran->pendaftaran->fakultas->nama_fakultas ?? 'Tidak diketahui';
         // Filter hanya berkas dengan upload mahasiswa
         $berkasUploadMahasiswa = $pendaftaran->pendaftaran->fileUploads->map(function ($fileUpload) {
             return [
@@ -145,7 +212,7 @@ class ValidasiController extends Controller
             ->exists();
     
         return view('beasiswa.detail', compact(
-            'pendaftaran', 'berkasUploadMahasiswa', 'namaBeasiswa', 'tahapans', 
+            'pendaftaran', 'berkasUploadMahasiswa', 'namaBeasiswa', 'namaFakultas', 'tahapans', 
             'tanggalMulaiSeleksi', 'tanggalAkhirSeleksi', 'isRolePertama', 'hasNextValidasi', 'statusUsulan',
             'interview', 'users',  'statusUsulanAwal'
         ));
@@ -178,6 +245,19 @@ class ValidasiController extends Controller
 
         if (!$currentValidasi) {
             return response()->json(['message' => 'Validasi tidak ditemukan.'], 404);
+        }
+
+         // Ambil pendaftaran terlebih dahulu
+        $pendaftaran = PendaftaranBeasiswa::with('fakultas')->findOrFail($pendaftaranId);
+
+        // Validasi role Operator Fakultas
+        if ($user->roles->first()->name === 'Operator Fakultas') {
+            Log::info('Fakultas ID dari pendaftaran:', ['fakultas_id' => $pendaftaran->fakultas_id]);
+            Log::info('Fakultas ID dari user:', ['user_fakultas_id' => $user->fakultas_id]);
+
+            if ($pendaftaran->fakultas_id != $user->fakultas_id) {
+                return response()->json(['message' => 'Anda tidak berhak memvalidasi data dari fakultas lain.'], 403);
+            }
         }
 
         $pendaftaran = PendaftaranBeasiswa::find($pendaftaranId);

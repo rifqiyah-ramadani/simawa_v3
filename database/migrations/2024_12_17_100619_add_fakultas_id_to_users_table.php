@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pendaftaran_beasiswas', function (Blueprint $table) {
-            $table->enum('status', ['menunggu', 'diproses', 'lulus seleksi administrasi', 'lulus seleksi wawancara', 'lulus seleksi tertulis', 'lulus semua tahapan', 'ditolak'])->default('menunggu')->after('user_id');
+        Schema::table('users', function (Blueprint $table) {
+            $table->unsignedBigInteger('fakultas_id')->nullable()->after('id'); // Tambahkan kolom fakultas_id
+            $table->foreign('fakultas_id')->references('id')->on('fakultas')->onDelete('set null'); // Relasi ke tabel fakultas
         });
     }
 
@@ -21,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pendaftaran_beasiswas', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             //
         });
     }

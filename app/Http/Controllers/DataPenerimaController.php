@@ -31,7 +31,7 @@ class DataPenerimaController extends Controller
         if ($request->ajax()) {
             // Ambil data dari tabel pendaftaran_beasiswas dengan status "diterima"
             $pendaftaranBeasiswas = PendaftaranBeasiswa::with([
-                'buatPendaftaranBeasiswa.beasiswa' // Relasi hingga nama beasiswa
+                'buatPendaftaranBeasiswa.beasiswa', // Relasi hingga nama beasiswa
             ])->where('status', 'diterima')->get();
     
             // Simpan data ke tabel data_penerimas jika belum ada
@@ -108,9 +108,9 @@ class DataPenerimaController extends Controller
                     // Ambil NIM mahasiswa
                     return $dataPenerima->pendaftaranBeasiswa->nim ?? '-';
                 })
-                ->addColumn('fakultas', function ($dataPenerima) {
+                ->addColumn('nama_fakultas', function ($dataPenerima) {
                     // Ambil jurusan mahasiswa
-                    return $dataPenerima->pendaftaranBeasiswa->fakultas ?? '-';
+                    return $dataPenerima->pendaftaranBeasiswa->fakultas->nama_fakultas ?? '-';
                 })
                 ->addColumn('jurusan', function ($dataPenerima) {
                     // Ambil jurusan mahasiswa
@@ -151,6 +151,7 @@ class DataPenerimaController extends Controller
         // Ambil data penerima dengan relasi pendaftaran_beasiswa dan buat_pendaftaran_beasiswa
        $dataPenerima = DataPenerima::with([
             'pendaftaranBeasiswa.buatPendaftaranBeasiswa.beasiswa',
+            'pendaftaranBeasiswa.fakultas',
             'pendaftaranBeasiswa.fileUploads.berkasPendaftaran'
         ])->findOrFail($id);
     
@@ -189,6 +190,7 @@ class DataPenerimaController extends Controller
         // Ambil data penerima dengan relasi terkait
         $dataPenerima = DataPenerima::with([
             'pendaftaranBeasiswa.buatPendaftaranBeasiswa.beasiswa', // Relasi ke beasiswa
+            'pendaftaranBeasiswa.fakultas',
             'pendaftaranBeasiswa.fileUploads.berkasPendaftaran' // Relasi ke file uploads
         ])->findOrFail($id);
 
