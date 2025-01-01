@@ -44,6 +44,20 @@
             background-color: white; 
             padding: 1rem;
         }
+
+        .badge {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+        .badge-success {
+            background-color: #28a745 !important;
+        }
+        .badge-warning {
+            background-color: #ffc107 !important;
+        }
+        .badge-info {
+            background-color: #17a2b8 !important;
+        }
     </style>
 @endpush
 
@@ -249,7 +263,19 @@
                     { data: 'pendaftaran_beasiswa.telepon', name: 'telepon' },
                     { data: 'pendaftaran_beasiswa.buat_pendaftaran_beasiswa.mulai_berlaku', name: 'mulai_berlaku' },
                     { data: 'pendaftaran_beasiswa.buat_pendaftaran_beasiswa.akhir_berlaku', name: 'akhir_berlaku' },
-                    { data: 'status_penerima', name: 'status_penerima' },
+                    { 
+                        data: 'status_penerima', 
+                        name: 'status_penerima',
+                        render: function(data) {
+                            let badgeClass = 'badge-warning';
+                            if (data === 'sedang menerima') {
+                                badgeClass = 'badge-success';
+                            } else if (data === 'masa selesai') {
+                                badgeClass = 'badge-info';
+                            }
+                            return `<span class="badge ${badgeClass}">${data}</span>`;
+                        }
+                    },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false },
                 ]
             });

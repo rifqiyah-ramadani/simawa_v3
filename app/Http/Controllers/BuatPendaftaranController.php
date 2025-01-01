@@ -36,16 +36,20 @@ class BuatPendaftaranController extends Controller
             // Ambil data dengan relasi beasiswa
             $buatPendaftaran = BuatPendaftaranBeasiswa::with('beasiswa')->get();
             
+            // Looping untuk mengecek status pendaftaran beasiswa berdasarkan tanggal
             foreach ($buatPendaftaran as $pendaftaran) {
                 $currentDate = now()->startOfDay();
                 $tanggalMulai = \Carbon\Carbon::parse($pendaftaran->tanggal_mulai)->startOfDay();
                 $tanggalBerakhir = \Carbon\Carbon::parse($pendaftaran->tanggal_berakhir)->endOfDay();
-            
+
+                // Jika tanggal saat ini berada di luar rentang pendaftaran
                 if ($currentDate < $tanggalMulai || $currentDate > $tanggalBerakhir) {
+                    // Perbarui status menjadi 'ditutup' jika belum ditutup
                     if ($pendaftaran->status !== 'ditutup') {
                         $pendaftaran->update(['status' => 'ditutup']);
                     }
                 } else {
+                    // Perbarui status menjadi 'dibuka' jika dalam rentang pendaftaran
                     if ($pendaftaran->status !== 'dibuka') {
                         $pendaftaran->update(['status' => 'dibuka']);
                     }
@@ -134,11 +138,12 @@ class BuatPendaftaranController extends Controller
             'link_pendaftaran.url' => '*Link pendaftaran harus berupa URL yang valid',
         ]);
     
-        // Jika validasi gagal
+        // Jika validasi gagal, kembalikan error
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         } 
         
+        // Menentukan status pendaftaran secara otomatis berdasarkan tanggal
         $currentDate = now()->startOfDay();
         $tanggalMulai = \Carbon\Carbon::parse($request->tanggal_mulai)->startOfDay();
         $tanggalBerakhir = \Carbon\Carbon::parse($request->tanggal_berakhir)->endOfDay();
@@ -147,7 +152,7 @@ class BuatPendaftaranController extends Controller
             ? 'dibuka'
             : 'ditutup';        
 
-        // Buat pendaftaran beasiswa baru
+        // Buat pendaftaran beasiswa baru dan simpan ke database
         $buatPendaftaran = BuatPendaftaranBeasiswa::create([
             'daftar_beasiswas_id' => $request->daftar_beasiswas_id,
             'tahun' => $request->tahun,
@@ -219,7 +224,6 @@ class BuatPendaftaranController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Log::info('Request:', $request->all());
         // Validasi input
         $validate = Validator::make($request->all(), [
             'daftar_beasiswas_id' => 'required|exists:daftar_beasiswas,id',
@@ -347,124 +351,4 @@ class BuatPendaftaranController extends Controller
         // Berikan respons sukses
         return response()->json(['message' => 'Data pendaftaran dan semua relasi berhasil dihapus.'], 200);
     }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    // public function edit($id)
-    // {
-    //     // Muat pendaftaran beasiswa bersama dengan persyaratan, berkas, dan validasi
-    //     $buatPendaftaran = BuatPendaftaranBeasiswa::with(['persyaratan', 'berkas', 'validasi'])->findOrFail($id);
-
-    //     // Ambil ID persyaratan dan berkas untuk memudahkan pengisian di form edit
-    //     return response()->json([
-    //         'result' => $buatPendaftaran,
-    //         'persyaratan' => $buatPendaftaran->persyaratan->pluck('id')->toArray(),  // Ambil ID persyaratan
-    //         'berkas' => $buatPendaftaran->berkas->pluck('id')->toArray(),  // Ambil ID berkas
-    //         'roles' => $buatPendaftaran->validasi->map(function ($validasi) {
-    //             return [
-    //                 'role_id' => $validasi->role_id,
-    //                 'urutan' => $validasi->urutan
-    //             ];
-    //         })
-    //     ]);
-    // }
-
-
-    /**
-     * Update the specified resource in storage.
-     */
-    // public function update(Request $request, $id)
-    // {
-    //     // Validasi input
-    //     $validate = Validator::make($request->all(), [
-    //         'daftar_beasiswas_id' => 'required|exists:daftar_beasiswas,id',
-    //         'tahun' => 'required|integer',
-    //         'tanggal_mulai' => 'required|date',
-    //         'tanggal_berakhir' => 'required|date|after:tanggal_mulai',
-    //         'status' => 'required|in:dibuka,ditutup',
-    //         'persyaratan.*' => 'required|exists:persyaratan_beasiswas,id',
-    //         'berkas.*' => 'required|exists:berkas_pendaftarans,id',
-    //         'roles.*' => 'required|exists:roles,id',
-    //         'urutan.*' => 'required|integer|min:1',
-    //     ]);
-
-    //     if ($validate->fails()) {
-    //         return response()->json(['errors' => $validate->errors()]);
-    //     }
-
-    //     // Perbarui data pendaftaran beasiswa
-    //     $buatPendaftaran = BuatPendaftaranBeasiswa::find($id);
-    //     $buatPendaftaran->update([
-    //         'daftar_beasiswas_id' => $request->daftar_beasiswas_id,
-    //         'tahun' => $request->tahun,
-    //         'tanggal_mulai' => $request->tanggal_mulai,
-    //         'tanggal_berakhir' => $request->tanggal_berakhir,
-    //         'status' => $request->status,
-    //     ]);
-
-    //     // Sinkronisasi persyaratan yang dipilih
-    //     if ($request->has('persyaratan')) {
-    //         $buatPendaftaran->persyaratan()->sync($request->persyaratan);
-    //     }
-
-    //     // Sinkronisasi berkas yang dipilih
-    //     if ($request->has('berkas')) {
-    //         $buatPendaftaran->berkas()->sync($request->berkas);
-    //     }
-
-    //     // Update atau tambah role validasi
-    //     foreach ($request->roles as $index => $role_id) {
-    //         $urutan = $request->urutan[$index];
-            
-    //         // Cari apakah validasi untuk role ini sudah ada
-    //         $validasi = ValidasiPendaftaranBeasiswa::where('pendaftaran_id', $buatPendaftaran->id)
-    //             ->where('role_id', $role_id)
-    //             ->first();
-
-    //         if ($validasi) {
-    //             // Jika sudah ada, perbarui urutannya
-    //             $validasi->update(['urutan' => $urutan]);
-    //         } else {
-    //             // Jika belum ada, tambahkan validasi baru
-    //             ValidasiPendaftaranBeasiswa::create([
-    //                 'pendaftaran_id' => $buatPendaftaran->id,
-    //                 'role_id' => $role_id,
-    //                 'urutan' => $urutan,
-    //             ]);
-    //         }
-    //     }
-
-    //     // Hapus validasi yang sudah tidak ada di form
-    //     ValidasiPendaftaranBeasiswa::where('pendaftaran_id', $buatPendaftaran->id)
-    //         ->whereNotIn('role_id', $request->roles)
-    //         ->delete();
-
-    //     return response()->json(['success' => "Berhasil memperbarui data"]);
-    // }
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    // public function destroy($id)
-    // {
-    //     // Temukan data BuatPendaftaranBeasiswa berdasarkan ID
-    //     $buatPendaftaran = BuatPendaftaranBeasiswa::findOrFail($id);
-        
-    //     // Jika ada relasi yang ingin dihapus juga (seperti validasi, persyaratan, berkas), gunakan detach atau delete.
-    //     // Misalnya, jika BuatPendaftaranBeasiswa memiliki relasi dengan persyaratan dan berkas:
-    //     $buatPendaftaran->persyaratan()->detach(); // Hapus relasi persyaratan
-    //     $buatPendaftaran->berkas()->detach(); // Hapus relasi berkas
-
-    //     // Hapus validasi yang berhubungan dengan pendaftaran ini
-    //     ValidasiPendaftaranBeasiswa::where('pendaftaran_id', $id)->delete();
-
-    //     // Hapus data pendaftaran beasiswa
-    //     $buatPendaftaran->delete();
-
-    //     // Berikan response sukses
-    //     return response()->json(['success' => 'Pendaftaran beasiswa berhasil dihapus']);
-    // }
 }

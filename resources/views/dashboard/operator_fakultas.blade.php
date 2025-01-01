@@ -128,7 +128,7 @@
 
                 <!-- Tombol -->
                 <div class="text-center mt-3">
-                    <a href="kelola_beasiswa/tervalidasi" 
+                    <a href="kelola_beasiswa/usulan_beasiswa" 
                     class="d-inline-block fw-bold text-decoration-none"
                     style="
                         display: inline-block;
@@ -179,7 +179,7 @@
 
                 <!-- Tombol -->
                 <div class="text-center mt-3">
-                    <a href="kelola_beasiswa/data_penerima" 
+                    <a href="kelola_beasiswa/penerima_beasiswa" 
                     class="d-inline-block fw-bold text-decoration-none"
                     style="
                         display: inline-block;
@@ -243,6 +243,20 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Grafik Aktivitas -->
+            <div class="col-lg-6">
+                <div class="card card-shadow border-0">
+                    <div class="card-header text-white" style="background: #f57c00">
+                        <h5 class="mb-0">📈 Grafik Aktivitas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!--end::App Content-->
@@ -256,4 +270,54 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Data untuk Grafik Jumlah Penerima Beasiswa Per Tahun
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const activityChart = new Chart(ctx, {
+            type: 'bar', // Gunakan tipe chart bar
+            data: {
+                labels: {!! json_encode($chartLabels ?? []) !!}, // Tahun
+                datasets: [{
+                    label: 'Jumlah Penerima Beasiswa',
+                    data: {!! json_encode($chartData ?? []) !!}, // Data jumlah per tahun
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Warna bar
+                    borderColor: 'rgba(75, 192, 192, 1)', // Warna border bar
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.raw} Penerima`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tahun',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Jumlah Penerima',
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 @endpush

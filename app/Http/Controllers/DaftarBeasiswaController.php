@@ -64,9 +64,11 @@ class DaftarBeasiswaController extends Controller
             'penyelenggara.required' => '*Penyelenggara beasiswa wajib diisi',
         ]);
     
+        // Jika validasi gagal, kembalikan error
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         } else {
+            // Jika tidak tambahkan data
             $daftarBeasiswa = [
                 'kode_beasiswa' => $request->kode_beasiswa,
                 'nama_beasiswa' => $request->nama_beasiswa,

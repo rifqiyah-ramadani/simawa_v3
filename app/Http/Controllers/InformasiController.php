@@ -106,12 +106,15 @@ class InformasiController extends Controller
     
         // Tambahkan validasi khusus untuk setiap kategori
         if ($kategori === 'berita') {
+            // Untuk berita, wajib ada konten dan gambar opsional
             $rules['content'] = 'required|string';
             $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048';
         } elseif ($kategori === 'pengumuman') {
+            // Untuk pengumuman, file opsional (hanya PDF dan Word yang diizinkan)
             $rules['file'] = 'nullable|mimes:pdf,doc,docx|max:5120';
         }
     
+        // Pesan error
         $messages = [
             'judul.required' => '*Judul wajib diisi',
             'judul.unique' => '*Judul sudah ada, silakan masukkan judul lain',
@@ -128,6 +131,7 @@ class InformasiController extends Controller
         // Validasi input
         $validate = Validator::make($request->all(), $rules, $messages);
     
+        // Jika validasi gagal, kembalikan respons error dalam format JSON
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);
         }
@@ -136,21 +140,24 @@ class InformasiController extends Controller
         $informasi = [
             'kategori_informasi' => $kategori,
             'judul' => $request->judul,
-            'publish_date' => now(),
+            'publish_date' => now(), // Tanggal publikasi otomatis
         ];
     
         // Simpan data tambahan berdasarkan kategori
         if ($kategori === 'berita') {
+             // Simpan konten berita
             $informasi['content'] = $request->content;
     
             // Upload gambar jika ada
             if ($request->hasFile('image')) {
+                // Simpan file ke folder 'uploads/berita' di storage publik
                 $path = $request->file('image')->store('uploads/berita', 'public');
                 $informasi['image'] = $path;
             }
         } elseif ($kategori === 'pengumuman') {
             // Upload file jika ada
             if ($request->hasFile('file')) {
+                // Simpan file ke folder 'uploads/pengumuman' di storage publik
                 $path = $request->file('file')->store('uploads/pengumuman', 'public');
                 $informasi['file'] = $path;
             }
@@ -196,9 +203,6 @@ class InformasiController extends Controller
      */
     public function update(Request $request, $kategori, $id)
     {
-        // Log::info('Request diterima:', ['data' => $request->all()]);
-        // Log::info('Kategori Diterima:', ['kategori' => $kategori]);
-    
         // Validasi kategori
         if (!in_array($kategori, ['berita', 'pengumuman'])) {
             return response()->json(['error' => 'Kategori tidak valid'], 404);
@@ -315,107 +319,4 @@ class InformasiController extends Controller
     
         return response()->json(['success' => 'Data berhasil dihapus']);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    // public function edit($kategori, $id)
-    // {
-    //     // \Log::info("Kategori yang diterima: " . $kategori);
-    //     // \Log::info("ID yang diterima: " . $id);
-    
-    //     $informasi = Informasi::find($id);
-    
-    //     if (!$informasi) {
-    //         \Log::warning("Data tidak ditemukan untuk ID: " . $id);
-    //         return response()->json(['error' => 'Data tidak ditemukan'], 404);
-    //     }
-    
-    //     return response()->json(['result' => $informasi]);
-    // }
-    
-    /**
-     * Update the specified resource in storage.
-     */
-    // public function update(Request $request, $kategori, $id)
-    // {
-    //     // Temukan data berdasarkan ID
-    //     $informasi = Informasi::find($id);
-    
-    //     if (!$informasi) {
-    //         return response()->json(['error' => 'Data tidak ditemukan'], 404);
-    //     }
-    
-    //     if (!in_array($kategori, ['berita', 'pengumuman'])) {
-    //         abort(404);
-    //     }
-    
-    //     $rules = [
-    //         'judul' => 'required|unique:informasis,judul,' . $id . ',id',
-    //     ];
-    
-    //     if ($kategori === 'berita') {
-    //         $rules['content'] = 'required|string';
-    //         $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048';
-    //     } elseif ($kategori === 'pengumuman') {
-    //         $rules['file'] = 'nullable|mimes:pdf,doc,docx|max:5120';
-    //     }
-    
-    //     $messages = [
-    //         'judul.required' => '*Judul wajib diisi',
-    //         'judul.unique' => '*Judul sudah ada, silakan masukkan judul lain',
-    //         'content.required' => '*Konten berita wajib diisi',
-    //         'image.image' => '*File yang diunggah harus berupa gambar',
-    //         'image.mimes' => '*Gambar harus berformat jpeg, png, jpg, atau gif',
-    //         'image.max' => '*Ukuran gambar maksimal 2MB',
-    //         'file.mimes' => '*File harus berupa PDF atau dokumen Word',
-    //         'file.max' => '*Ukuran file maksimal 5MB',
-    //     ];
-        
-    //     $validate = Validator::make($request->all(), $rules, $messages);
-        
-    
-    //     \Log::info('Step 1: Validating data');
-    //     if ($validate->fails()) {
-    //         \Log::error('Validation Errors:', $validate->errors()->toArray());
-    //         return response()->json(['errors' => $validate->errors()]);
-    //     }
-    //     \Log::info('Step 2: Validation passed');
-    
-    //     $informasi->judul = $request->judul;
-    //     $informasi->publish_date = now();
-    
-    //     if ($kategori === 'berita') {
-    //         $informasi->content = $request->content;
-    
-    //         if ($request->hasFile('image')) {
-    //             if ($informasi->image) {
-    //                 Storage::disk('public')->delete($informasi->image);
-    //             }
-    //             $path = $request->file('image')->store('uploads/berita', 'public');
-    //             $informasi->image = $path;
-    //         }
-    //     } elseif ($kategori === 'pengumuman') {
-    //         if ($request->hasFile('file')) {
-    //             if ($informasi->file) {
-    //                 Storage::disk('public')->delete($informasi->file);
-    //             }
-    //             $path = $request->file('file')->store('uploads/pengumuman', 'public');
-    //             $informasi->file = $path;
-    //         }
-    //     }
-    
-    //     $informasi->save();
-    
-    //     return response()->json(['success' => ucfirst($kategori) . ' berhasil diperbarui']);
-    // }
-    
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    // public function destroy(string $id)
-    // {
-    //     //
-    // }
 }

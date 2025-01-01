@@ -349,6 +349,8 @@
                 var var_type = id ? 'POST' : 'POST'; // POST digunakan dengan _method untuk PUT
 
                 // Membuat FormData untuk file upload
+                // menambahkan data ke dalam objek FormData
+                // Form data digunakan untuk mengelola dan mengirim data dalam format multipart/form-data ke server, sering digunakan untuk upload file atau mengirim form melalui AJAX.
                 var formData = new FormData();
                 formData.append('nama_file', $('#nama_file').val());
                 formData.append('keterangan', $('#keterangan').val());

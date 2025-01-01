@@ -12,6 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Routing\Controller as Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Validation\Rule;
 
 class UserRoleController extends Controller
 {
@@ -68,7 +69,13 @@ class UserRoleController extends Controller
             'nip' => 'nullable',
             'usertype' => 'required',
             'roles' => 'required|array',
-            'fakultas_id' => 'required_if:roles,Operator Fakultas|exists:fakultas,id', // Validasi fakultas_id
+            'fakultas_id' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return in_array('Operator Fakultas', (array) $request->roles);
+                }),
+                'exists:fakultas,id',
+            ],
         ], [
             'username.required' => '*Username wajib diisi',
             'username.unique' => '*Username sudah ada, silakan masukkan yang lain',
@@ -143,7 +150,13 @@ class UserRoleController extends Controller
             'nip' => 'nullable',
             'usertype' => 'required',
             'roles' => 'required|array',
-            'fakultas_id' => 'required_if:roles,Operator Fakultas|exists:fakultas,id', // Validasi fakultas_id
+            'fakultas_id' => [
+                'nullable',
+                Rule::requiredIf(function () use ($request) {
+                    return in_array('Operator Fakultas', (array) $request->roles);
+                }),
+                'exists:fakultas,id',
+            ],
         ], [
             'username.required' => '*Username wajib diisi',
             'username.unique' => '*Username sudah ada, silakan masukkan yang lain',
@@ -151,6 +164,7 @@ class UserRoleController extends Controller
             'fakultas_id.required_if' => '*Fakultas wajib dipilih jika role adalah Operator Fakultas',
             'fakultas_id.exists' => '*Fakultas tidak valid',
         ]);
+        
     
         if ($validate->fails()) {
             return response()->json(['errors' => $validate->errors()]);

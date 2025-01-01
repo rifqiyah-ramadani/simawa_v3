@@ -21,6 +21,7 @@ class PendaftaranBeasiswa extends Model
         'alamat_lengkap',
         'telepon',
         'IPK',
+        'IP',
         'semester',
         'status',
         'biaya_hidup',

@@ -128,7 +128,7 @@
 
                     <!-- Tombol -->
                     <div class="text-center mt-3">
-                        <a href="kelola_beasiswa/tervalidasi" 
+                        <a href="kelola_beasiswa/usulan_beasiswa" 
                         class="d-inline-block fw-bold text-decoration-none"
                         style="
                             display: inline-block;
@@ -179,7 +179,7 @@
 
                     <!-- Tombol -->
                     <div class="text-center mt-3">
-                        <a href="kelola_beasiswa/data_penerima" 
+                        <a href="kelola_beasiswa/penerima_beasiswa" 
                         class="d-inline-block fw-bold text-decoration-none"
                         style="
                             display: inline-block;

@@ -201,7 +201,7 @@
     </div>
 </div>
 <!--end::App Main-->
-@endsection
+@endsection 
 
 @push('script')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -253,7 +253,7 @@
                 $('.fakultas-group').show();
             } else {
                 $('.fakultas-group').hide();
-                $('#fakultas_id').val(''); // Reset fakultas_id jika tidak dibutuhkan
+                $('#fakultas_id').val(null); // Reset ke null
             }
         });
         

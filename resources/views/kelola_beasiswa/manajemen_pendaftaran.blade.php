@@ -108,7 +108,7 @@
     <!--end::App Content Header--> 
     
     <!--begin::App Content-->
-    <div class="app-content"> 
+    <div class="app-content">  
         <!--begin::Container-->
         <div class="container-fluid"> 
             <!--begin::Row-->
@@ -119,8 +119,10 @@
                     <div class="card mb-4"> 
                         <!--begin::card header-->
                         <div class="card-header">
-                            <a href="#" class="btn text-dark tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
-                        </div> 
+                            @role('Operator Kemahasiswaan')
+                                <a href="#" class="btn text-dark tombol-tambah"><i class="bi bi-plus"></i> Tambah Data</a>
+                            @endrole
+                        </div>
                         <!--end::card header-->
 
                         <!--begin::card body-->

@@ -3,6 +3,7 @@
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     
     <style>
         /* Menambah padding dan border */
@@ -21,20 +22,39 @@
             text-align: center;
             border: 1px solid #f2f2f2; 
         }
-        /* Tambahkan gaya warna untuk status */
-        .status-menunggu,
-        .status-diproses {
-            color: blue;
-            font-weight: bold;
+       /* Gaya untuk Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.5em;
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            color: white; /* Warna teks */
         }
-        .status-lulus,
-        .status-seleksi {
-            color: green;
-            font-weight: bold;
-        } 
-        .status-ditolak {
-            color: red;
-            font-weight: bold;
+
+        /* Warna spesifik untuk setiap status */
+        .badge-menunggu {
+            background-color: #007bff; /* Biru */
+        }
+
+        .badge-diproses {
+            background-color: #17a2b8; /* Cyan */
+        }
+
+        .badge-lulus {
+            background-color: #28a745; /* Hijau */
+        }
+
+        .badge-diterima {
+            background-color: #28a745; /* Hijau */
+        }
+
+        .badge-ditolak {
+            background-color: #dc3545; /* Merah */
         }
     </style>
 @endpush
@@ -132,7 +152,7 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ route('riwayat_usulan.index') }}",
-                    type: 'GET'
+                    type: 'GET' 
                 },
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
@@ -148,22 +168,30 @@
                             // Capitalize the first letter of the status
                             let capitalizedStatus = data.charAt(0).toUpperCase() + data.slice(1);
 
-                            // Assign CSS class based on status
-                            let statusClass = '';
+                            // Assign CSS class and badge content based on status
+                            let badgeClass = '';
+                            let icon = '';
                             if (['menunggu', 'diproses'].includes(data.toLowerCase())) {
-                                statusClass = 'status-menunggu';
+                                badgeClass = 'badge-menunggu';
+                                icon = '<i class="fas fa-hourglass-half"></i>'; // Ikon menunggu/diproses
                             } else if (data.toLowerCase().startsWith('lulus')) {
-                                // Applies to any status starting with "lulus"
-                                statusClass = 'status-lulus';
+                                badgeClass = 'badge-lulus';
+                                icon = '<i class="fas fa-check-circle"></i>'; // Ikon lulus
                             } else if (data.toLowerCase() === 'ditolak') {
-                                statusClass = 'status-ditolak';
+                                badgeClass = 'badge-ditolak';
+                                icon = '<i class="fas fa-times-circle"></i>'; // Ikon ditolak
+                            } else if (data.toLowerCase() === 'diterima') {
+                                badgeClass = 'badge-diterima';
+                                icon = '<i class="fas fa-handshake"></i>'; // Ikon diterima
                             }
 
-                            return `<span class="${statusClass}">${capitalizedStatus}</span>`;
-                        }
+                            return `<span class="badge ${badgeClass}">${icon} ${capitalizedStatus}</span>`;
+                    }
+
                     },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
                 ]
+
             });
         });
     </script> 

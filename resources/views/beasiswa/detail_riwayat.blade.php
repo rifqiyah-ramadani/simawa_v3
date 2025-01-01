@@ -207,7 +207,7 @@
                                 <!-- Header card menampilkan nama beasiswa dan status -->
                                 <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #f6783a;">
                                     <h4 class="fw-bold mb-0">{{ $namaBeasiswa }}</h4>
-                                    <span class="badge-status">Status: {{ $pendaftaran->status }}</span>
+                                    {{-- <span class="badge-status">Status: {{ $pendaftaran->status }}</span> --}}
                                 </div>
     
                                 <!-- card body menampilkan data mahasiswa -->
@@ -219,7 +219,8 @@
                                         <tr><th>NIM</th><td>{{ $pendaftaran->nim }}</td></tr>
                                         <tr><th>Fakultas</th><td>{{ $pendaftaran->fakultas->nama_fakultas }}</td></tr>
                                         <tr><th>Jurusan</th><td>{{ $pendaftaran->jurusan }}</td></tr>
-                                        <tr><th>IPK</th><td>{{ $pendaftaran->IPK }}</td></tr>
+                                        <tr><th>Indeks Prestasi (IP)</th><td>{{ $pendaftaran->IP }}</td></tr>
+                                        <tr><th>Indeks Prestasi Kumulatif (IPK)</th><td>{{ $pendaftaran->IPK }}</td></tr>
                                         <tr><th>Semester</th><td>{{ $pendaftaran->semester }}</td></tr>
                                         <tr><th>Alamat Lengkap</th><td>{{ $pendaftaran->alamat_lengkap }}</td></tr>
                                         <tr><th>Telepon</th><td>{{ $pendaftaran->telepon }}</td></tr>

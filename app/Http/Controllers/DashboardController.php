@@ -86,7 +86,7 @@ class DashboardController extends Controller
         $jumlahTervalidasi = ValidasiPendaftaranMahasiswa::with(['pendaftaran.validasi'])
             ->where('role_id', $role->id)
             ->where('status', 'disetujui') // Hanya data dengan status disetujui
-            ->count();
+            ->count(); 
 
         // Hitung jumlah data penerima dengan status "Sedang Menerima"
         $jumlahPenerima = DataPenerima::where('status_penerima', 'Sedang Menerima')->count();

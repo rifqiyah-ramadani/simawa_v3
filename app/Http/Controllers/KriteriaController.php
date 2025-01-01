@@ -38,7 +38,6 @@ class KriteriaController extends Controller
         return response()->json(['message' => 'Modal kriteria ditampilkan', 'fields' => array_values($filteredColumns)]);
     }
     
-
     /**
      * Store persyaratan
      */

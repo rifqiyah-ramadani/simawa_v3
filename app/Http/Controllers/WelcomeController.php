@@ -28,7 +28,7 @@ class WelcomeController extends Controller
             if ($type === 'berita') {
                 return view('partials.berita-partial', compact('berita'))->render();
             }
-
+ 
             if ($type === 'pengumuman') {
                 return view('partials.pengumuman-partial', compact('pengumuman'))->render();
             }

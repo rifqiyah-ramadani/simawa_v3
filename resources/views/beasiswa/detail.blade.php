@@ -248,7 +248,8 @@
                                         <tr><th>NIM</th><td>{{ $pendaftaran->pendaftaran->nim }}</td></tr>
                                         <tr><th>Fakultas</th><td>{{ $namaFakultas }}</td></tr>
                                         <tr><th>Jurusan</th><td>{{ $pendaftaran->pendaftaran->jurusan }}</td></tr>
-                                        <tr><th>IPK</th><td>{{ $pendaftaran->pendaftaran->IPK }}</td></tr>
+                                        <tr><th>Indeks Prestasi (IP)</th><td>{{ $pendaftaran->pendaftaran->IP }}</td></tr>
+                                        <tr><th>Indeks Prestasi Kumulatif (IPK)</th><td>{{ $pendaftaran->pendaftaran->IPK }}</td></tr>
                                         <tr><th>Semester</th><td>{{ $pendaftaran->pendaftaran->semester }}</td></tr>
                                         <tr><th>Alamat Lengkap</th><td>{{ $pendaftaran->pendaftaran->alamat_lengkap }}</td></tr>
                                         <tr><th>Telepon</th><td>{{ $pendaftaran->pendaftaran->telepon }}</td></tr>
@@ -412,140 +413,139 @@
                                 </div>
                             @endif
                                 <div class="card shadow-sm rounded mb-4">
-                                    <div class="card-header text-white" style="background-color: #4a90e2;">
-                                        <h4 class="fw-bold mb-0"><i class="fa fa-calendar-check"></i> Jadwal Wawancara</h4>
-                                    </div>
+                                    <div class="card-body">
+                                        @if($interview)
+                                            <!-- Tampilkan informasi jadwal wawancara jika sudah disimpan -->
+                                            <div class="alert alert-info mb-4">
+                                                <strong>Info Jadwal:</strong> Mahasiswa telah diinformasikan jadwal wawancara berikut.
+                                            </div>
+                                            <p><strong>Tanggal Wawancara:</strong> {{ $interview->tanggal_mulai }} {{ $interview->tanggal_akhir ? 's/d ' . $interview->tanggal_akhir : '' }}</p>
+                                            <p><strong>Jam Wawancara:</strong> {{ $interview->jam_wawancara }}</p>
+                                            <p><strong>Lokasi:</strong> {{ $interview->lokasi }}</p>
+                                            <p><strong>Nama Pewawancara:</strong> {{ implode(', ', $interview->pewawancara_names) }}</p>
 
-                                <div class="card-body">
-                                    @if($interview)
-                                        <!-- Tampilkan informasi jadwal wawancara jika sudah disimpan -->
-                                        <div class="alert alert-info mb-4">
-                                            <strong>Info Jadwal:</strong> Mahasiswa telah diinformasikan jadwal wawancara berikut.
-                                        </div>
-                                        <p><strong>Tanggal Wawancara:</strong> {{ $interview->tanggal_mulai }} {{ $interview->tanggal_akhir ? 's/d ' . $interview->tanggal_akhir : '' }}</p>
-                                        <p><strong>Jam Wawancara:</strong> {{ $interview->jam_wawancara }}</p>
-                                        <p><strong>Lokasi:</strong> {{ $interview->lokasi }}</p>
-                                        <p><strong>Nama Pewawancara:</strong> {{ implode(', ', $interview->pewawancara_names) }}</p>
+                                            <!-- Tombol Validasi Seleksi Wawancara -->
+                                            <div class="d-flex justify-content-center mt-4">
+                                                <button class="btn btn-success me-2"
+                                                        onclick="validate('setuju', {{ $pendaftaran->pendaftaran->id }})"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
+                                                            disabled
+                                                        @endif>
+                                                    <i class="fa fa-check-circle"></i> Setujui Usulan
+                                                </button>
 
-                                        <!-- Tombol Validasi Seleksi Wawancara -->
-                                        <div class="d-flex justify-content-center mt-4">
-                                            <button class="btn btn-success me-2"
-                                                    onclick="validate('setuju', {{ $pendaftaran->pendaftaran->id }})"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
-                                                        disabled
-                                                    @endif>
-                                                <i class="fa fa-check-circle"></i> Setujui Usulan
-                                            </button>
-
-                                            <!-- Tombol Tolak Pendaftaran -->
-                                            <button class="btn btn-danger"
-                                                    onclick="validate('tolak', {{ $pendaftaran->pendaftaran->id }})"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
-                                                        disabled
-                                                    @endif>
-                                                <i class="fa fa-times-circle"></i> Tolak Usulan
-                                            </button>
-                                        </div>
-                                    @else
-                                        <!-- Alert jika status pendaftaran adalah "ditolak" -->
-                                        @if ($pendaftaran->status === 'ditolak')
-                                            <div class="alert alert-danger text-center mb-4">
-                                                <strong>Validasi selanjutnya tidak dapat dilakukan</strong> karena mahasiswa sudah dinyatakan <strong>{{ ucfirst($pendaftaran->status) }}</strong>.
+                                                <!-- Tombol Tolak Pendaftaran -->
+                                                <button class="btn btn-danger"
+                                                        onclick="validate('tolak', {{ $pendaftaran->pendaftaran->id }})"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
+                                                            disabled
+                                                        @endif>
+                                                    <i class="fa fa-times-circle"></i> Tolak Usulan
+                                                </button>
                                             </div>
                                         @else
-                                            <!-- Tampilkan konten jika status bukan "ditolak" -->
-                                            <div class="card shadow-sm rounded mb-4">
-                                                <div class="card-header text-white" style="background-color: #4a90e2;">
-                                                    <h4 class="fw-bold mb-0"><i class="fa fa-calendar-check"></i> Jadwal Wawancara</h4>
+                                            <!-- Alert jika status pendaftaran adalah "ditolak" -->
+                                            @if ($pendaftaran->status === 'ditolak')
+                                                <div class="alert alert-danger text-center mb-4">
+                                                    <strong>Validasi selanjutnya tidak dapat dilakukan</strong> karena mahasiswa sudah dinyatakan <strong>{{ ucfirst($pendaftaran->status) }}</strong>.
                                                 </div>
+                                            @else
+                                                <!-- Tampilkan konten jika status bukan "ditolak" -->
+                                                <div class="card shadow-sm rounded mb-4">
+                                                    <div class="card-header text-white" style="background-color: #4a90e2;">
+                                                        <h4 class="fw-bold mb-0"><i class="fa fa-calendar-check"></i> Jadwal Wawancara</h4>
+                                                    </div>
 
-                                                <div class="card-body">
-                                                    @if($interview)
-                                                        <!-- Informasi jadwal wawancara jika sudah disimpan -->
-                                                        <div class="alert alert-info mb-4">
-                                                            <strong>Info Jadwal:</strong> Mahasiswa telah diinformasikan jadwal wawancara berikut.
-                                                        </div>
-                                                        <p><strong>Tanggal Wawancara:</strong> {{ $interview->tanggal_mulai }} {{ $interview->tanggal_akhir ? 's/d ' . $interview->tanggal_akhir : '' }}</p>
-                                                        <p><strong>Jam Wawancara:</strong> {{ $interview->jam_wawancara }}</p>
-                                                        <p><strong>Lokasi:</strong> {{ $interview->lokasi }}</p>
-                                                        <p><strong>Nama Pewawancara:</strong> {{ implode(', ', $interview->pewawancara_names) }}</p>
+                                                    <div class="card-body">
+                                                        @if($interview)
+                                                            <!-- Informasi jadwal wawancara jika sudah disimpan -->
+                                                            <div class="alert alert-info mb-4">
+                                                                <strong>Info Jadwal:</strong> Mahasiswa telah diinformasikan jadwal wawancara berikut.
+                                                            </div>
+                                                            <p><strong>Tanggal Wawancara:</strong> {{ $interview->tanggal_mulai }} {{ $interview->tanggal_akhir ? 's/d ' . $interview->tanggal_akhir : '' }}</p>
+                                                            <p><strong>Jam Wawancara:</strong> {{ $interview->jam_wawancara }}</p>
+                                                            <p><strong>Lokasi:</strong> {{ $interview->lokasi }}</p>
+                                                            <p><strong>Nama Pewawancara:</strong> {{ implode(', ', $interview->pewawancara_names) }}</p>
 
-                                                        <!-- Tombol Validasi Seleksi Wawancara -->
-                                                        <div class="d-flex justify-content-center mt-4">
-                                                            <button class="btn btn-success me-2"
-                                                                    onclick="validate('setuju', {{ $pendaftaran->pendaftaran->id }})"
-                                                                    data-bs-toggle="tooltip"
-                                                                    data-bs-placement="top"
-                                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
-                                                                        disabled
-                                                                    @endif>
-                                                                <i class="fa fa-check-circle"></i> Setujui Usulan
-                                                            </button>
-                
-                                                            <!-- Tombol Tolak Pendaftaran -->
-                                                            <button class="btn btn-danger"
-                                                                    onclick="validate('tolak', {{ $pendaftaran->pendaftaran->id }})"
-                                                                    data-bs-toggle="tooltip"
-                                                                    data-bs-placement="top"
-                                                                    @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
-                                                                        disabled
-                                                                    @endif>
-                                                                <i class="fa fa-times-circle"></i> Tolak Usulan
-                                                            </button>
-                                                        </div>
-                                                    @else
-                                                        <!-- Form input jadwal wawancara jika belum diisi -->
-                                                        <div class="alert alert-warning mb-4">
-                                                            <strong>Penting:</strong> Anda perlu mengisi jadwal wawancara sebelum melakukan validasi.
-                                                        </div>
-                                                        <form action="{{ route('beasiswa.storeInterview', $pendaftaran->pendaftaran->id) }}" method="POST">
-                                                            @csrf
-                                                            <input type="hidden" name="pendaftaran_id" value="{{ $pendaftaran->pendaftaran->id }}">
-                                                            
-                                                            <!-- Input Tanggal Mulai dan Akhir Wawancara -->
-                                                            <div class="mb-3">
-                                                                <label for="tanggal_mulai" class="form-label">Tanggal Mulai Wawancara</label>
-                                                                <input type="date" class="form-control" id="tanggal_mulai" name="tanggal_mulai" required>
+                                                            <!-- Tombol Validasi Seleksi Wawancara -->
+                                                            <div class="d-flex justify-content-center mt-4">
+                                                                <button class="btn btn-success me-2"
+                                                                        onclick="validate('setuju', {{ $pendaftaran->pendaftaran->id }})"
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
+                                                                            disabled
+                                                                        @endif>
+                                                                    <i class="fa fa-check-circle"></i> Setujui Usulan
+                                                                </button>
+                    
+                                                                <!-- Tombol Tolak Pendaftaran -->
+                                                                <button class="btn btn-danger"
+                                                                        onclick="validate('tolak', {{ $pendaftaran->pendaftaran->id }})"
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        @if (!$isSeleksiWawancaraActive || in_array($pendaftaran->status, [ 'ditolak']))
+                                                                            disabled
+                                                                        @endif>
+                                                                    <i class="fa fa-times-circle"></i> Tolak Usulan
+                                                                </button>
                                                             </div>
-                                                            <div class="mb-3">
-                                                                <label for="tanggal_akhir" class="form-label">Tanggal Akhir Wawancara (opsional)</label>
-                                                                <input type="date" class="form-control" id="tanggal_akhir" name="tanggal_akhir">
+                                                        @else
+                                                            <!-- Form input jadwal wawancara jika belum diisi -->
+                                                            <div class="alert alert-warning mb-4">
+                                                                <strong>Penting:</strong> Anda perlu mengisi jadwal wawancara sebelum melakukan validasi.
                                                             </div>
+                                                            <form action="{{ route('beasiswa.storeInterview', $pendaftaran->pendaftaran->id) }}" method="POST">
+                                                                @csrf
+                                                                <input type="hidden" name="pendaftaran_id" value="{{ $pendaftaran->pendaftaran->id }}">
+                                                                
+                                                                <!-- Input Tanggal Mulai dan Akhir Wawancara -->
+                                                                <div class="mb-3">
+                                                                    <label for="tanggal_mulai" class="form-label">Tanggal Mulai Wawancara</label>
+                                                                    <input type="date" class="form-control" id="tanggal_mulai" name="tanggal_mulai" required>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="tanggal_akhir" class="form-label">Tanggal Akhir Wawancara (opsional)</label>
+                                                                    <input type="date" class="form-control" id="tanggal_akhir" name="tanggal_akhir">
+                                                                </div>
 
-                                                            <!-- Input Jam Wawancara dan Lokasi -->
-                                                            <div class="mb-3">
-                                                                <label for="jam_wawancara" class="form-label">Jam Wawancara</label>
-                                                                <input type="time" class="form-control" id="jam_wawancara" name="jam_wawancara" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="lokasi" class="form-label">Lokasi Wawancara</label>
-                                                                <input type="text" class="form-control" id="lokasi" name="lokasi" required>
-                                                            </div>
+                                                                <!-- Input Jam Wawancara dan Lokasi -->
+                                                                <div class="mb-3">
+                                                                    <label for="jam_wawancara" class="form-label">Jam Wawancara</label>
+                                                                    <input type="time" class="form-control" id="jam_wawancara" name="jam_wawancara" required>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label for="lokasi" class="form-label">Lokasi Wawancara</label>
+                                                                    <input type="text" class="form-control" id="lokasi" name="lokasi" required>
+                                                                </div>
 
-                                                            <!-- Pewawancara Selection -->
-                                                            <div class="mb-3">
-                                                                <label for="pewawancara_ids" class="form-label">Nama Pewawancara</label>
-                                                                <select class="form-select" id="pewawancara_ids" name="pewawancara_ids[]" multiple required>
-                                                                    @foreach ($users as $user)
-                                                                        @if ($user->role != 'mahasiswa')
-                                                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                                                        @endif
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
+                                                                <!-- Pewawancara Selection -->
+                                                                <div class="mb-3">
+                                                                    <label for="pewawancara_ids" class="form-label">Nama Pewawancara</label>
+                                                                    <select class="form-select" id="pewawancara_ids" name="pewawancara_ids[]" multiple required>
+                                                                        <!-- Tambahkan option untuk Penyelenggara Beasiswa -->
+                                                                        <option value="penyelenggara_beasiswa">Penyelenggara Beasiswa</option>
 
-                                                            <button type="submit" class="btn btn-primary">Simpan Jadwal Wawancara</button>
-                                                        </form>
-                                                    @endif
+                                                                        @foreach ($users as $user)
+                                                                            @if ($user->role != 'mahasiswa')
+                                                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+
+                                                                <button type="submit" class="btn btn-primary">Simpan Jadwal Wawancara</button>
+                                                            </form>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endif
                                         @endif
-                                    @endif
-                                </div>
+                                    </div>
                             </div>
                         @elseif (strtolower($tahapan['nama_tahapan']) === 'pengumuman akhir' || strtolower($tahapan['nama_tahapan']) === 'pengumuman seleksi wawancara')
                             <!-- Konten Pengumuman Seleksi Administrasi -->

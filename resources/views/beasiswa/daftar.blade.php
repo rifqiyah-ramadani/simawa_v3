@@ -22,7 +22,7 @@
             <!--begin::Row-->
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Beasiswaaaaa - Pendaftaran Beasiswa</h3>
+                    <h3 class="mb-0">Beasiswa - Pendaftaran Beasiswa</h3>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-end">
@@ -105,13 +105,13 @@
                                         <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap
                                             <span style="color: red;">*</span>
                                         </label>
-                                        <input type="text" class="form-control" id="nama_lengkap" placeholder="Enter Nama Lengkap" name="nama_lengkap" required>
+                                        <input type="text" class="form-control" id="nama_lengkap" placeholder="Masukkan Nama Lengkap" name="nama_lengkap" required>
                                     </div>
                                     <div class="col mb-3">
                                         <label for="nim" class="form-label fw-bold">NIM
                                             <span style="color: red;">*</span>
                                         </label>
-                                        <input type="text" class="form-control" id="nim" placeholder="Enter NIM" name="nim" required>
+                                        <input type="text" class="form-control" id="nim" placeholder="Masukkan NIM" name="nim" required>
                                     </div>
                                 </div>
 
@@ -129,20 +129,52 @@
                                         </select>
                                     </div>
                                     <div class="col mb-3">
-                                        <label for="jurusan" class="form-label fw-bold">Jurusan:
+                                        <label for="jurusan" class="form-label fw-bold">Program Studi:
                                             <span style="color: red;">*</span>
                                         </label>
                                         <select class="form-control" id="jurusan" name="jurusan" required>
-                                            <option value="" disabled selected>--Pilih Jurusan--</option>
+                                            <option value="" disabled selected>--Pilih Program Studi--</option>
+                                            <option value="DIII akuntansi">DIII akuntansi</option>
+                                            <option value="Ekonomi Islam">Ekonomi Islam</option>
+                                            <option value="Ekonomi Pembangunan">Ekonomi Pembangunan</option>
+                                            <option value="Keuangan Daerah">Keuangan Daerah</option>
+                                            <option value="Manajemen">Manajemen</option>
+                                            <option value="Manajemen Pemasaran">Manajemen Pemasaran</option>
+                                            <option value="Perpajakan">Perpajakan</option>
+                                            <option value="S1 Akuntansi">S1 Akuntansi</option>
+                                            <option value="Ilmu Hukum">Ilmu Hukum</option>
+                                            <option value="Arkeologi">Arkeologi</option>
+                                            <option value="Bahasa Arab">Bahasa Arab</option>
+                                            <option value="Ilmu Sejarah">Ilmu Sejarah</option>
+                                            <option value="Seni Drama Tari dan Musik">Seni Drama Tari dan Musik</option>
+                                            <option value="Ilmu Pemerintahan">Ilmu Pemerintahan</option>
+                                            <option value="Ilmu Politik">Ilmu Politik</option>
+                                            <option value="Manajemen Pemerintahan">Manajemen Pemerintahan</option>
+                                            <option value="Farmasi">Farmasi</option>
+                                            <option value="Ilmu Keperawatan">Ilmu Keperawatan</option>
+                                            <option value="Ilmu Kesehatan Masyarakat">Ilmu Kesehatan Masyarakat</option>
+                                            <option value="Kedokteran">Kedokteran</option>
+                                            <option value="Psikologi">Psikologi</option>
                                             <option value="Administrasi Pendidikan">Administrasi Pendidikan</option>
-                                            <option value="Pendidikan Pancasila dan Kewarganegaraan">Pendidikan Pancasila dan Kewarganegaraan</option>
-                                            <option value="Pendidikan Matematika">Pendidikan Matematika</option>
-                                            <option value="Pendidikan Guru Sekolah Dasar">Pendidikan Guru Sekolah Dasar</option>
-                                            <option value="Pendidikan Sejarah">Pendidikan Sejarah</option>
+                                            <option value="Bimbingan dan Konseling">Bimbingan dan Konseling</option>
+                                            <option value="Kepelatihan Olahraga">Kepelatihan Olahraga</option>
+                                            <option value="PG-PAUD">PG-PAUD</option>
+                                            <option value="PGSD">PGSD</option>
                                             <option value="Pendidikan Bahasa Inggris">Pendidikan Bahasa Inggris</option>
-                                            <option value="Pendidikan Kimia">Pendidikan Kimia</option>
+                                            <option value="Pendidikan Bahasa dan Sastra Indo">Pendidikan Bahasa dan Sastra Indo</option>
+                                            <option value="Pendidikan Biologi">Pendidikan Biologi</option>
+                                            <option value="Pendidikan Ekonomi">Pendidikan Ekonomi</option>
                                             <option value="Pendidikan Fisika">Pendidikan Fisika</option>
-                                            <option value="Pendidikan Guru PAUD">Pendidikan Guru PAUD</option>
+                                            <option value="Pendidikan Kimia">Pendidikan Kimia</option>
+                                            <option value="Pendidikan Matematika">Pendidikan Matematika</option>
+                                            <option value="Pendidikan Olahraga dan Kesehatan">Pendidikan Olahraga dan Kesehatan</option>
+                                            <option value="Pendidikan PPKN">Pendidikan PPKN</option>
+                                            <option value="Pendidikan Sejarah">Pendidikan Sejarah</option>
+                                            <option value="Sastra Indonesia">Sastra Indonesia</option>
+                                            <option value="Kehutanan">Kehutanan</option>
+                                            <option value="Agribisnis">Agribisnis</option>
+                                            <option value="Agrobisnis">Agrobisnis</option>
+                                            <option value="Agroekoteknologi">Agroekoteknologi</option>
                                             <option value="Sistem Informasi">Sistem Informasi</option>
                                             <option value="Kimia">Kimia</option>
                                             <option value="Farmasi">Farmasi</option>
@@ -158,13 +190,8 @@
                                             <option value="Teknik Geofisika">Teknik Geofisika</option>
                                             <option value="Teknik Lingkungan">Teknik Lingkungan</option>
                                             <option value="Teknik Elektro">Teknik Elektro</option>
-                                            <option value="Kehutanan">Kehutanan</option>
                                             <option value="Peternakan">Peternakan</option>
                                             <option value="Perikanan">Perikanan</option>
-                                            <option value="Peandidikan Olahraga">Pendidikan Olahraga</option>
-                                            <option value="Sejarah">Sejarah</option>
-                                            <option value="Ilmu Ekonomi">Ilmu Ekonomi</option>
-                                            <option value="Akuntansi">Akuntansi</option>
                                         </select>
                                     </div>
                                 </div>
@@ -185,14 +212,22 @@
                                             <option value="6">Semester 6</option>
                                             <option value="7">Semester 7</option>
                                             <option value="8">Semester 8</option>
+                                            <option value="9">Semester 9</option>
                                         </select>
+                                    </div>
+
+                                    <div class="col mb-3">
+                                        <label for="IP" class="form-label fw-bold">Indeks Prestasi (IP) saat ini
+                                            <span style="color: red;">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="IP" placeholder="Masukkan IP Saat Ini" name="IP" required>
                                     </div>
                         
                                     <div class="col mb-3">
                                         <label for="IPK" class="form-label fw-bold">IPK Semester Terakhir
                                             <span style="color: red;">*</span>
                                         </label>
-                                        <input type="text" class="form-control" id="IPK" placeholder="Enter IPK Terakhir" name="IPK" required>
+                                        <input type="text" class="form-control" id="IPK" placeholder="Masukkan IPK Terakhir" name="IPK" required>
                                     </div>
                                 </div>
 
@@ -202,24 +237,24 @@
                                         <label for="alamat_lengkap" class="form-label fw-bold">Alamat Lengkap (Sesuai KTP)
                                             <span style="color: red;">*</span>
                                         </label>
-                                        <input type="text" class="form-control" id="alamat_lengkap" placeholder="Enter Alamat Lengkap" name="alamat_lengkap" required>
+                                        <input type="text" class="form-control" id="alamat_lengkap" placeholder="Masukkan Alamat Lengkap" name="alamat_lengkap" required>
                                     </div>
                                     <div class="col mb-3">
                                         <label for="telepon" class="form-label fw-bold">No. Telepon
                                             <span style="color: red;">*</span>
                                         </label>
-                                        <input type="text" class="form-control" id="telepon" placeholder="Enter Telepon" name="telepon" required>
+                                        <input type="text" class="form-control" id="telepon" placeholder="Masukkan Telepon" name="telepon" required>
                                     </div>
                                 </div>
                                 
                                 <div class="row">
                                     <div class="col mb-3">
                                         <label for="biaya_hidup" class="form-label fw-bold">Biaya Hidup</label>
-                                        <input type="number" step="0.01" name="biaya_hidup" id="biaya_hidup" class="form-control">
+                                        <input type="number" step="0.01" name="biaya_hidup" id="biaya_hidup" class="form-control" placeholder="Contoh 1250000">
                                     </div>
                                     <div class="col mb-3">
                                         <label for="biaya_ukt" class="form-label fw-bold">Biaya UKT</label>
-                                        <input type="number" step="0.01" name="biaya_ukt" id="biaya_ukt" class="form-control">
+                                        <input type="number" step="0.01" name="biaya_ukt" id="biaya_ukt" class="form-control" placeholder="Contoh 1250000">
                                     </div> 
                                 </div>
 

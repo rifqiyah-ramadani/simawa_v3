@@ -188,19 +188,22 @@ class PendaftaranBeasiswaController extends Controller
      */
     private function validasiPersyaratan($persyaratan, $detailUser)
     {
-        $result = [];
+        $result = []; // Array untuk menyimpan hasil validasi
 
         foreach ($persyaratan as $syarat) {
-            $kriteria = $syarat->kriteria;
+            $kriteria = $syarat->kriteria; // Ambil kriteria dari persyaratan
+            
+            // Jika kriteria tidak ditemukan, tambahkan pesan error dan lanjutkan ke iterasi berikutnya
             if (!$kriteria) {
                 $result[] = [
                     'nama' => $syarat->nama_persyaratan,
                     'status' => false,
                     'message' => "Kriteria '{$syarat->nama_persyaratan}' tidak ditemukan atau tidak terhubung dengan field yang valid.",
                 ];
-                continue;
+                continue; // Lanjutkan ke persyaratan berikutnya
             }
 
+            // Ambil nilai user sesuai dengan key_detail_user dari kriteria
             $userValue = $detailUser->{$kriteria->key_detail_user} ?? null; // Ambil nilai user sesuai key_detail_user
             $operator = $syarat->operator;
             $value = $syarat->value ? json_decode($syarat->value, true) : null;    
@@ -214,7 +217,7 @@ class PendaftaranBeasiswaController extends Controller
 
             $isValid = false;
 
-            // Validasi berdasarkan tipe input
+             // Validasi berdasarkan tipe input (dropdown, number, text)
             switch ($kriteria->tipe_input) {
                 case 'dropdown':
                     if (is_array($value)) {
@@ -222,12 +225,12 @@ class PendaftaranBeasiswaController extends Controller
                 
                         // Jika input mengandung 'Semester', ubah ke numerik untuk perbandingan
                         if (Str::contains(strtolower($userValue), 'semester')) {
-                            $userNumericValue = $this->extractNumericValue($userValue);
+                            $userNumericValue = $this->extractNumericValue($userValue); // Ambi angka dari userValue
                             $valueNumeric = $this->extractNumericValue($value[0]); // Ambil angka dari value pertama
                 
                             Log::info("Extracted Semester Values: userNumericValue = {$userNumericValue}, valueNumeric = {$valueNumeric}");
                 
-                            // Lakukan perbandingan numerik
+                            // Lakukan perbandingan jika kedua nilai numerik
                             if (is_numeric($userNumericValue) && is_numeric($valueNumeric)) {
                                 $isValid = $this->compareNumeric($userNumericValue, $operator, $valueNumeric);
                             } else {
@@ -272,25 +275,6 @@ class PendaftaranBeasiswaController extends Controller
     /**
      * Fungsi untuk membandingkan nilai berdasarkan operator.
      */
-    // private function compareValues($userValue, $operator, $value)
-    // {
-    //     switch ($operator) {
-    //         case '>=':
-    //             return $userValue >= $value;
-    //         case '<=':
-    //             return $userValue <= $value;
-    //         case '=':
-    //             return $userValue == $value;
-    //         case '>':
-    //             return $userValue > $value;
-    //         case '<':
-    //             return $userValue < $value;
-    //         case '!=':
-    //             return $userValue != $value;
-    //         default:
-    //             return false;
-    //     }
-    // }
     private function compareValues($userValue, $operator, $value)
     {
         Log::info("Original Input: userValue = $userValue, value = $value, operator = $operator");
@@ -379,9 +363,8 @@ class PendaftaranBeasiswaController extends Controller
         }
     }
     
-
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource. 
      */
     public function store(Request $request, $buatPendaftaranId)
     {
@@ -392,6 +375,7 @@ class PendaftaranBeasiswaController extends Controller
             'fakultas_id' => 'required|exists:fakultas,id',
             'jurusan' => 'required|string|max:255',
             'IPK' => 'required|numeric|between:0,4.00',
+            'IP' => 'required|numeric|between:0,4.00',
             'semester' => 'required|string|max:255',
             'alamat_lengkap' => 'required|string',
             'telepon' => 'required|string|max:20',
@@ -455,6 +439,7 @@ class PendaftaranBeasiswaController extends Controller
                 'alamat_lengkap' => $request->alamat_lengkap,
                 'telepon' => $request->telepon,
                 'IPK' => $request->IPK,
+                'IP' => $request->IP,
                 'semester' => $request->semester,
                 'biaya_hidup' => $request->biaya_hidup,
                 'biaya_ukt' => $request->biaya_ukt,
@@ -493,15 +478,6 @@ class PendaftaranBeasiswaController extends Controller
         /// Ambil template validasi berdasarkan buat_pendaftaran_id
         $templateValidasi = ValidasiPendaftaranBeasiswa::where('buat_pendaftaran_id', $buatPendaftaranId)->get();
 
-        // // Buat validasi untuk mahasiswa berdasarkan template
-        // foreach ($templateValidasi as $validasi) {
-        //     ValidasiPendaftaranMahasiswa::create([
-        //         'pendaftaran_id' => $pendaftaran->id,
-        //         'role_id' => $validasi->role_id,
-        //         'urutan' => $validasi->urutan,
-        //         'status' => 'menunggu',  // Status awal validasi
-        //     ]);
-        // }
          // Tambahkan validasi berdasarkan template
         foreach ($templateValidasi as $validasi) {
             // Jika role adalah "Operator Fakultas", cocokkan fakultas mahasiswa

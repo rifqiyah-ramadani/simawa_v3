@@ -223,6 +223,7 @@ class ValidasiController extends Controller
     */
     public function lanjutkanValidasi(Request $request)
     {
+        // Validasi request untuk memastikan input action dan pendaftaranId sesuai aturan
         $request->validate([
             'action' => 'required|in:setuju,tolak',
             'pendaftaranId' => 'required|exists:pendaftaran_beasiswas,id',
@@ -231,13 +232,16 @@ class ValidasiController extends Controller
         $action = $request->action;
         $pendaftaranId = $request->pendaftaranId;
 
+        // Pengun login
         $user = auth()->user();
         $roleId = $user->roles->first()?->id;
 
+        // jik pengguna tidak punya role, berikan error
         if (!$roleId) {
             return response()->json(['message' => 'Role user tidak ditemukan.'], 422);
         }
 
+        // Cari validasi pendaftaran yang sedang dalam status 'diproses', 'menunggu', atau 'disetujui'
         $currentValidasi = ValidasiPendaftaranMahasiswa::where('pendaftaran_id', $pendaftaranId)
             ->where('role_id', $roleId)
             ->whereIn('status', ['diproses', 'menunggu', 'disetujui'])
@@ -247,14 +251,15 @@ class ValidasiController extends Controller
             return response()->json(['message' => 'Validasi tidak ditemukan.'], 404);
         }
 
-         // Ambil pendaftaran terlebih dahulu
+         // Ambil pendaftaran yang sedang divalidasi (termasuk relasi fakultas)
         $pendaftaran = PendaftaranBeasiswa::with('fakultas')->findOrFail($pendaftaranId);
 
-        // Validasi role Operator Fakultas
+        // Validasi untuk pengguna dengan role 'Operator Fakultas'
         if ($user->roles->first()->name === 'Operator Fakultas') {
             Log::info('Fakultas ID dari pendaftaran:', ['fakultas_id' => $pendaftaran->fakultas_id]);
             Log::info('Fakultas ID dari user:', ['user_fakultas_id' => $user->fakultas_id]);
 
+            // Pastikan operator hanya bisa memvalidasi data fakultas mereka sendiri
             if ($pendaftaran->fakultas_id != $user->fakultas_id) {
                 return response()->json(['message' => 'Anda tidak berhak memvalidasi data dari fakultas lain.'], 403);
             }
@@ -263,9 +268,11 @@ class ValidasiController extends Controller
         $pendaftaran = PendaftaranBeasiswa::find($pendaftaranId);
         // $tahapans = $pendaftaran->buatPendaftaranBeasiswa->tahapan()->orderBy('pivot_tanggal_mulai')->get();
 
+        // Ambil tahapan seleksi dari pendaftaran beasiswa
         $tahapans = $pendaftaran->buatPendaftaranBeasiswa->tahapan()
         ->orderBy('pivot_tanggal_mulai')->get()
         ->filter(function ($tahapan) {
+            // Hanya ambil tahapan yang dimulai dengan kata 'seleksi'
             return Str::startsWith(strtolower($tahapan->nama_tahapan), 'seleksi');
         });
         
@@ -276,6 +283,7 @@ class ValidasiController extends Controller
             return response()->json(['message' => 'Tidak ada tahapan yang relevan ditemukan.'], 404);
         }
 
+        // Cari tahapan seleksi yang sedang berlangsung
         $currentTahapan = $tahapans->first(function ($tahapan) {
             return Carbon::parse($tahapan->pivot->tanggal_mulai) <= now() &&
                    Carbon::parse($tahapan->pivot->tanggal_akhir)->endOfDay() >= now();
@@ -289,7 +297,7 @@ class ValidasiController extends Controller
             return response()->json(['message' => 'Tahapan saat ini tidak ditemukan.'], 404);
         }
 
-        // Tentukan tahapan berikutnya berdasarkan urutan
+        // Cari tahapan berikutnya setelah tahapan saat ini
         $nextTahapan = $tahapans->first(function ($tahapan) use ($currentTahapan) {
             return $tahapan->pivot->tanggal_mulai > $currentTahapan->pivot->tanggal_mulai;
         });
@@ -306,44 +314,57 @@ class ValidasiController extends Controller
             return response()->json(['message' => 'Validasi telah ditolak dan tidak dilanjutkan.']);
         }
 
+        // Jika setuju
         if ($action === 'setuju') {
+            // Update status validasi saat ini menjadi 'disetujui'
             $currentValidasi->update(['status' => 'disetujui']);
 
+             // Cari validasi berikutnya yang memiliki urutan lebih besar
             $nextValidasi = ValidasiPendaftaranMahasiswa::where('pendaftaran_id', $pendaftaranId)
                 ->where('urutan', '>', $currentValidasi->urutan)
                 ->orderBy('urutan')
                 ->first();
 
+            // Hitung total role yang terlibat dalam validasi pendaftaran ini
             $totalRoles = ValidasiPendaftaranMahasiswa::where('pendaftaran_id', $pendaftaranId)
                 ->distinct('role_id')
                 ->count('role_id');
 
+            // Jika hanya ada satu role
             if ($totalRoles === 1) {
                 // Periksa apakah ini tahapan terakhir
                 if (!$nextTahapan || !Str::startsWith(strtolower($nextTahapan->nama_tahapan), 'seleksi')) {
+                    // Update status pendaftaran menjadi 'diterima'
                     $pendaftaran->update(['status' => 'diterima']);
                     return response()->json(['message' => 'Validasi disetujui, status pendaftaran diterima.']);
                 
                 } else {
+                    // Update status pendaftaran dengan nama tahapan saat ini
                     $pendaftaran->update(['status' => "lulus {$currentTahapan->nama_tahapan}"]);
                     return response()->json(['message' => "Validasi disetujui, status pendaftaran menjadi lulus {$currentTahapan->nama_tahapan}."]);
                 }
             } else {
+                // Jika terdapat lebih dari satu role yang terlibat
                 if ($nextTahapan) {
                     if ($nextValidasi) {
+                         // Lanjutkan ke validasi berikutnya
                         $nextValidasi->update(['status' => 'diproses']);
                         $pendaftaran->update(['status' => 'diproses']);
                         return response()->json(['message' => "Validasi disetujui oleh role ini, dilanjutkan ke role berikutnya"]);
                     } else {
+                        // Semua role telah menyelesaikan validasi untuk tahapan ini
                         $pendaftaran->update(['status' => "lulus {$currentTahapan->nama_tahapan}"]);
                         return response()->json(['message' => "Validasi disetujui oleh semua role, status menjadi lulus {$currentTahapan->nama_tahapan}."]);
                     }
                 } else {
+                    // Jika tidak ada tahapan berikutnya
                     if ($nextValidasi) {
+                        // Lanjutkan ke validasi berikutnya
                         $nextValidasi->update(['status' => 'diproses']);
                         $pendaftaran->update(['status' => 'diproses']);
                         return response()->json(['message' => 'Validasi disetujui oleh role ini, dilanjutkan ke role berikutnya. Status: diproses.']);
                     } else {
+                        // Semua role telah menyelesaikan validasi, pendaftaran diterima
                         $pendaftaran->update(['status' => 'diterima']);
                         return response()->json(['message' => 'Validasi disetujui oleh semua role, status pendaftaran diterima.']);
                     }
